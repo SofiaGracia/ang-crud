@@ -1,0 +1,12 @@
+<div class="card bg-base-100 w-96 shadow-sm" [routerLink]="['/projects', project().id]">
+    <figure>
+        <img
+            src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
+            alt="Shoes"
+        />
+    </figure>
+    <div class="card-body">
+        <h2 class="card-title">{{ project().name }}</h2>
+        <p>{{ project().description }}</p>
+    </div>
+</div>

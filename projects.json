@@ -1,0 +1,20 @@
+{
+    "projects": [
+        {
+            "id": 1,
+            "name": "Dashboard analytics",
+            "tools": ["v0"],
+            "url": "https://v0.dev/example",
+            "projectId": 1,
+            "description": "Prototip inicial del dashboard"
+        },
+        {
+            "id": 2,
+            "name": "User onboarding",
+            "tools": ["Lovable"],
+            "url": "https://lovable.dev/example",
+            "projectId": 2,
+            "description": "Flux d'onboarding"
+        }
+    ]
+}

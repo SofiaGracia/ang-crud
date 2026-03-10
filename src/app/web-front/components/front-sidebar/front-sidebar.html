@@ -1,0 +1,21 @@
+<div class="sidebar" [class.collapsed]="collapsed">
+    <button type="button" (click)="toggle()">
+        <fa-icon [class.hidden]="collapsed" [icon]="faBars"></fa-icon>
+        <fa-icon [class.hidden]="!collapsed" [icon]="faTimes"></fa-icon>
+    </button>
+    <ul>
+        @for (option of sidebarOptions; track option) {
+            <li class="flex items-center gap-2" [routerLink]="option.route">
+                <fa-icon [icon]="option.icon" class="text-slate-200"></fa-icon>
+
+                <span
+                    class="inline-block overflow-hidden whitespace-nowrap transition-all duration-300"
+                    [style.width.px]="collapsed ? 0 : 80"
+                    [style.opacity]="collapsed ? 0 : 1"
+                >
+                    {{ option.title }}
+                </span>
+            </li>
+        }
+    </ul>
+</div>

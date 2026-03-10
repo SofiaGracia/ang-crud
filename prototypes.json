@@ -1,0 +1,22 @@
+[
+    {
+        "id": 1,
+        "name": "Dashboard analytics",
+        "tool": "v0",
+        "url": "https://v0.dev/example",
+        "project": "Analytics platform",
+        "description": "Prototip inicial del dashboard",
+        "createdAt": "2026-03-09",
+        "tags": ["dashboard", "analytics"]
+    },
+    {
+        "id": 2,
+        "name": "Mobile onboarding",
+        "tool": "Lovable",
+        "url": "https://lovable.dev/example",
+        "project": "Mobile app",
+        "description": "Flux d'onboarding per a nous usuaris",
+        "createdAt": "2026-03-05",
+        "tags": ["mobile", "onboarding"]
+    }
+]

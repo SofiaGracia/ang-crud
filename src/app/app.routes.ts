@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { Projects } from '@projects/projects/projects';
+import { Projects } from '@projects/components/projects/projects';
 import { Prototypes } from '@prototypes/prototypes/prototypes';
 import { Prototype } from '@prototypes/prototype/prototype';
 

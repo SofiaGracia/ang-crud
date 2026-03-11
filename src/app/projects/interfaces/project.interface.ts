@@ -10,11 +10,8 @@
 //     projects: Project[];
 // }
 
-export interface Project {
-    id:          string;
+export interface ProjectInterface {
+    id:          number;
     name:        string;
-    tools:       string[];
-    url:         string;
-    projectId:   number;
-    description: string;
+    description: string | null;
 }

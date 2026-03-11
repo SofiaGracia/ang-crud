@@ -1,5 +1,5 @@
 import { Component, input } from '@angular/core';
-import { Project } from '@projects/interfaces/project-response.interface';
+import { ProjectInterface } from '@projects/interfaces/project.interface';
 import { RouterLink } from "@angular/router";
 
 @Component({
@@ -8,6 +8,6 @@ import { RouterLink } from "@angular/router";
   templateUrl: './project-card.html',
 })
 export class ProjectCard {
-    project = input.required<Project>();
+    project = input.required<ProjectInterface>();
 
 }

@@ -1,0 +1,16 @@
+<p>projects works!</p>
+
+@if (projectsResource.isLoading()) {
+    <p>Loading...</p>
+}
+
+@if (projectsResource.error()) {
+    <p>Error loading projects</p>
+}
+
+@if (projectsResource.hasValue()) {
+    <dialog-create-project #dialogCreate></dialog-create-project>
+    @for (proj of projectsResource.value(); track proj) {
+        <project-card [project]="proj"></project-card>
+    }
+}

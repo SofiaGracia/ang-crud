@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { Observable, tap } from 'rxjs';
 import { environment } from 'src/environments/environment';
-import { Project } from '../interfaces/project-response.interface';
+import { ProjectInterface } from '../interfaces/project.interface';
 
 const baseUrl = environment.baseUrl;
 
@@ -11,9 +11,9 @@ export class ProjectsService {
     private http = inject(HttpClient);
 
     // Valorar poner opciones
-    getProjects(): Observable<Project[]> {
+    getProjects(): Observable<ProjectInterface[]> {
         return this.http
-            .get<Project[]>(`${baseUrl}/projects`, {})
+            .get<ProjectInterface[]>(`${baseUrl}/projects`, {})
             .pipe(tap((resp) => console.log(resp)));
     }
 }

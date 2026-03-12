@@ -1,4 +1,4 @@
-import { Component, computed, ElementRef, inject, ViewChild } from '@angular/core';
+import { Component, effect, ElementRef, inject, input, ViewChild } from '@angular/core';
 import { ProjectSupabaseService } from '@projects/services/projectsSupabase.service';
 import {
     AbstractControl,
@@ -10,16 +10,19 @@ import {
 } from '@angular/forms';
 import { Observable, of, map, catchError } from 'rxjs';
 import { JsonPipe } from '@angular/common';
-import { Project, ProjectInterface } from '@projects/interfaces/project.interface';
+import { Project } from '@projects/interfaces/project.interface';
 import { ProjectsFacade } from '@projects/facades/projects.facade';
 
 @Component({
-    selector: 'dialog-create-project',
+    selector: 'dialog-cm-project',
     imports: [ReactiveFormsModule, JsonPipe],
-    templateUrl: './dialog-create-project.html',
+    templateUrl: './dialog-cm-project.html',
 })
-export class DialogCreateProject {
-    @ViewChild('dialogCreate') dialogCreate!: ElementRef<HTMLDialogElement>;
+export class DialogCMProject {
+    mode = input.required<'create' | 'edit'>();
+    project = input<Project | undefined>();
+
+    @ViewChild('dialogCM') dialogCM!: ElementRef<HTMLDialogElement>;
 
     projectSupabaseService = inject(ProjectSupabaseService);
     private projectsFacade = inject(ProjectsFacade);
@@ -29,6 +32,19 @@ export class DialogCreateProject {
         name: ['', Validators.required],
         description: [''],
     });
+
+    constructor() {
+        effect(() => {
+            const project = this.project();
+
+            if (project) {
+                this.createForm.patchValue({
+                    name: project.name,
+                    description: project.description,
+                });
+            }
+        });
+    }
 
     errorsName(): string[] {
         const errors = this.createForm.controls['name'].errors;
@@ -90,20 +106,24 @@ export class DialogCreateProject {
             };
 
             // Consider capturing errors
-            this.projectsFacade.addProject(newProject);
+            if (this.mode() === 'create') {
+                console.log('ESTIC PASSANT PER ACI')
+                this.projectsFacade.addProject(newProject);
+            } else {
+                // this.projectsFacade.updateProject(newProject);
+            }
 
             // Reset form
             this.createForm.reset();
             this.closeModal();
-
         });
     }
 
     openDialog() {
-        this.dialogCreate.nativeElement.showModal();
+        this.dialogCM.nativeElement.showModal();
     }
 
     closeModal() {
-        this.dialogCreate.nativeElement.close();
+        this.dialogCM.nativeElement.close();
     }
 }

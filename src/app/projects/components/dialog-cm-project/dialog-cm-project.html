@@ -1,6 +1,4 @@
-<button class="btn btn-primary mb-2" (click)="openDialog()">Add project</button>
-
-<dialog #dialogCreate class="modal">
+<dialog #dialogCM class="modal">
     <div class="modal-box">
         <form method="dialog">
             <button
@@ -16,6 +14,7 @@
             class="flex flex-col items-center gap-3"
         >
             <h3 class="text-lg font-bold">Create project</h3>
+            <h4>{{ project | json}}</h4>
             <div>
                 <input
                     type="text"

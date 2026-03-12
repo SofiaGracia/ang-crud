@@ -1,3 +1,4 @@
+<dialog-cm-project #dialogCM [mode]="'edit'" [project]="project()"></dialog-cm-project>
 <div class="card bg-base-100 w-96 shadow-sm relative" [routerLink]="['/projects', project().id]">
     <figure>
         <img
@@ -23,7 +24,12 @@
                 >
                     <li>
                         <a (click)="deleteProject($event, project().id)" class="text-red-600">
-                            Eliminar
+                            Remove
+                        </a>
+                    </li>
+                    <li>
+                        <a (click)="dialogCM.openDialog()" class="text-grey-100">
+                            Modify
                         </a>
                     </li>
                 </ul>

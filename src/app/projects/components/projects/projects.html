@@ -1,6 +1,7 @@
 <p>projects works!</p>
 
-<dialog-create-project #dialogCreate></dialog-create-project>
+<dialog-cm-project #dialogCM [mode]="'create'"></dialog-cm-project>
+<button class="btn btn-primary mb-2" (click)="dialogCM.openDialog()">Add project</button>
 @if (projects$ | async; as projects) {
     @if (projects.length === 0) {
         <p>No hi ha projectes.</p>

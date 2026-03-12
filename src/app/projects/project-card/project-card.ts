@@ -4,10 +4,11 @@ import { RouterLink } from '@angular/router';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { faEllipsis } from '@fortawesome/free-solid-svg-icons';
 import { ProjectsFacade } from '@projects/facades/projects.facade';
+import { DialogCMProject } from '@projects/components/dialog-cm-project/dialog-cm-project';
 
 @Component({
     selector: 'project-card',
-    imports: [RouterLink, FaIconComponent],
+    imports: [RouterLink, FaIconComponent, DialogCMProject],
     templateUrl: './project-card.html',
 })
 export class ProjectCard {

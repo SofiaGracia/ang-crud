@@ -1,16 +1,14 @@
 <p>projects works!</p>
 
-@if (projectsResource.isLoading()) {
-    <p>Loading...</p>
-}
+<dialog-create-project #dialogCreate></dialog-create-project>
+@if (projects$ | async; as projects) {
+    @if (projects.length === 0) {
+        <p>No hi ha projectes.</p>
+    }
 
-@if (projectsResource.error()) {
-    <p>Error loading projects</p>
-}
-
-@if (projectsResource.hasValue()) {
-    <dialog-create-project #dialogCreate></dialog-create-project>
-    @for (proj of projectsResource.value(); track proj) {
+    @for (proj of projects; track proj.id) {
         <project-card [project]="proj"></project-card>
     }
+} @else {
+    <p>Carregant projectes...</p>
 }

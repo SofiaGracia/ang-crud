@@ -1,4 +1,4 @@
-<div class="card bg-base-100 w-96 shadow-sm" [routerLink]="['/projects', project().id]">
+<div class="card bg-base-100 w-96 shadow-sm relative" [routerLink]="['/projects', project().id]">
     <figure>
         <img
             src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
@@ -6,7 +6,28 @@
         />
     </figure>
     <div class="card-body">
-        <h2 class="card-title">{{ project().name }}</h2>
-        <p>{{ project().description }}</p>
+        <div class="flex flex-row justify-between items-center">
+            <div class="flex flex-col">
+                <h2 class="card-title">{{ project().name }}</h2>
+                <p>{{ project().description }}</p>
+            </div>
+
+            <!-- Dropdown DaisyUI -->
+            <div class="dropdown dropdown-end" (click)="$event.stopPropagation()">
+                <label tabindex="0" class="btn btn-ghost btn-circle p-2 m-0">
+                    <fa-icon [icon]="faEllipsis"></fa-icon>
+                </label>
+                <ul
+                    tabindex="0"
+                    class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-32"
+                >
+                    <li>
+                        <a (click)="deleteProject($event, project().id)" class="text-red-600">
+                            Eliminar
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
     </div>
 </div>

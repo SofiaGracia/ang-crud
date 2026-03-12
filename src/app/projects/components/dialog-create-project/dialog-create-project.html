@@ -10,7 +10,40 @@
                 ✕
             </button>
         </form>
-        <h3 class="text-lg font-bold">Hello!</h3>
-        <p class="py-4">Press ESC key or click on ✕ button to close</p>
+        <form
+            [formGroup]="createForm"
+            (submit)="onSubmit($event)"
+            class="flex flex-col items-center gap-3"
+        >
+            <h3 class="text-lg font-bold">Create project</h3>
+            <div>
+                <input
+                    type="text"
+                    placeholder="Name your project"
+                    class="input"
+                    formControlName="name"
+                />
+                <!-- Sols vull renderitzar-ho quan es seleccione el botó de crear -->
+                @if (this.createForm.controls['name'].touched && createForm.controls['name'].errors) {
+                    <ul class="error-list">
+                        @for (error of errorsName(); track error) {
+                            <li>{{ error }}</li>
+                        }
+                    </ul>
+                }
+            </div>
+            <p>Invite others to collaborate on this project</p>
+            <textarea
+                class="textarea"
+                placeholder="Project's description"
+                formControlName="description"
+            ></textarea>
+            <div class="mt-5 mb-5">
+                <span>{{ createForm.controls['name'].errors | json }}</span>
+            </div>
+            <button type="submit" class="btn btn-wide" [disabled]="createForm.errors">
+                Create
+            </button>
+        </form>
     </div>
 </dialog>

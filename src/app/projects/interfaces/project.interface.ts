@@ -1,4 +1,3 @@
-
 // Valorar escalar ProjectResponse:
 // export interface ProductResponse {
 //     count:    number;
@@ -10,8 +9,13 @@
 //     projects: Project[];
 // }
 
+export interface Project {
+    name: string;
+    description: string | null;
+}
+
 export interface ProjectInterface {
-    id:          number;
-    name:        string;
+    id: number;
+    name: string;
     description: string | null;
 }

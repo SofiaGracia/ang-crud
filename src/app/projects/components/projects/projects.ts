@@ -1,8 +1,5 @@
-import { Component, ElementRef, inject, viewChild, ViewChild } from '@angular/core';
-import { rxResource } from '@angular/core/rxjs-interop';
-import { ProjectCard } from '@projects/project-card/project-card';
-import { ProjectInterface } from '@projects/interfaces/project.interface';
-import { ProjectSupabaseService } from '@projects/services/projectsSupabase.service';
+import { Component, inject } from '@angular/core';
+import { ProjectCard } from '@projects/components/project-card/project-card';
 import { DialogCMProject } from '../dialog-cm-project/dialog-cm-project';
 import { ProjectsFacade } from '@projects/facades/projects.facade';
 import { AsyncPipe } from '@angular/common';

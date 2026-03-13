@@ -7,7 +7,7 @@
 
     <!-- el teu contingut -->
     @for (proto of prototypes; track proto.id) {
-        <h1>Prototip</h1>
+        <prototype-card [proto]="proto"></prototype-card>
     }
 } @else {
     <h2>Carregant prototips...</h2>

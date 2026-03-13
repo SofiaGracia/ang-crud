@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 import { Projects } from '@projects/components/projects/projects';
-import { Prototypes } from '@prototypes/prototypes/prototypes';
-import { Prototype } from '@prototypes/prototype/prototype';
+import { Prototypes } from '@prototypes/components/prototypes/prototypes';
+import { Prototype } from '@prototypes/components/prototype/prototype';
 
 export const routes: Routes = [
     {

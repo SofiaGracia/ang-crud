@@ -9,5 +9,10 @@ export const SIDEMENUOPTIONS: SidebarOption[] = [
         title: 'Recent',
         icon: 'file',
         route: '/projects/recent',
-    }
+    },
+    // {
+    //     title: 'Trash',
+    //     icon: 'trash',
+    //     route: '/projects/trash',
+    // }
 ];

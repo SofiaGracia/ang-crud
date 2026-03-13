@@ -1,0 +1,14 @@
+<p>prototypes works!</p>
+@if (prototypesFacade.prototypes$ | async; as prototypes) {
+
+    @if (prototypes.length === 0) {
+        <p>No hi ha prototips.</p>
+    }
+
+    <!-- el teu contingut -->
+    @for (proto of prototypes; track proto.id) {
+        <h1>Prototip</h1>
+    }
+} @else {
+    <h2>Carregant prototips...</h2>
+}

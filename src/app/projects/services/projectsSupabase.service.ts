@@ -1,16 +1,10 @@
 import { Injectable } from '@angular/core';
-import { environment } from 'src/environments/environment';
-import { createClient } from '@supabase/supabase-js';
 import { Observable, from, map } from 'rxjs';
 import { Project, ProjectInterface } from '@projects/interfaces/project.interface';
-import { Database } from '@projects/types/datatypes.types';
-
-const supabaseUrl = environment.supabaseUrl;
-const supabaseKey = environment.supabaseKey;
+import { SupabaseBaseService } from '@shared/services/supabase.client';
 
 @Injectable({ providedIn: 'root' })
-export class ProjectSupabaseService {
-    supabase = createClient<Database>(supabaseUrl, supabaseKey);
+export class ProjectSupabaseService extends SupabaseBaseService  {
 
     getProjects(): Observable<ProjectInterface[]> {
         const promise = this.supabase.from('projects').select('*');
@@ -40,6 +34,18 @@ export class ProjectSupabaseService {
 
     removeProject(projectId: number): Observable<void> {
         const promise = this.supabase.from('projects').delete().eq('id', projectId);
+        return from(promise).pipe(
+            map((response) => {
+                if (response.error) {
+                    throw response.error;
+                }
+                return;
+            }),
+        );
+    }
+
+    updateProject(projectId: number, dataToUpdate: Project): Observable<void> {
+        const promise = this.supabase.from('projects').update(dataToUpdate).eq('id', projectId);
         return from(promise).pipe(
             map((response) => {
                 if (response.error) {

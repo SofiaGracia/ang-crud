@@ -36,4 +36,15 @@ export class ProjectsFacade {
             },
         });
     }
+
+    updateProject(projectId: number, dataToUpdate: Project) {
+        this.projectSupabaseService.updateProject(projectId, dataToUpdate).subscribe({
+            next: () => {
+                this.refresh$.next();
+            },
+            error: (err) => {
+                console.error('Error updating project', err);
+            },
+        });
+    }
 }

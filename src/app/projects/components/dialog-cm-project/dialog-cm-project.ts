@@ -10,7 +10,7 @@ import {
 } from '@angular/forms';
 import { Observable, of, map, catchError } from 'rxjs';
 import { JsonPipe } from '@angular/common';
-import { Project } from '@projects/interfaces/project.interface';
+import { Project, ProjectInterface } from '@projects/interfaces/project.interface';
 import { ProjectsFacade } from '@projects/facades/projects.facade';
 
 @Component({
@@ -20,7 +20,7 @@ import { ProjectsFacade } from '@projects/facades/projects.facade';
 })
 export class DialogCMProject {
     mode = input.required<'create' | 'edit'>();
-    project = input<Project | undefined>();
+    project = input<ProjectInterface | undefined>();
 
     @ViewChild('dialogCM') dialogCM!: ElementRef<HTMLDialogElement>;
 
@@ -107,10 +107,10 @@ export class DialogCMProject {
 
             // Consider capturing errors
             if (this.mode() === 'create') {
-                console.log('ESTIC PASSANT PER ACI')
                 this.projectsFacade.addProject(newProject);
             } else {
-                // this.projectsFacade.updateProject(newProject);
+                const idProject = this.project()!.id; // Is never going to be undefined because we are modifying
+                this.projectsFacade.updateProject(idProject, newProject);
             }
 
             // Reset form

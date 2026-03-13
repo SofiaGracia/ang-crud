@@ -8,7 +8,8 @@
             "@prototypes/*": ["./src/app/prototypes/*"],
             "@projects/*": ["./src/app/projects/*"],
             "@web-front/*": ["./src/app/web-front/*"],
-            "@images/*": ["./public/assets/images/*"]
+            "@images/*": ["./public/assets/images/*"],
+            "@shared/*": ["./src/app/shared/*"]
         },
         "strict": true,
         "noImplicitOverride": true,

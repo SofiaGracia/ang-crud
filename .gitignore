@@ -43,6 +43,7 @@ testem.log
 __screenshots__/
 pasos.txt
 .editorconfig
+.cursor
 
 # System files
 .DS_Store

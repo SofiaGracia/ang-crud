@@ -10,11 +10,14 @@ import { FrontSidebar } from '@web-front/components/front-sidebar/front-sidebar'
         .layout {
             display: flex;
             height: 100vh;
+            overflow: hidden;
         }
 
         .content {
             flex: 1;
             padding: 2rem;
+            height: 100%;
+            overflow-y: auto;
         }
     `,
 })

@@ -16,6 +16,8 @@ import { SIDEMENUOPTIONS } from '@web-front/constants/sidebar-options.constant';
             color: white;
             transition: width 0.3s;
             padding: 1rem;
+            overflow: hidden; /* importante: que no scrollee */
+            flex-shrink: 0;
         }
 
         .sidebar.collapsed {

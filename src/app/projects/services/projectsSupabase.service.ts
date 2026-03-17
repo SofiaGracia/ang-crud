@@ -20,6 +20,11 @@ export class ProjectSupabaseService extends SupabaseBaseService  {
         return from(promise).pipe(map((response) => response.data));
     }
 
+    getProjectById(id: number): Observable<ProjectInterface | null> {
+        const promise = this.supabase.from('projects').select('*').eq('id', id).maybeSingle();
+        return from(promise).pipe(map((response) => response.data));
+    }
+
     addProject(project: Project): Observable<ProjectInterface> {
         const promise = this.supabase.from('projects').insert(project).select('*').single();
         return from(promise).pipe(

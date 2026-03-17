@@ -1,13 +1,19 @@
-<p>prototypes works!</p>
-@if (prototypesFacade.prototypes$ | async; as prototypes) {
+@if (project$ | async; as project) {
+    <h2>{{ project?.name }}</h2>
+    @if (project?.description) {
+        <p>{{ project.description }}</p>
+    }
+} @else {
+    <h2>Carregant projecte...</h2>
+}
 
+@if (prototypes$ | async; as prototypes) {
     @if (prototypes.length === 0) {
         <p>No hi ha prototips.</p>
-    }
-
-    <!-- el teu contingut -->
-    @for (proto of prototypes; track proto.id) {
-        <prototype-card [proto]="proto"></prototype-card>
+    } @else {
+        @for (proto of prototypes; track proto.id) {
+            <prototype-card [proto]="proto"></prototype-card>
+        }
     }
 } @else {
     <h2>Carregant prototips...</h2>

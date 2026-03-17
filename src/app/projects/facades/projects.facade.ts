@@ -1,15 +1,30 @@
 import { inject, Injectable } from '@angular/core';
 import { Project } from '@projects/interfaces/project.interface';
 import { ProjectSupabaseService } from '@projects/services/projectsSupabase.service';
-import { BehaviorSubject, switchMap } from 'rxjs';
+import { BehaviorSubject, switchMap, of } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class ProjectsFacade {
+
+    // Subject to refresh the projects list
     private refresh$ = new BehaviorSubject<void>(undefined);
     private projectSupabaseService = inject(ProjectSupabaseService);
 
     projects$ = this.refresh$.pipe(switchMap(() => this.projectSupabaseService.getProjects()));
 
+    // Subject to select a project
+    private selectedProjectId$ = new BehaviorSubject<number | null>(null);
+
+    project$ = this.selectedProjectId$.pipe(
+        switchMap((id) => (id == null ? of(null) : this.projectSupabaseService.getProjectById(id))),
+    );
+
+    // Select a project
+    loadProject(id: number) {
+        this.selectedProjectId$.next(id);
+    }
+
+    // Load the projects list
     loadProjects() {
         this.refresh$.next();
     }

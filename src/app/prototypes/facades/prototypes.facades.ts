@@ -1,5 +1,5 @@
 import { inject, Injectable } from '@angular/core';
-import { PrototypesSupabaseService } from '@prototypes/services/prototypesSupabaseService';
+import { PrototypesSupabaseService } from '@prototypes/services/prototypesSupabase.service';
 import { BehaviorSubject, switchMap, filter } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })

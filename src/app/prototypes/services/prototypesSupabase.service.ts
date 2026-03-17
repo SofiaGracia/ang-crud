@@ -1,10 +1,11 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { PrototypeInterface } from '@prototypes/interfaces/prototype.interface';
 import { map, Observable, from } from 'rxjs';
-import { SupabaseBaseService } from '@shared/services/supabase.client';
+import { SupabaseClientService } from '@shared/services/supabase-client.service';
 
 @Injectable({ providedIn: 'root' })
-export class PrototypesSupabaseService extends SupabaseBaseService  {
+export class PrototypesSupabaseService {
+    private supabase = inject(SupabaseClientService).instance;
 
     getPrototypesByProject(projectId: number): Observable<PrototypeInterface[]> {
         const promise = this.supabase.from('prototypes').select('*').eq('project_id', projectId);

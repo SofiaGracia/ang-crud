@@ -16,6 +16,7 @@ jobs:
       - run: npm ci
       - name: Crear environment.development.ts
         run: |
+          mkdir -p src/environments
           cat > src/environments/environment.development.ts << 'EOF'
           export const environment = {
             production: false,

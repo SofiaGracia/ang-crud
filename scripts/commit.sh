@@ -55,38 +55,43 @@ if [ -z "$DIFF" ] && [ -z "$UNTRACKED" ]; then
   exit 1
 fi
 
-if [ -n "$UNTRACKED" ]; then
-  DIFF="${DIFF}"$'\n\n'"New files:"$'\n'"${UNTRACKED}"
-fi
-
 echo -e "${BLUE}→ Querying ${MODEL} to generate branch name and commit...${NC}"
+
+# --- Capture full diff including untracked file contents ---
+FULL_DIFF="$DIFF"
+
+if [ -n "$UNTRACKED" ]; then
+  for f in $UNTRACKED; do
+    FULL_DIFF="${FULL_DIFF}"$'\n\n'"=== New untracked file: $f ==="$'\n'"$(cat "$f" 2>/dev/null | head -50)"
+  done
+fi
 
 # --- Create JSON payload with Python to avoid escaping issues ---
 TMP_PAYLOAD=$(mktemp /tmp/ollama_payload_XXXXXX.json)
 TMP_RESPONSE=$(mktemp /tmp/ollama_response_XXXXXX.json)
 
-echo "$DIFF" | head -100 | python3 - <<EOF > "$TMP_PAYLOAD"
+echo "$FULL_DIFF" | python3 - <<EOF > "$TMP_PAYLOAD"
 import json
 import sys
 
 diff = sys.stdin.read()
 next_id = ${NEXT}
 
-prompt = f"""Analyze this git diff from an Angular project and generate:
-1. A branch name following the format: feat/{next_id}-<description-in-english-kebab-case>.
-   Make it short but descriptive (up to 8 words), reflecting the **main feature or change**.
-2. A commit message following the format: feat(#{next_id}): <short-description-in-english>.
-   Focus on the **most relevant changes**, including:
-   - Component templates (.html)
-   - Component logic (.ts)
-   - Badge updates
-   - Deleted or modified elements
-   - Newly added files
+prompt = f"""You are a git commit message generator. Analyze the EXACT diff below and generate names based ONLY on what you see in the diff — do not invent or assume anything not present.
 
-Respond ONLY with a JSON object like this (without any extra text or backticks):
+Generate:
+1. A branch name: feat/{next_id}-<description-in-english-kebab-case> (max 6 words, based strictly on the diff)
+2. A commit message: feat(#{next_id}): <short-description-in-english> (based strictly on the diff)
+
+Rules:
+- ONLY describe what is actually changed in the diff
+- If the diff removes a line, say "remove" not "add"
+- If the diff is tiny, the message must be short and precise
+- Do NOT mention features that are not in the diff
+- Respond ONLY with a JSON object, no extra text, no backticks:
 {{"branch": "...", "commit": "..."}}
 
-Diff:
+Diff to analyze:
 {diff}"""
 
 payload = {

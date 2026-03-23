@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # ============================================================
-# commit.sh — Crea branca, commit i PR automàticament amb IA
-# Ús: ./scripts/commit.sh
-# Requisits: ollama, gh (GitHub CLI), python3
+# commit.sh — Automatically creates branch, commit and PR using AI
+# Usage: ./scripts/commit.sh
+# Requirements: ollama, gh (GitHub CLI), python3
 # ============================================================
 
 set -e
@@ -15,26 +15,26 @@ NC='\033[0m'
 
 MODEL="qwen2.5-coder:7b"
 
-# --- Comprovacions prèvies ---
+# --- Pre-checks ---
 if ! command -v gh &> /dev/null; then
-  echo -e "${RED}Error: GitHub CLI (gh) no està instal·lat.${NC}"
-  echo "Instal·la'l amb: sudo snap install gh"
+  echo -e "${RED}Error: GitHub CLI (gh) is not installed.${NC}"
+  echo "Install it with: sudo snap install gh"
   exit 1
 fi
 
 if ! command -v ollama &> /dev/null; then
-  echo -e "${RED}Error: Ollama no està instal·lat.${NC}"
-  echo "Instal·la'l amb: sudo snap install ollama"
+  echo -e "${RED}Error: Ollama is not installed.${NC}"
+  echo "Install it with: sudo snap install ollama"
   exit 1
 fi
 
 if ! curl -s http://localhost:11434 &> /dev/null; then
-  echo -e "${RED}Error: Ollama no està en marxa.${NC}"
-  echo "Arrencat amb: ollama serve"
+  echo -e "${RED}Error: Ollama is not running.${NC}"
+  echo "Start it with: ollama serve"
   exit 1
 fi
 
-# --- Llegir i incrementar el comptador ---
+# --- Read and increment counter ---
 COUNTER_FILE=".feature-counter"
 
 if [ ! -f "$COUNTER_FILE" ]; then
@@ -44,39 +44,47 @@ fi
 CURRENT=$(cat "$COUNTER_FILE")
 NEXT=$((CURRENT + 1))
 
-echo -e "${BLUE}→ ID de la feature: #${NEXT}${NC}"
+echo -e "${BLUE}→ Feature ID: #${NEXT}${NC}"
 
-# --- Capturar el git diff ---
+# --- Capture git diff ---
 DIFF=$(git diff HEAD)
 UNTRACKED=$(git ls-files --others --exclude-standard)
 
 if [ -z "$DIFF" ] && [ -z "$UNTRACKED" ]; then
-  echo -e "${RED}Error: No hi ha canvis per fer commit.${NC}"
+  echo -e "${RED}Error: No changes to commit.${NC}"
   exit 1
 fi
 
 if [ -n "$UNTRACKED" ]; then
-  DIFF="${DIFF}"$'\n\n'"Fitxers nous:"$'\n'"${UNTRACKED}"
+  DIFF="${DIFF}"$'\n\n'"New files:"$'\n'"${UNTRACKED}"
 fi
 
-echo -e "${BLUE}→ Consultant ${MODEL} per generar el nom de la branca i el commit...${NC}"
+echo -e "${BLUE}→ Querying ${MODEL} to generate branch name and commit...${NC}"
 
-# --- Crear el payload JSON amb Python per evitar problemes d'escapament ---
+# --- Create JSON payload with Python to avoid escaping issues ---
 TMP_PAYLOAD=$(mktemp /tmp/ollama_payload_XXXXXX.json)
 TMP_RESPONSE=$(mktemp /tmp/ollama_response_XXXXXX.json)
 
-python3 - <<EOF > "$TMP_PAYLOAD"
+echo "$DIFF" | head -100 | python3 - <<EOF > "$TMP_PAYLOAD"
 import json
+import sys
 
-diff = """$(echo "$DIFF" | head -100)"""
+diff = sys.stdin.read()
 next_id = ${NEXT}
 
-prompt = f"""Analitza aquest git diff d'un projecte Angular i genera:
-1. Un nom de branca seguint el format: feat/{next_id}-<descripció-en-kebab-case-en-anglès> (màxim 5 paraules)
-2. Un missatge de commit seguint el format: feat(#{next_id}): <descripció-curta-en-anglès>
+prompt = f"""Analyze this git diff from an Angular project and generate:
+1. A branch name following the format: feat/{next_id}-<description-in-english-kebab-case>.
+   Make it short but descriptive (up to 8 words), reflecting the **main feature or change**.
+2. A commit message following the format: feat(#{next_id}): <short-description-in-english>.
+   Focus on the **most relevant changes**, including:
+   - Component templates (.html)
+   - Component logic (.ts)
+   - Badge updates
+   - Deleted or modified elements
+   - Newly added files
 
-Respon ÚNICAMENT amb aquest JSON sense cap altre text, explicació ni backticks:
-{{"branch": "feat/{next_id}-...", "commit": "feat(#{next_id}): ..."}}
+Respond ONLY with a JSON object like this (without any extra text or backticks):
+{{"branch": "...", "commit": "..."}}
 
 Diff:
 {diff}"""
@@ -90,22 +98,18 @@ payload = {
 print(json.dumps(payload))
 EOF
 
-# --- Cridar Ollama amb el payload del fitxer ---
-# curl -s -m 120 http://localhost:11434/api/generate \
-#   -H "Content-Type: application/json" \
-#   -d @"$TMP_PAYLOAD" > "$TMP_RESPONSE"
-
+# --- Call Ollama with payload file ---
 HTTP_STATUS=$(curl -s -o "$TMP_RESPONSE" -w "%{http_code}" -m 120 \
   http://localhost:11434/api/generate \
   -H "Content-Type: application/json" \
   -d @"$TMP_PAYLOAD")
 
 if [ "$HTTP_STATUS" -ne 200 ]; then
-  echo -e "${RED}Error: Ollama ha fallat (HTTP $HTTP_STATUS).${NC}"
+  echo -e "${RED}Error: Ollama failed (HTTP $HTTP_STATUS).${NC}"
   exit 1
 fi
 
-# --- Extreure i parsejar la resposta amb Python ---
+# --- Extract and parse response with Python ---
 RESULT=$(python3 - <<EOF
 import json, sys, re
 
@@ -114,13 +118,13 @@ with open("$TMP_RESPONSE") as f:
 
 raw = data.get("response", "")
 
-# Netejar possibles backticks o text extra
+# Clean possible backticks or extra text
 raw = re.sub(r'\`\`\`json|\`\`\`', '', raw).strip()
 
-# Trobar el JSON dins la resposta
+# Find JSON inside response
 match = re.search(r'\{.*\}', raw, re.DOTALL)
 if not match:
-    print("ERROR: no s'ha trobat JSON a la resposta")
+    print("ERROR: JSON not found in response")
     print("RAW: " + raw, file=sys.stderr)
     sys.exit(1)
 
@@ -130,34 +134,34 @@ print(parsed["commit"])
 EOF
 )
 
-# --- Netejar fitxers temporals ---
+# --- Clean temp files ---
 rm -f "$TMP_PAYLOAD" "$TMP_RESPONSE"
 
-# --- Separar branch i commit ---
+# --- Split branch and commit ---
 BRANCH=$(echo "$RESULT" | sed -n '1p')
 COMMIT_MSG=$(echo "$RESULT" | sed -n '2p')
 
 if [ -z "$BRANCH" ] || [ -z "$COMMIT_MSG" ]; then
-  echo -e "${RED}Error: El model no ha retornat una resposta vàlida.${NC}"
+  echo -e "${RED}Error: Model did not return a valid response.${NC}"
   exit 1
 fi
 
-echo -e "${GREEN}→ Branca:  $BRANCH${NC}"
+echo -e "${GREEN}→ Branch:  $BRANCH${NC}"
 echo -e "${GREEN}→ Commit:  $COMMIT_MSG${NC}"
 
-# --- Confirmació ---
-read -p "Continuar? (s/N): " CONFIRM
-if [[ ! "$CONFIRM" =~ ^[sS]$ ]]; then
-  echo "Cancel·lat."
+# --- Confirmation ---
+read -p "Continue? (y/N): " CONFIRM
+if [[ ! "$CONFIRM" =~ ^[yY]$ ]]; then
+  echo "Cancelled."
   exit 0
 fi
 
-# --- Git: crear branca, afegir, commit i push ---
+# --- Git: create branch, add, commit and push ---
 git checkout -b "$BRANCH"
 git add .
 git commit -m "$COMMIT_MSG"
 
-# --- Actualitzar el comptador ---
+# --- Update counter ---
 echo "$NEXT" > "$COUNTER_FILE"
 git add "$COUNTER_FILE"
 git commit --amend --no-edit
@@ -165,11 +169,11 @@ git commit --amend --no-edit
 # --- Push ---
 git push origin "$BRANCH"
 
-# --- Obrir PR ---
-echo -e "${BLUE}→ Creant la PR a GitHub...${NC}"
+# --- Open PR ---
+echo -e "${BLUE}→ Creating PR on GitHub...${NC}"
 gh pr create \
   --title "$COMMIT_MSG" \
   --body "Feature #${NEXT}" \
   --base master
 
-echo -e "${GREEN}✓ PR creada correctament!${NC}"
+echo -e "${GREEN}✓ PR created successfully!${NC}"

@@ -15,9 +15,16 @@ jobs:
           node-version: '20'
           cache: 'npm'
       - run: npm ci
-      - name: Crear environment.development.ts
+      - name: Crear environment files
         run: |
           mkdir -p src/environments
+          cat > src/environments/environment.ts << 'EOF'
+          export const environment = {
+            production: true,
+            supabaseUrl: '${{ secrets.SUPABASE_URL }}',
+            supabaseKey: '${{ secrets.SUPABASE_KEY }}'
+          };
+          EOF
           cat > src/environments/environment.development.ts << 'EOF'
           export const environment = {
             production: false,

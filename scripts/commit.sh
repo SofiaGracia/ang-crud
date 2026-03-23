@@ -91,9 +91,19 @@ print(json.dumps(payload))
 EOF
 
 # --- Cridar Ollama amb el payload del fitxer ---
-curl -s -m 120 http://localhost:11434/api/generate \
+# curl -s -m 120 http://localhost:11434/api/generate \
+#   -H "Content-Type: application/json" \
+#   -d @"$TMP_PAYLOAD" > "$TMP_RESPONSE"
+
+HTTP_STATUS=$(curl -s -o "$TMP_RESPONSE" -w "%{http_code}" -m 120 \
+  http://localhost:11434/api/generate \
   -H "Content-Type: application/json" \
-  -d @"$TMP_PAYLOAD" > "$TMP_RESPONSE"
+  -d @"$TMP_PAYLOAD")
+
+if [ "$HTTP_STATUS" -ne 200 ]; then
+  echo -e "${RED}Error: Ollama ha fallat (HTTP $HTTP_STATUS).${NC}"
+  exit 1
+fi
 
 # --- Extreure i parsejar la resposta amb Python ---
 RESULT=$(python3 - <<EOF

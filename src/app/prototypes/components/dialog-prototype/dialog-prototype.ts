@@ -26,6 +26,8 @@ export class DialogPrototype {
     prototype = input<PrototypeInterface | undefined>();
     project = input.required<ProjectInterface>();
 
+    selectedHtmlFile: File | null = null;
+
     prototypesSupabaseService = inject(PrototypesSupabaseService);
     private prototypesFacade = inject(PrototypesFacade);
 
@@ -64,6 +66,13 @@ export class DialogPrototype {
         }
 
         return messages;
+    }
+
+    onFileSelected(event: Event) {
+        const input = event.target as HTMLInputElement;
+        if (input.files && input.files.length > 0) {
+            this.selectedHtmlFile = input.files[0];
+        }
     }
 
     onSubmit(event: Event) {

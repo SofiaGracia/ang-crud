@@ -1,8 +1,8 @@
 export interface Prototype {
     name: string;
-    tool: string;
-    url: string;
-    description: string;
+    tool: string | null;
+    url: string | null;
+    description: string | null;
     project_id: number;
 }
 

@@ -89,22 +89,31 @@ export class DialogPrototype {
         }
 
         // Second async validation ONLY when submit
-        this.prototypesSupabaseService.getProtoByName(control.value!).subscribe((proto) => {
-            // Check it exists on same project
+        this.prototypesSupabaseService.getProtoByName(control.value!).subscribe(async (proto) => {
             if (proto && proto.project_id === this.project().id) {
-
-                // Alredy exists → set control's new error
                 control.setErrors({ ...(control.errors || {}), protoNameExists: true });
                 control.markAsTouched();
                 return;
             }
 
+            let publicUrl = null;
+            if (this.selectedHtmlFile !== null) {
+                publicUrl = await this.prototypesSupabaseService.uploadPrototypeFile(
+                    this.selectedHtmlFile,
+                    this.project().id,
+                );
+            }
             console.log('Creating prototype with data:', this.createForm.value);
 
             const newProto = {
                 name: this.createForm.controls['name'].value!,
                 description: this.createForm.controls['description'].value!,
+                project_id: this.project().id,
+                url: publicUrl,
+                tool: null,
             };
+
+            console.log('Values of new prototype:', newProto);
 
             // Consider capturing errors
             if (this.mode() === 'create') {

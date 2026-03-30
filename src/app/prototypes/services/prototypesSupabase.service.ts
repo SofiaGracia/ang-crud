@@ -37,4 +37,26 @@ export class PrototypesSupabaseService {
             }),
         );
     }
+
+    async uploadPrototypeFile(file: File, projectId: number): Promise<string> {
+        const filePath = `${projectId}/${Date.now()}.html`;
+        const response = await this.supabase.storage.from('prototypes').upload(filePath, file, {
+            contentType: 'text/html',
+            upsert: false,
+        });
+
+        if (response.error) {
+            throw response.error;
+        }
+
+        const { data: publicUrlData } = this.supabase.storage
+            .from('prototypes')
+            .getPublicUrl(filePath);
+
+        if (!publicUrlData?.publicUrl) {
+            throw new Error('Could not get public URL');
+        }
+
+        return publicUrlData.publicUrl;
+    }
 }

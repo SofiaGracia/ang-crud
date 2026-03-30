@@ -6,10 +6,11 @@ import { PrototypesFacade } from '@prototypes/facades/prototypes.facades';
 import { PrototypeCard } from '../prototype-card/prototype-card';
 import { distinctUntilChanged, filter, map, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { DialogPrototype } from '../dialog-prototype/dialog-prototype';
 
 @Component({
     selector: 'app-prototypes',
-    imports: [AsyncPipe, PrototypeCard],
+    imports: [AsyncPipe, PrototypeCard, DialogPrototype],
     templateUrl: './prototypes.html',
 })
 export class Prototypes {

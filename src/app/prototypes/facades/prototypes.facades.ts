@@ -22,4 +22,26 @@ export class PrototypesFacade {
     //         error: (err) => console.error('Error creating prototype', err),
     //     });
     // }
+
+    removeProto(protoId: number, projectId: number) {
+        this.prototypesSupabaseService.removeProto(protoId).subscribe({
+            next: () => {
+                this.refresh$.next(projectId);
+            },
+            error: (err) => {
+                console.error('Error removing prototype', err);
+            },
+        });
+    }
+
+    // updateProject(projectId: number, dataToUpdate: Project) {
+    //     this.projectSupabaseService.updateProject(projectId, dataToUpdate).subscribe({
+    //         next: () => {
+    //             this.refresh$.next();
+    //         },
+    //         error: (err) => {
+    //             console.error('Error updating project', err);
+    //         },
+    //     });
+    // }
 }

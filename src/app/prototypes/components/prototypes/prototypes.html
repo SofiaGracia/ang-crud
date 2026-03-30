@@ -3,6 +3,9 @@
     @if (project?.description) {
         <p>{{ project.description }}</p>
     }
+    <!-- Crear prototip -->
+    <dialog-prototype #dialogPro [mode]="'create'"></dialog-prototype>
+    <button class="btn btn-primary mb-2" (click)="dialogPro.openDialog()">Add prototype</button>
 } @else {
     <h2>Carregant projecte...</h2>
 }

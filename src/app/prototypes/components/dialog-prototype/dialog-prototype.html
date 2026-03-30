@@ -72,7 +72,10 @@
                         </p>
                         <p class="text-xs">Only HTML files (.html)</p>
                     </div>
-                    <input id="dropzone-file" type="file" class="hidden" accept=".html,text/html" />
+                    @if (selectedHtmlFile) {
+                        <p class="text-sm text-success mt-2">{{ selectedHtmlFile.name }}</p>
+                    }
+                    <input id="dropzone-file" type="file" class="hidden" accept=".html,text/html" (change)="onFileSelected($event)" />
                 </label>
             </div>
 

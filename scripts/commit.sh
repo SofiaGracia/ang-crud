@@ -83,19 +83,24 @@ import os
 next_id = ${NEXT}
 diff = os.environ.get("DIFF_PASSED", "")
 
-prompt = f"""You are a git commit message generator. Analyze the EXACT diff below and generate names based ONLY on what you see in the d>
+prompt = f"""You are a git commit message generator. Analyze the EXACT diff below and generate names based ONLY on what you see in the diff.
 
 Generate:
 1. A branch name: feat/{next_id}-<description-in-english-kebab-case> (max 6 words, based strictly on the diff)
-2. A commit message: feat(#{next_id}): <short-description-in-english> (based strictly on the diff)
+2. A commit message with the following structure:
+   - First line: feat(#{next_id}): <short-summary-in-english> (max 10 words)
+   - A blank line
+   - A bullet-point list (using "- ") describing each meaningful change found in the diff
 
 Rules:
 - ONLY describe what is actually changed in the diff
 - If the diff removes a line, say "remove" not "add"
-- If the diff is tiny, the message must be short and precise
-- Do NOT mention features that are not in the diff
+- Each bullet point must describe ONE specific change (added, removed or modified)
+- Bullet points must be concrete and technical, not vague
+- Do NOT invent or assume changes that are not visible in the diff
+- Write between 2 and 6 bullet points depending on the complexity of the diff
 - Respond ONLY with a JSON object, no extra text, no backticks:
-{{"branch": "...", "commit": "..."}}
+{{"branch": "...", "commit": "feat(#{next_id}): <summary>\\n\\n- <change 1>\\n- <change 2>\\n- <change N>"}}
 
 Diff to analyze:
 {diff}"""

@@ -20,6 +20,7 @@ export class PrototypesSupabaseService {
         );
     }
 
+    // Deuria comprovar-se per mateix nom i mateix projecte
     getProtoByName(name: string): Observable<PrototypeInterface | null> {
         const promise = this.supabase.from('prototypes').select('*').eq('name', name).maybeSingle();
         return from(promise).pipe(map((response) => response.data));

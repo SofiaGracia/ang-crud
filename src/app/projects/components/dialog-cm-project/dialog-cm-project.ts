@@ -63,19 +63,6 @@ export class DialogCMProject {
         return messages;
     }
 
-    projectNameExistsValidator(projectService: ProjectSupabaseService): AsyncValidatorFn {
-        return (control: AbstractControl): Observable<ValidationErrors | null> => {
-            if (!control.value) {
-                return of(null);
-            }
-
-            return projectService.getProjectByName(control.value).pipe(
-                map((exists) => (exists ? { projectNameExists: true } : null)),
-                catchError(() => of(null)),
-            );
-        };
-    }
-
     onSubmit(event: Event) {
         event.preventDefault();
 

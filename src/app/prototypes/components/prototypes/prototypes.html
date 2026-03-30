@@ -4,7 +4,7 @@
         <p>{{ project.description }}</p>
     }
     <!-- Crear prototip -->
-    <dialog-prototype #dialogPro [mode]="'create'"></dialog-prototype>
+    <dialog-prototype #dialogPro [mode]="'create'" [project]="project"></dialog-prototype>
     <button class="btn btn-primary mb-2" (click)="dialogPro.openDialog()">Add prototype</button>
 } @else {
     <h2>Carregant projecte...</h2>

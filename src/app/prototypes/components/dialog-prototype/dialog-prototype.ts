@@ -8,6 +8,7 @@ import {
     ValidationErrors,
     Validators,
 } from '@angular/forms';
+import { ProjectInterface } from '@projects/interfaces/project.interface';
 import { PrototypesFacade } from '@prototypes/facades/prototypes.facades';
 import { PrototypeInterface } from '@prototypes/interfaces/prototype.interface';
 import { PrototypesSupabaseService } from '@prototypes/services/prototypesSupabase.service';
@@ -23,9 +24,7 @@ export class DialogPrototype {
     mode = input.required<'create' | 'edit'>();
 
     prototype = input<PrototypeInterface | undefined>();
-
-    // projectSupabaseService = inject(ProjectSupabaseService);
-    // private projectsFacade = inject(ProjectsFacade);
+    project = input.required<ProjectInterface>();
 
     prototypesSupabaseService = inject(PrototypesSupabaseService);
     private prototypesFacade = inject(PrototypesFacade);
@@ -67,19 +66,6 @@ export class DialogPrototype {
         return messages;
     }
 
-    projectNameExistsValidator(prototypeService: PrototypesSupabaseService): AsyncValidatorFn {
-        return (control: AbstractControl): Observable<ValidationErrors | null> => {
-            if (!control.value) {
-                return of(null);
-            }
-
-            return prototypeService.getProtoByName(control.value).pipe(
-                map((exists) => (exists ? { protoNameExists: true } : null)),
-                catchError(() => of(null)),
-            );
-        };
-    }
-
     onSubmit(event: Event) {
         event.preventDefault();
 
@@ -95,7 +81,9 @@ export class DialogPrototype {
 
         // Second async validation ONLY when submit
         this.prototypesSupabaseService.getProtoByName(control.value!).subscribe((proto) => {
-            if (proto) {
+            // Check it exists on same project
+            if (proto && proto.project_id === this.project().id) {
+
                 // Alredy exists → set control's new error
                 control.setErrors({ ...(control.errors || {}), protoNameExists: true });
                 control.markAsTouched();

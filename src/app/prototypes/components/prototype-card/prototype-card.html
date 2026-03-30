@@ -13,6 +13,21 @@
         <p>
             {{ proto().description }}
         </p>
+        <div class="dropdown dropdown-end" (click)="$event.stopPropagation()">
+            <label tabindex="0" class="btn btn-ghost btn-circle p-2 m-0">
+                <fa-icon [icon]="faEllipsis"></fa-icon>
+            </label>
+            <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-32">
+                <li>
+                    <a (click)="deleteProto($event, proto().id, proto().project_id!)" class="text-red-600">
+                        Remove
+                    </a>
+                </li>
+                <!-- <li>
+                    <a (click)="dialogCM.openDialog()" class="text-grey-100"> Modify </a>
+                </li> -->
+            </ul>
+        </div>
         <div class="card-actions justify-end">
             <div class="badge badge-outline">{{ proto().tool }}</div>
             <div class="badge badge-outline">{{ proto().tool }}</div>

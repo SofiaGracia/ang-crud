@@ -1,0 +1,61 @@
+<dialog #dialogRef class="modal">
+    <div class="modal-box">
+        <form method="dialog">
+            <button
+                class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
+                (click)="onClose()"
+            >
+                ✕
+            </button>
+        </form>
+        <form
+            [formGroup]="createForm()"
+            (submit)="submitFn()($event)"
+            class="flex flex-col items-center gap-3"
+        >
+            <!-- Slot pel títol -->
+            <ng-content select="[slot=title]" />
+
+            <!-- Slot per debug (provisional) -->
+            <ng-content select="[slot=debug]" />
+
+            <!-- Input name + errors compartits -->
+            <div>
+                <input
+                    type="text"
+                    [placeholder]="placeholder()"
+                    class="input"
+                    formControlName="name"
+                />
+                @if (
+                    createForm().controls['name'].touched && createForm().controls['name'].errors
+                ) {
+                    <ul class="error-list">
+                        @for (error of errorsFn()(); track error) {
+                            <li>{{ error }}</li>
+                        }
+                    </ul>
+                }
+            </div>
+
+            <p>Invite others to collaborate on this {{ entityName() }}</p>
+
+            <textarea
+                class="textarea"
+                [placeholder]="placeholder() + ' description'"
+                formControlName="description"
+            ></textarea>
+
+            <div class="mt-5 mb-5">
+                <span>{{ createForm().controls['name'].errors | json }}</span>
+            </div>
+
+            <!-- Slot per contingut extra (drop zone) -->
+            <ng-content select="[slot=extra]" />
+
+            <button type="submit" class="btn btn-wide" [disabled]="createForm().errors">
+                Create
+            </button>
+        </form>
+    </div>
+</dialog>

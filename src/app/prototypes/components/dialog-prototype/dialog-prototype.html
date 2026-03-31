@@ -1,87 +1,57 @@
-<dialog #dialogPro class="modal">
-    <div class="modal-box">
-        <form method="dialog">
-            <button
-                class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
-                (click)="closeModal()"
+<dialog-shell
+    #shell
+    entityName="prototype"
+    placeholder="Name your prototype"
+    [createForm]="createForm"
+    [submitFn]="onSubmit.bind(this)"
+    [errorsFn]="errorsName.bind(this)"
+    [onClose]="closeModal.bind(this)"
+>
+    <h3 slot="title" class="text-lg font-bold">Create prototype</h3>
+    <h4 slot="debug">{{ prototype() | json }}</h4>
+
+    <!-- ✅ Drop zone sols ací -->
+    <div slot="extra" class="flex items-center justify-center w-full">
+        <!-- ...drop zone... -->
+        <div class="flex items-center justify-center w-full">
+            <label
+                for="dropzone-file"
+                class="flex flex-col items-center justify-center w-full h-64 bg-neutral-secondary-medium border border-dashed border-default-strong rounded-base cursor-pointer hover:bg-neutral-tertiary-medium"
             >
-                ✕
-            </button>
-        </form>
-        <form
-            [formGroup]="createForm"
-            (submit)="onSubmit($event)"
-            class="flex flex-col items-center gap-3"
-        >
-            <h3 class="text-lg font-bold">Create prototype</h3>
-            <h4>{{ prototype | json }}</h4>
-            <div>
-                <input
-                    type="text"
-                    placeholder="Name your prototype"
-                    class="input"
-                    formControlName="name"
-                />
-                <!-- Sols vull renderitzar-ho quan es seleccione el botó de crear -->
-                @if (
-                    this.createForm.controls['name'].touched && createForm.controls['name'].errors
-                ) {
-                    <ul class="error-list">
-                        @for (error of errorsName(); track error) {
-                            <li>{{ error }}</li>
-                        }
-                    </ul>
+                <div class="flex flex-col items-center justify-center text-body pt-5 pb-6">
+                    <svg
+                        class="w-8 h-8 mb-4"
+                        aria-hidden="true"
+                        xmlns="http://www.w3.org/2000/svg"
+                        width="24"
+                        height="24"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke="currentColor"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M15 17h3a3 3 0 0 0 0-6h-.025a5.56 5.56 0 0 0 .025-.5A5.5 5.5 0 0 0 7.207 9.021C7.137 9.017 7.071 9 7 9a4 4 0 1 0 0 8h2.167M12 19v-9m0 0-2 2m2-2 2 2"
+                        />
+                    </svg>
+                    <p class="mb-2 text-sm">
+                        <span class="font-semibold">Click to upload</span> or drag and drop
+                    </p>
+                    <p class="text-xs">Only HTML files (.html)</p>
+                </div>
+                @if (selectedHtmlFile) {
+                    <p class="text-sm text-success mt-2">{{ selectedHtmlFile.name }}</p>
                 }
-            </div>
-            <p>Invite others to collaborate on this prototype</p>
-            <textarea
-                class="textarea"
-                placeholder="Prototype's description"
-                formControlName="description"
-            ></textarea>
-            <div class="mt-5 mb-5">
-                <span>{{ createForm.controls['name'].errors | json }}</span>
-            </div>
-
-            <!-- Drop Zone -->
-            <div class="flex items-center justify-center w-full">
-                <label
-                    for="dropzone-file"
-                    class="flex flex-col items-center justify-center w-full h-64 bg-neutral-secondary-medium border border-dashed border-default-strong rounded-base cursor-pointer hover:bg-neutral-tertiary-medium"
-                >
-                    <div class="flex flex-col items-center justify-center text-body pt-5 pb-6">
-                        <svg
-                            class="w-8 h-8 mb-4"
-                            aria-hidden="true"
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            fill="none"
-                            viewBox="0 0 24 24"
-                        >
-                            <path
-                                stroke="currentColor"
-                                stroke-linecap="round"
-                                stroke-linejoin="round"
-                                stroke-width="2"
-                                d="M15 17h3a3 3 0 0 0 0-6h-.025a5.56 5.56 0 0 0 .025-.5A5.5 5.5 0 0 0 7.207 9.021C7.137 9.017 7.071 9 7 9a4 4 0 1 0 0 8h2.167M12 19v-9m0 0-2 2m2-2 2 2"
-                            />
-                        </svg>
-                        <p class="mb-2 text-sm">
-                            <span class="font-semibold">Click to upload</span> or drag and drop
-                        </p>
-                        <p class="text-xs">Only HTML files (.html)</p>
-                    </div>
-                    @if (selectedHtmlFile) {
-                        <p class="text-sm text-success mt-2">{{ selectedHtmlFile.name }}</p>
-                    }
-                    <input id="dropzone-file" type="file" class="hidden" accept=".html,text/html" (change)="onFileSelected($event)" />
-                </label>
-            </div>
-
-            <button type="submit" class="btn btn-wide" [disabled]="createForm.errors">
-                Create
-            </button>
-        </form>
+                <input
+                    id="dropzone-file"
+                    type="file"
+                    class="hidden"
+                    accept=".html,text/html"
+                    (change)="onFileSelected($event)"
+                />
+            </label>
+        </div>
     </div>
-</dialog>
+</dialog-shell>

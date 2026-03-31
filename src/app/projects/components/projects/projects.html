@@ -1,7 +1,7 @@
 <p>projects works!</p>
 
-<dialog-project #dialogPro [mode]="'create'"></dialog-project>
-<button class="btn btn-primary mb-2" (click)="dialogPro.openDialog()">Add project</button>
+<dialog-project #dialogRef [mode]="'create'"></dialog-project>
+<button class="btn btn-primary mb-2" (click)="dialogRef.openDialog()">Add project</button>
 @if (projects$ | async; as projects) {
     @if (projects.length === 0) {
         <p>No hi ha projectes.</p>

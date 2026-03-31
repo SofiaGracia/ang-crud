@@ -1,31 +1,25 @@
-import { Component, effect, ElementRef, inject, input, ViewChild } from '@angular/core';
+import { Component, effect, inject, input, viewChild } from '@angular/core';
 import { ProjectSupabaseService } from '@projects/services/projectsSupabase.service';
-import {
-    AbstractControl,
-    AsyncValidatorFn,
-    FormBuilder,
-    ReactiveFormsModule,
-    ValidationErrors,
-    Validators,
-} from '@angular/forms';
-import { Observable, of, map, catchError } from 'rxjs';
+import { FormBuilder, Validators } from '@angular/forms';
 import { JsonPipe } from '@angular/common';
 import { Project, ProjectInterface } from '@projects/interfaces/project.interface';
 import { ProjectsFacade } from '@projects/facades/projects.facade';
+import { DialogBase } from '@shared/components/dialog.abstract';
+import { DialogShell } from '@shared/components/dialog-shell/dialog-shell';
 
 @Component({
     selector: 'dialog-project',
-    imports: [ReactiveFormsModule, JsonPipe],
+    imports: [DialogShell, JsonPipe],
     templateUrl: './dialog-project.html',
 })
-export class DialogProject {
-    mode = input.required<'create' | 'edit'>();
+export class DialogProject extends DialogBase<ProjectInterface> {
     project = input<ProjectInterface | undefined>();
 
-    @ViewChild('dialogPro') dialogPro!: ElementRef<HTMLDialogElement>;
+    private shell = viewChild.required<DialogShell>('shell');
 
-    projectSupabaseService = inject(ProjectSupabaseService);
     private projectsFacade = inject(ProjectsFacade);
+    projectSupabaseService = inject(ProjectSupabaseService);
+
     fb = inject(FormBuilder);
 
     createForm = this.fb.group({
@@ -34,53 +28,33 @@ export class DialogProject {
     });
 
     constructor() {
+        super();
         effect(() => {
-            const project = this.project();
-
-            if (project) {
+            const entity = this.getEntity();
+            if (entity) {
                 this.createForm.patchValue({
-                    name: project.name,
-                    description: project.description,
+                    name: entity.name,
+                    description: entity.description,
                 });
             }
         });
     }
 
-    errorsName(): string[] {
-        const errors = this.createForm.controls['name'].errors;
-        if (!errors) return [];
-
-        const messages: string[] = [];
-
-        if (errors['required']) {
-            messages.push("Don't forget to name your project");
-        }
-
-        if (errors['projectNameExists']) {
-            messages.push('Try a different name. You already have a project with this name!');
-        }
-
-        return messages;
+    getEntity() {
+        return this.project();
+    }
+    getErrorKey() {
+        return 'project';
     }
 
-    onSubmit(event: Event) {
-        event.preventDefault();
-
-        const control = this.createForm.get('name');
-        if (!control) return;
-
-        // First sync validations
-        control.markAsTouched();
-        this.createForm.updateValueAndValidity();
-        if (this.createForm.invalid) {
-            return;
-        }
+    handleSubmit(name: string) {
+        // First sync validations in abstract class
 
         // Second async validation ONLY when submit
-        this.projectSupabaseService.getProjectByName(control.value!).subscribe((project) => {
+        this.projectSupabaseService.getProjectByName(name).subscribe((project) => {
             if (project) {
-                // Alredy exists → set control's new error
-                control.setErrors({ ...(control.errors || {}), projectNameExists: true });
+                const control = this.createForm.get('name')!;
+                control.setErrors({ ...control.errors, nameExists: true });
                 control.markAsTouched();
                 return;
             }
@@ -100,17 +74,18 @@ export class DialogProject {
                 this.projectsFacade.updateProject(idProject, newProject);
             }
 
-            // Reset form
+            // Lògica específica de projects...
             this.createForm.reset();
             this.closeModal();
         });
     }
 
     openDialog() {
-        this.dialogPro.nativeElement.showModal();
+        this.shell().openDialog();
     }
 
     closeModal() {
-        this.dialogPro.nativeElement.close();
+        this.shell().closeDialog();
+        this.createForm.reset();
     }
 }

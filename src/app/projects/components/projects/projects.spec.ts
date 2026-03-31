@@ -15,11 +15,11 @@ class MockProjectCard {
 }
 
 @Component({
-    selector: 'dialog-cm-project',
+    selector: 'dialog-project',
     standalone: true,
     template: '<div></div>',
 })
-class MockDialogCMProject {}
+class MockDialogProject {}
 
 describe('Projects', () => {
     let component: Projects;
@@ -39,7 +39,7 @@ describe('Projects', () => {
             imports: [
                 Projects,
                 MockProjectCard,
-                MockDialogCMProject,
+                MockDialogProject,
             ],
             providers: [
                 { provide: ProjectsFacade, useValue: mockFacade },

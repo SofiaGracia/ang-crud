@@ -1,4 +1,5 @@
 import { inject, Injectable } from '@angular/core';
+import { Prototype } from '@prototypes/interfaces/prototype.interface';
 import { PrototypesSupabaseService } from '@prototypes/services/prototypesSupabase.service';
 import { BehaviorSubject, switchMap, filter } from 'rxjs';
 
@@ -16,12 +17,12 @@ export class PrototypesFacade {
         this.refresh$.next(projectId);
     }
 
-    // addPrototype(projectId: number, prototype: Prototype) {
-    //     this.prototypesSupabaseService.addPrototype(prototype).subscribe({
-    //         next: () => this.refresh$.next(projectId),
-    //         error: (err) => console.error('Error creating prototype', err),
-    //     });
-    // }
+    addPrototype(projectId: number, prototype: Prototype) {
+        this.prototypesSupabaseService.addPrototype(prototype).subscribe({
+            next: () => this.refresh$.next(projectId),
+            error: (err) => console.error('Error creating prototype', err),
+        });
+    }
 
     removeProto(protoId: number, projectId: number) {
         this.prototypesSupabaseService.removeProto(protoId).subscribe({

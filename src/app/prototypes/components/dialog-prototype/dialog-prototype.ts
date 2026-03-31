@@ -117,7 +117,7 @@ export class DialogPrototype {
 
             // Consider capturing errors
             if (this.mode() === 'create') {
-                // this.prototypesFacade.addProto(newProto);
+                this.prototypesFacade.addPrototype(this.project().id, newProto);
                 console.log('CREATE PROTOTYPE');
             } else {
                 // const idProject = this.prototype()!.id; // Is never going to be undefined because we are modifying

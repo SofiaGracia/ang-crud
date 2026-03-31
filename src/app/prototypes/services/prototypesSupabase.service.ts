@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { PrototypeInterface } from '@prototypes/interfaces/prototype.interface';
+import { Prototype, PrototypeInterface } from '@prototypes/interfaces/prototype.interface';
 import { map, Observable, from } from 'rxjs';
 import { SupabaseClientService } from '@shared/services/supabase-client.service';
 
@@ -58,5 +58,17 @@ export class PrototypesSupabaseService {
         }
 
         return publicUrlData.publicUrl;
+    }
+
+    addPrototype(prototype: Prototype): Observable<PrototypeInterface> {
+        const promise = this.supabase.from('prototypes').insert(prototype).select('*').single();
+        return from(promise).pipe(
+            map((response) => {
+                if (response.error) {
+                    throw response.error;
+                }
+                return response.data;
+            }),
+        );
     }
 }

@@ -14,15 +14,15 @@ import { Project, ProjectInterface } from '@projects/interfaces/project.interfac
 import { ProjectsFacade } from '@projects/facades/projects.facade';
 
 @Component({
-    selector: 'dialog-cm-project',
+    selector: 'dialog-project',
     imports: [ReactiveFormsModule, JsonPipe],
-    templateUrl: './dialog-cm-project.html',
+    templateUrl: './dialog-project.html',
 })
-export class DialogCMProject {
+export class DialogProject {
     mode = input.required<'create' | 'edit'>();
     project = input<ProjectInterface | undefined>();
 
-    @ViewChild('dialogCM') dialogCM!: ElementRef<HTMLDialogElement>;
+    @ViewChild('dialogPro') dialogPro!: ElementRef<HTMLDialogElement>;
 
     projectSupabaseService = inject(ProjectSupabaseService);
     private projectsFacade = inject(ProjectsFacade);
@@ -107,10 +107,10 @@ export class DialogCMProject {
     }
 
     openDialog() {
-        this.dialogCM.nativeElement.showModal();
+        this.dialogPro.nativeElement.showModal();
     }
 
     closeModal() {
-        this.dialogCM.nativeElement.close();
+        this.dialogPro.nativeElement.close();
     }
 }

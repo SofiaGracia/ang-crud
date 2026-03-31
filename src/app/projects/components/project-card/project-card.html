@@ -1,4 +1,4 @@
-<dialog-cm-project #dialogCM [mode]="'edit'" [project]="project()"></dialog-cm-project>
+<dialog-project #dialogPro [mode]="'edit'" [project]="project()"></dialog-project>
 <div class="card bg-base-100 w-96 shadow-sm relative" [routerLink]="['/projects', project().id]">
     <figure>
         <img
@@ -28,7 +28,7 @@
                         </a>
                     </li>
                     <li>
-                        <a (click)="dialogCM.openDialog()" class="text-grey-100">
+                        <a (click)="dialogPro.openDialog()" class="text-grey-100">
                             Modify
                         </a>
                     </li>

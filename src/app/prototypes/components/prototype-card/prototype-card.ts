@@ -3,7 +3,8 @@ import { PrototypeInterface } from '@prototypes/interfaces/prototype.interface';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { faEllipsis } from '@fortawesome/free-solid-svg-icons';
 import { PrototypesFacade } from '@prototypes/facades/prototypes.facades';
-import { DomSanitizer, SafeHtml, SafeResourceUrl } from '@angular/platform-browser';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { Router } from '@angular/router';
 
 @Component({
     selector: 'prototype-card',
@@ -14,6 +15,7 @@ export class PrototypeCard {
     proto = input.required<PrototypeInterface>();
     private prototypesFacade = inject(PrototypesFacade);
     private sanitizer = inject(DomSanitizer);
+    private router = inject(Router);
 
     htmlContent = signal<SafeHtml | null>(null);
 
@@ -25,20 +27,39 @@ export class PrototypeCard {
             fetch(url)
                 .then((res) => res.text())
                 .then((html) => {
-                    this.htmlContent.set(this.sanitizer.bypassSecurityTrustHtml(html));
+                    const wrappedSrcdoc = this.buildSrcdoc(html);
+                    this.htmlContent.set(this.sanitizer.bypassSecurityTrustHtml(wrappedSrcdoc));
                 });
         }
-    }
-
-    get safeUrl(): SafeResourceUrl | null {
-        const url = this.proto().url;
-        if (!url) return null;
-        return this.sanitizer.bypassSecurityTrustResourceUrl(url);
     }
 
     deleteProto(event: MouseEvent, id: number, projectId: number) {
         event.stopPropagation();
         this.prototypesFacade.removeProto(id, projectId);
         console.log('Prototype removed');
+    }
+
+    openPreview() {
+        const { id, project_id: projectId } = this.proto();
+        if (!projectId) return;
+        this.router.navigate(['/projects', projectId, 'prototypes', id]);
+    }
+
+    private buildSrcdoc(html: string): string {
+        return `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      html, body { margin: 0; padding: 0; min-height: 100%; }
+      body { padding: 0.75rem; }
+    </style>
+  </head>
+  <body>
+    ${html}
+  </body>
+</html>`;
     }
 }

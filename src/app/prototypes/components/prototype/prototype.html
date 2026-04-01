@@ -1,1 +1,34 @@
-<p>prototype works!</p>,
+<div class="flex flex-col gap-4">
+    <div class="flex items-center justify-between">
+        <div>
+            <h2 class="text-2xl font-semibold">
+                {{ prototype()?.name ?? 'Preview de prototipo' }}
+            </h2>
+            @if (prototype()?.description) {
+                <p class="text-base-content/70">{{ prototype()?.description }}</p>
+            }
+        </div>
+        <a class="btn btn-ghost" [routerLink]="['/projects', prototype()?.project_id, 'prototypes']">
+            Volver
+        </a>
+    </div>
+
+    @if (loading()) {
+        <div class="h-[70vh] rounded-box bg-base-200 flex items-center justify-center">
+            <span class="loading loading-spinner loading-lg"></span>
+        </div>
+    } @else if (error()) {
+        <div class="alert alert-warning">
+            <span>{{ error() }}</span>
+        </div>
+    } @else if (srcdoc()) {
+        <div class="rounded-box border border-base-300 overflow-hidden bg-base-100 h-[80vh]">
+            <iframe
+                [srcdoc]="srcdoc()!"
+                class="w-full h-full border-0"
+                sandbox="allow-scripts"
+                scrolling="auto"
+            ></iframe>
+        </div>
+    }
+</div>

@@ -36,8 +36,8 @@ export const routes: Routes = [
                             },
                             {
                                 path: 'prototypes/:prototypeId',
-                                // Detalle de un prototipo concreto (opcional)
-                                component: Prototype
+                                // Preview grande de un prototipo concreto
+                                component: Prototype,
                             },
                         ],
                     },

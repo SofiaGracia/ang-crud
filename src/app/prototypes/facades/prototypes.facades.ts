@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
-import { Prototype } from '@prototypes/interfaces/prototype.interface';
+import { Prototype, PrototypeInterface } from '@prototypes/interfaces/prototype.interface';
 import { PrototypesSupabaseService } from '@prototypes/services/prototypesSupabase.service';
-import { BehaviorSubject, switchMap, filter } from 'rxjs';
+import { BehaviorSubject, Observable, switchMap, filter } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class PrototypesFacade {
@@ -33,6 +33,10 @@ export class PrototypesFacade {
                 console.error('Error removing prototype', err);
             },
         });
+    }
+
+    getPrototypeById(projectId: number, prototypeId: number): Observable<PrototypeInterface | null> {
+        return this.prototypesSupabaseService.getPrototypeById(projectId, prototypeId);
     }
 
     // updateProject(projectId: number, dataToUpdate: Project) {

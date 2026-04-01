@@ -26,6 +26,24 @@ export class PrototypesSupabaseService {
         return from(promise).pipe(map((response) => response.data));
     }
 
+    getPrototypeById(projectId: number, prototypeId: number): Observable<PrototypeInterface | null> {
+        const promise = this.supabase
+            .from('prototypes')
+            .select('*')
+            .eq('project_id', projectId)
+            .eq('id', prototypeId)
+            .maybeSingle();
+
+        return from(promise).pipe(
+            map((response) => {
+                if (response.error) {
+                    throw response.error;
+                }
+                return response.data;
+            }),
+        );
+    }
+
     removeProto(protoId: number): Observable<void> {
         const promise = this.supabase.from('prototypes').delete().eq('id', protoId);
         return from(promise).pipe(

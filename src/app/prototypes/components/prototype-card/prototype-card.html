@@ -1,10 +1,14 @@
-<div class="card bg-base-100 w-96 shadow-sm">
+<div
+    class="card bg-base-100 w-96 shadow-sm cursor-pointer"
+    (click)="openPreview()"
+>
     <figure class="h-48 overflow-hidden">
         @if (htmlContent()) {
             <iframe
                 [srcdoc]="htmlContent()!"
                 class="w-full h-full border-0 pointer-events-none"
                 style="transform: scale(0.5); transform-origin: top left; width: 200%; height: 200%"
+                sandbox="allow-scripts"
                 scrolling="no"
             ></iframe>
         } @else if (proto().url) {

@@ -23,12 +23,39 @@
         </div>
     } @else if (srcdoc()) {
         <div class="rounded-box border border-base-300 overflow-hidden ">
-            <iframe
-                [srcdoc]="srcdoc()!"
-                class="w-full min-h-[75vh] border-0"
-                sandbox="allow-scripts"
-                scrolling="auto"
-            ></iframe>
+            <div class="border-b border-base-300">
+                <div class="tabs tabs-boxed">
+                    <button
+                        type="button"
+                        class="tab"
+                        [class.tab-active]="activeTab() === 'preview'"
+                        (click)="activeTab.set('preview')"
+                    >
+                        Preview
+                    </button>
+                    <button
+                        type="button"
+                        class="tab"
+                        [class.tab-active]="activeTab() === 'code'"
+                        (click)="activeTab.set('code')"
+                    >
+                        Código
+                    </button>
+                </div>
+            </div>
+
+            @if (activeTab() === 'preview') {
+                <iframe
+                    [srcdoc]="srcdoc()!"
+                    class="w-full min-h-[75vh] border-0"
+                    sandbox="allow-scripts"
+                    scrolling="auto"
+                ></iframe>
+            } @else {
+                <div class="p-4">
+                    <pre class="max-h-[75vh] overflow-x-auto overflow-y-auto whitespace-pre text-sm">{{ downloadedHtml() ?? '' }}</pre>
+                </div>
+            }
         </div>
     }
 </div>

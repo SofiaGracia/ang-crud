@@ -19,8 +19,10 @@ export class Prototype {
 
     prototype = signal<PrototypeInterface | null>(null);
     srcdoc = signal<SafeHtml | null>(null);
+    downloadedHtml = signal<string | null>(null);
     loading = signal(true);
     error = signal<string | null>(null);
+    activeTab = signal<'preview' | 'code'>('preview');
 
     constructor() {
         this.route.paramMap
@@ -44,6 +46,8 @@ export class Prototype {
                     this.loading.set(true);
                     this.error.set(null);
                     this.srcdoc.set(null);
+                    this.downloadedHtml.set(null);
+                    this.activeTab.set('preview');
                 }),
                 switchMap(({ projectId, prototypeId }) =>
                     this.prototypesFacade.getPrototypeById(projectId, prototypeId),
@@ -84,6 +88,7 @@ export class Prototype {
             })
             .then((html) => {
                 const wrappedSrcdoc = this.buildSrcdoc(html);
+                this.downloadedHtml.set(html);
                 this.srcdoc.set(this.sanitizer.bypassSecurityTrustHtml(wrappedSrcdoc));
                 this.loading.set(false);
             })

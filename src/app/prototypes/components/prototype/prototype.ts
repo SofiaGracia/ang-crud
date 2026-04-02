@@ -95,7 +95,13 @@ export class Prototype {
     }
 
     private buildSrcdoc(html: string): string {
-        return `<!doctype html>
+        const parser = new DOMParser();
+
+        // Parseamos el documento del prototipo para evitar anidar un `<!doctype html><html><body>...` dentro del preview.
+        const parsedDoc = parser.parseFromString(html, 'text/html');
+
+        // Shell del preview (mantiene Tailwind + el handler que evita navegación por `<a>`).
+        const shell = `<!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
@@ -119,10 +125,41 @@ export class Prototype {
     </style>
   </head>
   <body>
-    <div class="flex items-center justify-center bg-gray-900 p-8 scheme-dark">
-        ${html}
-    </div>
+    <div id="preview-root" class="flex items-center justify-center bg-gray-900 p-8 scheme-dark"></div>
   </body>
 </html>`;
+
+        const destDoc = parser.parseFromString(shell, 'text/html');
+        const destHead = destDoc.head;
+        const destRoot = destDoc.getElementById('preview-root');
+        const srcHead = parsedDoc.head;
+        const srcBody = parsedDoc.body;
+
+        // Fallback: si el parseo del prototipo no produce head/body razonables,
+        // lo tratamos como contenido "innerHTML" del contenedor.
+        if (!destHead || !destRoot) {
+            // Shell del preview no debería fallar; si falla, devolvemos el HTML sin transformar.
+            return shell;
+        }
+        if (!srcHead || !srcBody) {
+            destRoot.innerHTML = html;
+            return `<!doctype html>\n${destDoc.documentElement.outerHTML}`;
+        }
+
+        // Fusionar <head>: clonamos los hijos del head del prototipo.
+        // Nota: si el prototipo incluye `<base href>`, podría afectar a rutas relativas; es el mismo comportamiento
+        // que tendría en un documento normal, pero aquí lo preservamos porque se pidió tratar el head completo.
+        for (const node of Array.from(srcHead.childNodes)) {
+            destHead.appendChild(node.cloneNode(true));
+        }
+
+        // Insertar solo el contenido del <body> del prototipo en el contenedor del preview.
+        while (destRoot.firstChild) destRoot.removeChild(destRoot.firstChild);
+        for (const node of Array.from(srcBody.childNodes)) {
+            destRoot.appendChild(node.cloneNode(true));
+        }
+
+        // Serializamos el documento final para `srcdoc`.
+        return `<!doctype html>\n${destDoc.documentElement.outerHTML}`;
     }
 }

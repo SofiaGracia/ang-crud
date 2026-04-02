@@ -101,6 +101,19 @@ export class Prototype {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      // Evita que el preview navegue cuando el HTML del prototipo contiene enlaces.
+      // Mantenemos el resto de la interacción (hover, toggles, etc.).
+      document.addEventListener('click', (event) => {
+        const target = event.target;
+        if (!(target instanceof Element)) return;
+
+        const anchor = target.closest('a[href]');
+        if (!anchor) return;
+
+        event.preventDefault();
+      }, true);
+    </script>
     <style>
       body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; background-color: oklch(21% 0.034 264.665); }
     </style>

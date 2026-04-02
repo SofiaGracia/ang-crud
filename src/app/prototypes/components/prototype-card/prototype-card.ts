@@ -53,12 +53,14 @@ export class PrototypeCard {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-      html, body { margin: 0; padding: 0; min-height: 100%; }
+      html, body { margin: 0; padding: 2rem; min-height: 100%; display: flex, justify-content: center, background-color: #111827; }
       body { padding: 0.75rem; }
     </style>
   </head>
   <body>
-    ${html}
+  <div class="flex items-center justify-center bg-gray-900 p-8 scheme-dark">
+  ${html}
+  </div>
   </body>
 </html>`;
     }

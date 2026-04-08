@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, Output, EventEmitter } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
-import { faBars, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faTimes, faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 import { SIDEMENUOPTIONS } from '@web-front/constants/sidebar-options.constant';
 
 @Component({
@@ -16,24 +16,43 @@ import { SIDEMENUOPTIONS } from '@web-front/constants/sidebar-options.constant';
             color: white;
             transition: width 0.3s;
             padding: 1rem;
-            overflow: hidden; /* importante: que no scrollee */
+            overflow: hidden;
             flex-shrink: 0;
+            display: flex;
+            flex-direction: column;
         }
 
         .sidebar.collapsed {
             width: 70px;
         }
+
+        .nav-links {
+            flex: 1;
+        }
+
+        .logout-btn {
+            border-top: 1px solid #374151;
+            padding-top: 1rem;
+            margin-top: auto;
+        }
     `,
 })
 export class FrontSidebar {
+    @Output() signOut = new EventEmitter<void>();
+
     sidebarOptions = SIDEMENUOPTIONS;
 
     faBars = faBars;
     faTimes = faTimes;
+    faRightFromBracket = faRightFromBracket;
 
     collapsed = false;
 
     toggle() {
         this.collapsed = !this.collapsed;
+    }
+
+    onSignOut(): void {
+        this.signOut.emit();
     }
 }

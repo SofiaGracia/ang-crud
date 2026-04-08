@@ -5,6 +5,7 @@
     "compilerOptions": {
         "baseUrl": "./",
         "paths": {
+            "@auth/*": ["./src/app/auth/*"],
             "@prototypes/*": ["./src/app/prototypes/*"],
             "@projects/*": ["./src/app/projects/*"],
             "@web-front/*": ["./src/app/web-front/*"],

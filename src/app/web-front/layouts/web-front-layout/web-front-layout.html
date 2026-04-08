@@ -1,6 +1,7 @@
 <div class="layout">
-    <!-- SIDEBAR -->
-    <front-sidebar></front-sidebar>
+    @if (isAuthenticated$ | async) {
+        <front-sidebar (signOut)="signOut()"></front-sidebar>
+    }
 
     <div class="content">
         <router-outlet></router-outlet>

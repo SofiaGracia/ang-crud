@@ -1,21 +1,44 @@
 <div class="sidebar" [class.collapsed]="collapsed">
-    <button type="button" (click)="toggle()">
+    <button type="button" (click)="toggle()" class="mb-4">
         <fa-icon [class.hidden]="collapsed" [icon]="faBars"></fa-icon>
         <fa-icon [class.hidden]="!collapsed" [icon]="faTimes"></fa-icon>
     </button>
-    <ul>
-        @for (option of sidebarOptions; track option) {
-            <li class="flex items-center gap-2" [routerLink]="option.route">
-                <fa-icon [icon]="option.icon" class="text-slate-200"></fa-icon>
 
-                <span
-                    class="inline-block overflow-hidden whitespace-nowrap transition-all duration-300"
-                    [style.width.px]="collapsed ? 0 : 80"
-                    [style.opacity]="collapsed ? 0 : 1"
+    <div class="nav-links">
+        <ul>
+            @for (option of sidebarOptions; track option) {
+                <li
+                    class="flex items-center gap-2 cursor-pointer hover:bg-gray-700 rounded px-2 py-2"
+                    [routerLink]="option.route"
                 >
-                    {{ option.title }}
-                </span>
-            </li>
-        }
-    </ul>
+                    <fa-icon [icon]="option.icon" class="text-slate-200"></fa-icon>
+
+                    <span
+                        class="inline-block overflow-hidden whitespace-nowrap transition-all duration-300"
+                        [style.width.px]="collapsed ? 0 : 80"
+                        [style.opacity]="collapsed ? 0 : 1"
+                    >
+                        {{ option.title }}
+                    </span>
+                </li>
+            }
+        </ul>
+    </div>
+
+    <div class="logout-btn">
+        <button
+            type="button"
+            class="flex items-center gap-2 cursor-pointer hover:bg-gray-700 rounded px-2 py-2 w-full"
+            (click)="onSignOut()"
+        >
+            <fa-icon [icon]="faRightFromBracket" class="text-slate-200"></fa-icon>
+            <span
+                class="inline-block overflow-hidden whitespace-nowrap transition-all duration-300"
+                [style.width.px]="collapsed ? 0 : 80"
+                [style.opacity]="collapsed ? 0 : 1"
+            >
+                Logout
+            </span>
+        </button>
+    </div>
 </div>

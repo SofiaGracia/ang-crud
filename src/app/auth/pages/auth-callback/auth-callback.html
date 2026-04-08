@@ -1,0 +1,10 @@
+@if (errorMessage) {
+    <div class="alert alert-error shadow-lg">
+        <span>{{ errorMessage }}</span>
+    </div>
+} @else {
+    <div class="text-center">
+        <fa-icon [icon]="faSpinner" class="animate-spin text-5xl mb-4"></fa-icon>
+        <p class="text-lg">Signing you in...</p>
+    </div>
+}

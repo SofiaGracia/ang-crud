@@ -1,10 +1,12 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { AsyncPipe } from '@angular/common';
 import { FrontSidebar } from '@web-front/components/front-sidebar/front-sidebar';
+import { AuthFacade } from '@auth/facades/auth.facade';
 
 @Component({
     selector: 'app-web-front-layout',
-    imports: [RouterOutlet, FrontSidebar],
+    imports: [RouterOutlet, AsyncPipe, FrontSidebar],
     templateUrl: './web-front-layout.html',
     styles: `
         .layout {
@@ -21,4 +23,12 @@ import { FrontSidebar } from '@web-front/components/front-sidebar/front-sidebar'
         }
     `,
 })
-export default class WebFrontLayout {}
+export default class WebFrontLayout {
+    private authFacade = inject(AuthFacade);
+
+    isAuthenticated$ = this.authFacade.isAuthenticated$;
+
+    async signOut(): Promise<void> {
+        await this.authFacade.signOut();
+    }
+}

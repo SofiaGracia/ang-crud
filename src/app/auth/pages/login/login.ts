@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
@@ -30,36 +30,36 @@ export default class Login {
 
     email = '';
     password = '';
-    errorMessage = '';
-    isLoading = false;
-    isLoadingOAuth = false;
+    errorMessage = signal('');
+    isLoading = signal(false);
+    isLoadingOAuth = signal(false);
 
     async signInWithGoogle(): Promise<void> {
-        this.isLoadingOAuth = true;
+        this.isLoadingOAuth.set(true);
         await this.authFacade.signInWithGoogle();
     }
 
     async signInWithGithub(): Promise<void> {
-        this.isLoadingOAuth = true;
+        this.isLoadingOAuth.set(true);
         await this.authFacade.signInWithGithub();
     }
 
     async signInWithEmail(): Promise<void> {
         if (!this.email || !this.password) {
-            this.errorMessage = 'Please enter email and password';
+            this.errorMessage.set('Please enter email and password');
             return;
         }
 
-        this.isLoading = true;
-        this.errorMessage = '';
+        this.isLoading.set(true);
+        this.errorMessage.set('');
 
         try {
             await this.authFacade.signInWithPassword(this.email, this.password);
             this.navigateAfterLogin();
         } catch (_error) {
-            this.errorMessage = 'Invalid email or password';
+            this.errorMessage.set('Invalid email or password');
         } finally {
-            this.isLoading = false;
+            this.isLoading.set(false);
         }
     }
 

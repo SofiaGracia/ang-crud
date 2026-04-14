@@ -10,6 +10,10 @@ export const routes: Routes = [
         loadComponent: () => import('./auth/pages/login/login'),
     },
     {
+        path: 'register',
+        loadComponent: () => import('./auth/pages/register/register'),
+    },
+    {
         path: 'auth/callback',
         loadComponent: () => import('./auth/pages/auth-callback/auth-callback'),
     },

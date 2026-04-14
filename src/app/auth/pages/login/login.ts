@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { ActivatedRoute, Router } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { faEnvelope, faLock, faSpinner } from '@fortawesome/free-solid-svg-icons';
@@ -7,7 +7,7 @@ import { AuthFacade } from '@auth/facades/auth.facade';
 
 @Component({
     selector: 'app-login',
-    imports: [FormsModule, FaIconComponent],
+    imports: [FormsModule, FaIconComponent, RouterLink],
     templateUrl: './login.html',
     styles: `
         :host {

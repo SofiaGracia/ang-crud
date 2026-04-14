@@ -36,7 +36,7 @@ export class AuthSupabaseService {
         return { error };
     }
 
-    async signUp(email: string, password: string): Promise<{ error: Error | null }> {
+    async signUp(email: string, password: string): Promise<{ error: any }> {
         const { error } = await this.auth.signUp({
             email,
             password,

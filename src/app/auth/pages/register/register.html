@@ -1,0 +1,100 @@
+<div class="card bg-base-100 shadow-xl w-full max-w-md">
+    <div class="card-body">
+        <h2 class="card-title text-2xl font-bold text-center mb-6">Create Account</h2>
+
+        @if (errorMessage) {
+            <div class="alert alert-error mb-4">
+                <span>{{ errorMessage }}</span>
+            </div>
+        }
+
+        @if (successMessage) {
+            <div class="alert alert-success mb-4">
+                <fa-icon [icon]="faCheck"></fa-icon>
+                <span>{{ successMessage }}</span>
+            </div>
+        }
+
+        @if (!successMessage) {
+            <div class="space-y-4">
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">Email</span>
+                    </label>
+                    <label class="input input-bordered flex items-center gap-2">
+                        <fa-icon [icon]="faEnvelope" class="text-gray-400"></fa-icon>
+                        <input
+                            type="email"
+                            class="grow"
+                            placeholder="email@example.com"
+                            [(ngModel)]="email"
+                        />
+                    </label>
+                </div>
+
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">Password</span>
+                    </label>
+                    <label class="input input-bordered flex items-center gap-2">
+                        <fa-icon [icon]="faLock" class="text-gray-400"></fa-icon>
+                        <input
+                            type="password"
+                            class="grow"
+                            placeholder="Min. 6 characters"
+                            [(ngModel)]="password"
+                        />
+                    </label>
+                </div>
+
+                <div class="form-control">
+                    <label class="label">
+                        <span class="label-text">Confirm Password</span>
+                    </label>
+                    <label class="input input-bordered flex items-center gap-2">
+                        <fa-icon [icon]="faLock" class="text-gray-400"></fa-icon>
+                        <input
+                            type="password"
+                            class="grow"
+                            placeholder="Confirm your password"
+                            [(ngModel)]="confirmPassword"
+                        />
+                    </label>
+                </div>
+
+                <button
+                    type="button"
+                    class="btn btn-primary w-full"
+                    (click)="signUp()"
+                    [disabled]="isLoading"
+                >
+                    @if (isLoading) {
+                        <fa-icon [icon]="faSpinner" class="animate-spin"></fa-icon>
+                    } @else {
+                        Sign Up
+                    }
+                </button>
+
+                <p class="text-center mt-4 text-sm">
+                    Already have an account?
+                    <a routerLink="/login" class="link link-primary">Sign in</a>
+                </p>
+            </div>
+        } @else {
+            <div class="space-y-4">
+                <p class="text-center text-sm text-gray-600">
+                    Didn't receive the email? Check your spam folder or
+                    <button class="link link-primary" (click)="signUp()">try again</button>.
+                </p>
+
+                <button
+                    type="button"
+                    class="btn btn-outline w-full"
+                    (click)="goToLogin()"
+                >
+                    Back to Sign In
+                </button>
+            </div>
+        }
+    </div>
+</div>

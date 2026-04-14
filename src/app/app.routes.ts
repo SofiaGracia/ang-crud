@@ -19,44 +19,38 @@ export const routes: Routes = [
     },
     {
         path: '',
+        loadComponent: () => import('./web-front/pages/landing/landing'),
+    },
+    {
+        path: 'projects',
         loadComponent: () => import('./web-front/layouts/web-front-layout/web-front-layout'),
         canActivate: [authGuard],
         children: [
             {
                 path: '',
-                redirectTo: 'projects',
-                pathMatch: 'full',
+                component: Projects,
             },
             {
-                path: 'projects',
+                path: ':projectId',
                 children: [
                     {
                         path: '',
-                        component: Projects,
+                        redirectTo: 'prototypes',
+                        pathMatch: 'full',
                     },
                     {
-                        path: ':projectId',
-                        children: [
-                            {
-                                path: '',
-                                redirectTo: 'prototypes',
-                                pathMatch: 'full',
-                            },
-                            {
-                                path: 'prototypes',
-                                component: Prototypes,
-                            },
-                            {
-                                path: 'prototypes/:prototypeId',
-                                component: Prototype,
-                            },
-                        ],
+                        path: 'prototypes',
+                        component: Prototypes,
+                    },
+                    {
+                        path: 'prototypes/:prototypeId',
+                        component: Prototype,
                     },
                 ],
             },
             {
                 path: '**',
-                redirectTo: 'projects',
+                redirectTo: '',
             },
         ],
     },

@@ -20,9 +20,7 @@ export const authGuard: CanActivateFn = (route, _state) => {
             const redirectParam = encodeURIComponent(`/${redirectTo}`);
 
             if (!isAuthenticated) {
-                router.navigate(['/login'], {
-                    queryParams: { redirect: redirectParam },
-                });
+                router.navigate(['/']);
                 return false;
             }
 

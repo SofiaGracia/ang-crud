@@ -62,7 +62,7 @@ export class AuthFacade implements OnDestroy {
     async signInWithPassword(email: string, password: string): Promise<void> {
         const { error } = await this.authService.signInWithPassword(email, password);
         if (error) {
-            console.error('Sign in error:', error);
+            // console.error('Sign in error:', error);
             throw error;
         }
     }

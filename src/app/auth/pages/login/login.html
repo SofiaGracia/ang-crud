@@ -2,9 +2,9 @@
     <div class="card-body">
         <h2 class="card-title text-2xl font-bold text-center mb-6">Welcome Back</h2>
 
-        @if (errorMessage) {
+        @if (errorMessage()) {
             <div class="alert alert-error mb-4">
-                <span>{{ errorMessage }}</span>
+                <span>{{ errorMessage() }}</span>
             </div>
         }
 
@@ -13,9 +13,9 @@
                 type="button"
                 class="btn btn-outline w-full gap-2"
                 (click)="signInWithGoogle()"
-                [disabled]="isLoadingOAuth || isLoading"
+                [disabled]="isLoadingOAuth() || isLoading()"
             >
-                @if (isLoadingOAuth) {
+                @if (isLoadingOAuth()) {
                     <fa-icon [icon]="faSpinner" class="animate-spin"></fa-icon>
                 } @else {
                     <svg class="w-5 h-5" viewBox="0 0 24 24">
@@ -44,9 +44,9 @@
                 type="button"
                 class="btn btn-outline w-full gap-2"
                 (click)="signInWithGithub()"
-                [disabled]="isLoadingOAuth || isLoading"
+                [disabled]="isLoadingOAuth() || isLoading()"
             >
-                @if (isLoadingOAuth) {
+                @if (isLoadingOAuth()) {
                     <fa-icon [icon]="faSpinner" class="animate-spin"></fa-icon>
                 } @else {
                     <svg class="w-5 h-5" viewBox="0 0 24 24">
@@ -95,9 +95,9 @@
                 type="button"
                 class="btn btn-primary w-full"
                 (click)="signInWithEmail()"
-                [disabled]="isLoading || isLoadingOAuth"
+                [disabled]="isLoading() || isLoadingOAuth()"
             >
-                @if (isLoading) {
+                @if (isLoading()) {
                     <fa-icon [icon]="faSpinner" class="animate-spin"></fa-icon>
                 } @else {
                     Sign In

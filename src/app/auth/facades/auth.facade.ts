@@ -67,12 +67,12 @@ export class AuthFacade implements OnDestroy {
         }
     }
 
-    async signUp(email: string, password: string): Promise<void> {
-        const { error } = await this.authService.signUp(email, password);
-        if (error) {
-            console.error('Sign up error:', error);
-            throw error;
+    async signUp(email: string, password: string): Promise<{ error: any }> {
+        const result = await this.authService.signUp(email, password);
+        if (result.error) {
+            console.error('Sign up error:', result.error);
         }
+        return result;
     }
 
     async signOut(): Promise<void> {

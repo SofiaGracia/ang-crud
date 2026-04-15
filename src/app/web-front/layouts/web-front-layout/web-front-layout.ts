@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 import { AsyncPipe } from '@angular/common';
 import { FrontSidebar } from '@web-front/components/front-sidebar/front-sidebar';
 import { AuthFacade } from '@auth/facades/auth.facade';
@@ -25,10 +25,12 @@ import { AuthFacade } from '@auth/facades/auth.facade';
 })
 export default class WebFrontLayout {
     private authFacade = inject(AuthFacade);
+    private router = inject(Router);
 
     isAuthenticated$ = this.authFacade.isAuthenticated$;
 
     async signOut(): Promise<void> {
         await this.authFacade.signOut();
+        this.router.navigate(['/']);
     }
 }

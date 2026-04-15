@@ -16,8 +16,6 @@ export const authGuard: CanActivateFn = (route, _state) => {
             }
 
             const isAuthenticated = authFacade['user$'].value !== null;
-            const redirectTo = route.url.map((segment) => segment.path).join('/') || 'projects';
-            const redirectParam = encodeURIComponent(`/${redirectTo}`);
 
             if (!isAuthenticated) {
                 router.navigate(['/']);

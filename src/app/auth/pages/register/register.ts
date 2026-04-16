@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
@@ -33,7 +33,7 @@ export default class Register {
     confirmPassword = '';
     errorMessage = '';
     successMessage = '';
-    isLoading = false;
+    isLoading = signal(false);
 
     async signUp(): Promise<void> {
         this.errorMessage = '';
@@ -59,7 +59,7 @@ export default class Register {
             return;
         }
 
-        this.isLoading = true;
+        this.isLoading.set(true);
 
         try {
             const { error } = await this.authFacade.signUp(this.email, this.password);
@@ -75,7 +75,7 @@ export default class Register {
         } catch (error: any) {
             this.handleSignUpError(error);
         } finally {
-            this.isLoading = false;
+            this.isLoading.set(false);
         }
     }
 

@@ -66,9 +66,9 @@
                     type="button"
                     class="btn btn-primary w-full"
                     (click)="signUp()"
-                    [disabled]="isLoading"
+                    [disabled]="isLoading()"
                 >
-                    @if (isLoading) {
+                    @if (isLoading()) {
                         <fa-icon [icon]="faSpinner" class="animate-spin"></fa-icon>
                     } @else {
                         Sign Up

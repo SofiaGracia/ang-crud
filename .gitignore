@@ -44,6 +44,9 @@ __screenshots__/
 pasos.txt
 .editorconfig
 
+#Migrations
+src/app/auth/Migrations
+
 # System files
 .DS_Store
 Thumbs.db

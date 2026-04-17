@@ -62,4 +62,22 @@ export class AuthSupabaseService {
     onAuthStateChange(callback: (event: string, session: Session | null) => void) {
         return this.auth.onAuthStateChange(callback);
     }
+
+    async checkEmailAvailability(email: string): Promise<{
+        available: boolean;
+        message?: string;
+        error: Error | null;
+    }> {
+        const { data, error } = await this.supabase.functions.invoke('check-email-availability', {
+            body: { email },
+        });
+
+        if (error) return { available: false, error };
+
+        return {
+            available: data.available,
+            message: data.message,
+            error: null,
+        };
+    }
 }

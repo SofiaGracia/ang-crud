@@ -82,6 +82,15 @@ export class AuthFacade implements OnDestroy {
         }
     }
 
+    async checkEmailAvailability(email: string): Promise<{ available: boolean; message?: string }> {
+        const result = await this.authService.checkEmailAvailability(email);
+        if (result.error) {
+            console.error('Error checking email:', result.error);
+            throw result.error;
+        }
+        return { available: result.available, message: result.message };
+    }
+
     ngOnDestroy(): void {
         this.user$.complete();
         this.session$.complete();

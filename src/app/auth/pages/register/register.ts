@@ -62,6 +62,13 @@ export default class Register {
         this.isLoading.set(true);
 
         try {
+            const { available, message } = await this.authFacade.checkEmailAvailability(this.email);
+            if (!available) {
+                this.errorMessage = message || 'This email is already registered';
+                this.isLoading.set(false);
+                return;
+            }
+
             const { error } = await this.authFacade.signUp(this.email, this.password);
 
             if (error) {

@@ -2,6 +2,7 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { PrototypesFacade } from '@prototypes/facades/prototypes.facades';
+import { RecentPrototypesService } from '@prototypes/services/recent-prototypes.service';
 import { distinctUntilChanged, filter, map, switchMap, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { PrototypeInterface } from '@prototypes/interfaces/prototype.interface';
@@ -16,6 +17,7 @@ export class Prototype {
     private route = inject(ActivatedRoute);
     private prototypesFacade = inject(PrototypesFacade);
     private sanitizer = inject(DomSanitizer);
+    private recentService = inject(RecentPrototypesService);
 
     prototype = signal<PrototypeInterface | null>(null);
     srcdoc = signal<SafeHtml | null>(null);
@@ -61,6 +63,11 @@ export class Prototype {
                         this.error.set('No se encontro el prototipo.');
                         this.loading.set(false);
                         return;
+                    }
+                    const projectId = Number(this.route.snapshot.paramMap.get('projectId'));
+                    const prototypeId = prototype.id;
+                    if (projectId && prototypeId) {
+                        this.recentService.addRecentPrototype(prototypeId, projectId);
                     }
                     this.loadPreview(prototype.url ?? null);
                 },

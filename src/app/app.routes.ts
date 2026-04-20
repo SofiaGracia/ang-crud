@@ -2,6 +2,7 @@ import { Routes } from '@angular/router';
 import { Projects } from '@projects/components/projects/projects';
 import { Prototypes } from '@prototypes/components/prototypes/prototypes';
 import { Prototype } from '@prototypes/components/prototype/prototype';
+import { RecentPrototypes } from '@web-front/components/recent-prototypes/recent-prototypes';
 import { authGuard } from '@auth/guards/auth.guard';
 
 export const routes: Routes = [
@@ -29,6 +30,10 @@ export const routes: Routes = [
             {
                 path: '',
                 component: Projects,
+            },
+            {
+                path: 'recent',
+                component: RecentPrototypes,
             },
             {
                 path: ':projectId',

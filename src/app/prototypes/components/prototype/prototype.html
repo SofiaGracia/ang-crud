@@ -8,9 +8,6 @@
                 <p class="text-base-content/70">{{ prototype()?.description }}</p>
             }
         </div>
-        <a class="btn btn-ghost" [routerLink]="['/projects', prototype()?.project_id, 'prototypes']">
-            Volver
-        </a>
     </div>
 
     @if (loading()) {

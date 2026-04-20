@@ -9,7 +9,6 @@ import { PrototypeInterface } from '@prototypes/interfaces/prototype.interface';
 
 @Component({
     selector: 'app-prototype',
-    imports: [RouterLink],
     templateUrl: './prototype.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })

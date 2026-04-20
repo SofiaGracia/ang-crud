@@ -1,0 +1,38 @@
+<div class="p-6">
+    <div class="flex items-center gap-3 mb-6">
+        <fa-icon [icon]="faClock" class="text-2xl"></fa-icon>
+        <h1 class="text-2xl font-bold">Recent Prototypes</h1>
+    </div>
+
+    @if (loading()) {
+        <div class="flex justify-center py-12">
+            <span class="loading loading-spinner loading-lg"></span>
+        </div>
+    } @else if (recentPrototypes().length === 0) {
+        <div class="text-center py-12 text-base-content/60">
+            <p>No recent prototypes</p>
+            <p class="text-sm mt-2">Visit a prototype to see it here</p>
+        </div>
+    } @else {
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            @for (item of recentPrototypes(); track item.prototype.id) {
+                <div
+                    class="card bg-base-100 shadow-sm hover:shadow-md transition-shadow cursor-pointer"
+                    [routerLink]="['/projects', item.project.id, 'prototypes', item.prototype.id]"
+                >
+                    <div class="card-body">
+                        <h2 class="card-title text-lg">{{ item.prototype.name }}</h2>
+                        <p class="text-sm text-base-content/70">
+                            <span class="font-medium">Project:</span> {{ item.project.name }}
+                        </p>
+                        @if (item.prototype.description) {
+                            <p class="text-sm text-base-content/60 line-clamp-2">
+                                {{ item.prototype.description }}
+                            </p>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

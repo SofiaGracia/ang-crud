@@ -1,0 +1,107 @@
+<div class="p-6">
+    <div class="flex items-center gap-3 mb-6">
+        <fa-icon [icon]="faTrash" class="text-2xl"></fa-icon>
+        <h1 class="text-2xl font-bold">Trash</h1>
+    </div>
+
+    <div class="tabs tabs-boxed mb-6">
+        <button
+            class="tab"
+            [class.tab-active]="activeTab() === 'projects'"
+            (click)="setActiveTab('projects')"
+        >
+            Projects ({{ trashedProjects().length }})
+        </button>
+        <button
+            class="tab"
+            [class.tab-active]="activeTab() === 'prototypes'"
+            (click)="setActiveTab('prototypes')"
+        >
+            Prototypes ({{ trashedPrototypes().length }})
+        </button>
+    </div>
+
+    @if (loading()) {
+        <div class="flex justify-center py-12">
+            <span class="loading loading-spinner loading-lg"></span>
+        </div>
+    } @else if (activeTab() === 'projects') {
+        @if (trashedProjects().length === 0) {
+            <div class="text-center py-12 text-base-content/60">
+                <p>No deleted projects</p>
+            </div>
+        } @else {
+            <div class="space-y-3">
+                @for (project of trashedProjects(); track project.id) {
+                    <div class="card bg-base-100 shadow-sm">
+                        <div class="card-body flex-row items-center justify-between p-4">
+                            <div>
+                                <h2 class="font-semibold">{{ project.name }}</h2>
+                                @if (project.deleted_at) {
+                                    <p class="text-xs text-base-content/60">
+                                        Deleted: {{ project.deleted_at | date: 'short' }}
+                                    </p>
+                                }
+                            </div>
+                            <div class="flex gap-2">
+                                <button
+                                    class="btn btn-sm btn-ghost"
+                                    title="Restore"
+                                    (click)="restoreProject(project.id)"
+                                >
+                                    <fa-icon [icon]="faRotateBack"></fa-icon>
+                                </button>
+                                <button
+                                    class="btn btn-sm btn-error btn-outline"
+                                    title="Delete permanently"
+                                    (click)="permanentDeleteProject(project.id)"
+                                >
+                                    <fa-icon [icon]="faTrashCan"></fa-icon>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    } @else {
+        @if (trashedPrototypes().length === 0) {
+            <div class="text-center py-12 text-base-content/60">
+                <p>No deleted prototypes</p>
+            </div>
+        } @else {
+            <div class="space-y-3">
+                @for (proto of trashedPrototypes(); track proto.id) {
+                    <div class="card bg-base-100 shadow-sm">
+                        <div class="card-body flex-row items-center justify-between p-4">
+                            <div>
+                                <h2 class="font-semibold">{{ proto.name }}</h2>
+                                @if (proto.deleted_at) {
+                                    <p class="text-xs text-base-content/60">
+                                        Deleted: {{ proto.deleted_at | date: 'short' }}
+                                    </p>
+                                }
+                            </div>
+                            <div class="flex gap-2">
+                                <button
+                                    class="btn btn-sm btn-ghost"
+                                    title="Restore"
+                                    (click)="restorePrototype(proto.id)"
+                                >
+                                    <fa-icon [icon]="faRotateBack"></fa-icon>
+                                </button>
+                                <button
+                                    class="btn btn-sm btn-error btn-outline"
+                                    title="Delete permanently"
+                                    (click)="permanentDeletePrototype(proto.id)"
+                                >
+                                    <fa-icon [icon]="faTrashCan"></fa-icon>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    }
+</div>

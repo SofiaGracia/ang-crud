@@ -44,7 +44,50 @@ export class PrototypesSupabaseService {
         );
     }
 
-    removeProto(protoId: number): Observable<void> {
+    moveToTrash(protoId: number): Observable<void> {
+        const promise = this.supabase
+            .from('prototypes')
+            .update({ deleted_at: new Date().toISOString() } as any)
+            .eq('id', protoId);
+        return from(promise).pipe(
+            map((response) => {
+                if (response.error) {
+                    throw response.error;
+                }
+                return;
+            }),
+        );
+    }
+
+    getTrashedPrototypes(): Observable<PrototypeInterface[]> {
+        const promise = this.supabase
+            .from('prototypes')
+            .select('*')
+            .not('deleted_at', 'is', null)
+            .order('deleted_at', { ascending: false });
+        return from(promise).pipe(
+            map((response) => {
+                return response.data ?? [];
+            }),
+        );
+    }
+
+    restorePrototype(protoId: number): Observable<void> {
+        const promise = this.supabase
+            .from('prototypes')
+            .update({ deleted_at: null } as any)
+            .eq('id', protoId);
+        return from(promise).pipe(
+            map((response) => {
+                if (response.error) {
+                    throw response.error;
+                }
+                return;
+            }),
+        );
+    }
+
+    permanentDeletePrototype(protoId: number): Observable<void> {
         const promise = this.supabase.from('prototypes').delete().eq('id', protoId);
         return from(promise).pipe(
             map((response) => {

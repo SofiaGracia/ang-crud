@@ -4,7 +4,7 @@ import { provideRouter } from '@angular/router';
 import { routes } from './app.routes';
 
 import { FontAwesomeModule, FaIconLibrary } from '@fortawesome/angular-fontawesome';
-import { faHouse, faFile, faBars, faTimes } from '@fortawesome/free-solid-svg-icons';
+import { faHouse, faFile, faBars, faTimes, faTrash } from '@fortawesome/free-solid-svg-icons';
 import { provideHttpClient, withFetch } from '@angular/common/http';
 
 
@@ -18,7 +18,7 @@ export const appConfig: ApplicationConfig = {
         provide: FaIconLibrary,
         useFactory: () => {
             const lib = new FaIconLibrary();
-            lib.addIcons(faHouse, faFile);
+            lib.addIcons(faHouse, faFile, faTrash);
             return lib
         }
     }

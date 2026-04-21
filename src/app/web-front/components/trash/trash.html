@@ -54,7 +54,7 @@
                                 <button
                                     class="btn btn-sm btn-error btn-outline"
                                     title="Delete permanently"
-                                    (click)="permanentDeleteProject(project.id)"
+                                    (click)="openDeleteModal(project.id, project.name, 'project')"
                                 >
                                     <fa-icon [icon]="faTrashCan"></fa-icon>
                                 </button>
@@ -93,7 +93,7 @@
                                 <button
                                     class="btn btn-sm btn-error btn-outline"
                                     title="Delete permanently"
-                                    (click)="permanentDeletePrototype(proto.id)"
+                                    (click)="openDeleteModal(proto.id, proto.name, 'prototype')"
                                 >
                                     <fa-icon [icon]="faTrashCan"></fa-icon>
                                 </button>
@@ -104,4 +104,18 @@
             </div>
         }
     }
+
+    <confirm-modal
+        [isOpen]="this.showDeleteModal()"
+        [title]="'Eliminar ' + (this.activeTab() === 'projects' ? 'project' : 'prototype')"
+        [message]="
+            'Eliminar permanentment el ' +
+            (this.activeTab() === 'projects' ? 'project' : 'prototype')+'?'
+        "
+        [confirmText]="'Eliminar'"
+        [cancelText]="'Cancel·lar'"
+        [variant]="'warning'"
+        (confirm)="confirmDelete()"
+        (cancel)="closeDeleteModal()"
+    ></confirm-modal>
 </div>

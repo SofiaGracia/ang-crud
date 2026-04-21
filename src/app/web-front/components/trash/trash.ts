@@ -6,10 +6,11 @@ import { ProjectSupabaseService } from '@projects/services/projectsSupabase.serv
 import { PrototypesSupabaseService } from '@prototypes/services/prototypesSupabase.service';
 import { ProjectInterface } from '@projects/interfaces/project.interface';
 import { PrototypeInterface } from '@prototypes/interfaces/prototype.interface';
+import { ConfirmModal } from '@shared/components/confirm-modal/confirm-modal';
 
 @Component({
     selector: 'app-trash',
-    imports: [FaIconComponent, DatePipe],
+    imports: [FaIconComponent, DatePipe, ConfirmModal],
     templateUrl: './trash.html',
 })
 export class Trash implements OnInit {
@@ -21,6 +22,11 @@ export class Trash implements OnInit {
     loading = signal(true);
 
     activeTab = signal<'projects' | 'prototypes'>('projects');
+
+    showDeleteModal = signal(false);
+    itemToDelete = signal<{ id: number; name: string; type: 'project' | 'prototype' } | null>(
+        null,
+    );
 
     faTrash = faTrash;
     faRotateBack = faRotateBack;
@@ -68,6 +74,28 @@ export class Trash implements OnInit {
             },
             error: (err) => console.error('Error restoring prototype', err),
         });
+    }
+
+    openDeleteModal(id: number, name: string, type: 'project' | 'prototype') {
+        this.itemToDelete.set({ id, name, type });
+        this.showDeleteModal.set(true);
+    }
+
+    closeDeleteModal() {
+        this.showDeleteModal.set(false);
+        this.itemToDelete.set(null);
+    }
+
+    confirmDelete() {
+        const item = this.itemToDelete();
+        if (!item) return;
+
+        if (item.type === 'project') {
+            this.permanentDeleteProject(item.id);
+        } else {
+            this.permanentDeletePrototype(item.id);
+        }
+        this.closeDeleteModal();
     }
 
     permanentDeleteProject(id: number) {

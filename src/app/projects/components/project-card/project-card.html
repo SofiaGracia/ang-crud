@@ -1,16 +1,39 @@
 <dialog-project #dialogPro [mode]="'edit'" [project]="project()"></dialog-project>
 <div class="card bg-base-100 w-96 shadow-sm relative" [routerLink]="['/projects', project().id]">
     <figure>
-        <img
-            src="https://img.daisyui.com/images/stock/photo-1606107557195-0e29a4b5b4aa.webp"
-            alt="Shoes"
-        />
+        @if (prototypes().length > 0) {
+            <div class="grid grid-cols-2 gap-0.5 w-full h-48 bg-base-300">
+                @for (proto of prototypes(); track proto.id; let i = $index) {
+                    @if (i < 4) {
+                        <div class="bg-base-200 flex items-center justify-center overflow-hidden">
+                            <span class="text-xs text-base-content/50 truncate px-2">
+                                {{ proto.name }}
+                            </span>
+                        </div>
+                    }
+                }
+                @for (i of [0,1,2,3]; track i) {
+                    @if (i >= prototypes().length) {
+                        <div class="bg-base-200 flex items-center justify-center">
+                            <fa-icon [icon]="faPlus" class="text-base-content/30 text-2xl"></fa-icon>
+                        </div>
+                    }
+                }
+            </div>
+        } @else {
+            <div class="w-full h-48 bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center">
+                <fa-icon [icon]="faPlus" class="text-white/50 text-4xl"></fa-icon>
+            </div>
+        }
     </figure>
     <div class="card-body">
         <div class="flex flex-row justify-between items-center">
             <div class="flex flex-col">
                 <h2 class="card-title">{{ project().name }}</h2>
                 <p>{{ project().description }}</p>
+                <span class="text-xs text-base-content/60 mt-1">
+                    {{ prototypes().length }} prototype{{ prototypes().length !== 1 ? 's' : '' }}
+                </span>
             </div>
 
             <!-- Dropdown DaisyUI -->

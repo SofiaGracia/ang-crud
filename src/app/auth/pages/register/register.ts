@@ -2,8 +2,17 @@ import { Component, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
-import { faEnvelope, faLock, faSpinner, faCheck } from '@fortawesome/free-solid-svg-icons';
+import { faEnvelope, faLock, faSpinner, faCheck, faCheckCircle, faTimesCircle } from '@fortawesome/free-solid-svg-icons';
 import { AuthFacade } from '@auth/facades/auth.facade';
+
+interface PasswordValidation {
+    hasMinLength: boolean;
+    hasUppercase: boolean;
+    hasLowercase: boolean;
+    hasNumber: boolean;
+    hasSpecial: boolean;
+    isValid: boolean;
+}
 
 @Component({
     selector: 'app-register',
@@ -27,6 +36,8 @@ export default class Register {
     faLock = faLock;
     faSpinner = faSpinner;
     faCheck = faCheck;
+    faCheckCircle = faCheckCircle;
+    faTimesCircle = faTimesCircle;
 
     email = '';
     password = '';
@@ -34,6 +45,14 @@ export default class Register {
     errorMessage = '';
     successMessage = '';
     isLoading = signal(false);
+    passwordValidation = signal<PasswordValidation>({
+        hasMinLength: false,
+        hasUppercase: false,
+        hasLowercase: false,
+        hasNumber: false,
+        hasSpecial: false,
+        isValid: false,
+    });
 
     async signUp(): Promise<void> {
         this.errorMessage = '';
@@ -49,8 +68,11 @@ export default class Register {
             return;
         }
 
-        if (this.password.length < 6) {
-            this.errorMessage = 'Password must be at least 6 characters';
+        const validation = this.validatePassword(this.password);
+        this.passwordValidation.set(validation);
+
+        if (!validation.isValid) {
+            this.errorMessage = 'Password does not meet all requirements';
             return;
         }
 
@@ -89,6 +111,27 @@ export default class Register {
     private isValidEmail(email: string): boolean {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
         return emailRegex.test(email);
+    }
+
+    private validatePassword(pwd: string): PasswordValidation {
+        const hasMinLength = pwd.length >= 8;
+        const hasUppercase = /[A-Z]/.test(pwd);
+        const hasLowercase = /[a-z]/.test(pwd);
+        const hasNumber = /[0-9]/.test(pwd);
+        const hasSpecial = /[!@#$%^&*(),.?":{}|<>]/.test(pwd);
+
+        return {
+            hasMinLength,
+            hasUppercase,
+            hasLowercase,
+            hasNumber,
+            hasSpecial,
+            isValid: hasMinLength && hasUppercase && hasLowercase && hasNumber && hasSpecial,
+        };
+    }
+
+    onPasswordInput(): void {
+        this.passwordValidation.set(this.validatePassword(this.password));
     }
 
     private handleSignUpError(error: any): void {

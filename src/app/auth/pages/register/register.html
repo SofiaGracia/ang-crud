@@ -41,10 +41,35 @@
                         <input
                             type="password"
                             class="grow"
-                            placeholder="Min. 6 characters"
+                            placeholder="Min. 8 characters"
                             [(ngModel)]="password"
+                            (input)="onPasswordInput()"
                         />
                     </label>
+                    @if (password.length > 0) {
+                        <div class="mt-2 space-y-1 text-sm">
+                            <p [class.text-green-600]="passwordValidation().hasMinLength" [class.text-gray-400]="!passwordValidation().hasMinLength">
+                                <fa-icon [icon]="passwordValidation().hasMinLength ? faCheckCircle : faTimesCircle"></fa-icon>
+                                Min. 8 characters
+                            </p>
+                            <p [class.text-green-600]="passwordValidation().hasUppercase" [class.text-gray-400]="!passwordValidation().hasUppercase">
+                                <fa-icon [icon]="passwordValidation().hasUppercase ? faCheckCircle : faTimesCircle"></fa-icon>
+                                One uppercase letter
+                            </p>
+                            <p [class.text-green-600]="passwordValidation().hasLowercase" [class.text-gray-400]="!passwordValidation().hasLowercase">
+                                <fa-icon [icon]="passwordValidation().hasLowercase ? faCheckCircle : faTimesCircle"></fa-icon>
+                                One lowercase letter
+                            </p>
+                            <p [class.text-green-600]="passwordValidation().hasNumber" [class.text-gray-400]="!passwordValidation().hasNumber">
+                                <fa-icon [icon]="passwordValidation().hasNumber ? faCheckCircle : faTimesCircle"></fa-icon>
+                                One number
+                            </p>
+                            <p [class.text-green-600]="passwordValidation().hasSpecial" [class.text-gray-400]="!passwordValidation().hasSpecial">
+                                <fa-icon [icon]="passwordValidation().hasSpecial ? faCheckCircle : faTimesCircle"></fa-icon>
+                                One special character
+                            </p>
+                        </div>
+                    }
                 </div>
 
                 <div class="form-control">

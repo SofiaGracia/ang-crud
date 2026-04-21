@@ -170,18 +170,47 @@ describe('ProjectSupabaseService', () => {
         });
     });
 
-    describe('removeProject', () => {
-        it('should delete project without returning data', async () => {
+    describe('moveToTrash', () => {
+        it('should soft delete project by setting deleted_at', async () => {
+            mockSupabase.from.mockReturnValue({
+                update: vi.fn().mockReturnValue({
+                    eq: vi.fn().mockResolvedValue({ data: null, error: null }),
+                }),
+            });
+
+            await service.moveToTrash(1).toPromise();
+            expect(mockSupabase.from).toHaveBeenCalledWith('projects');
+        });
+
+        it('should throw error when soft delete fails', async () => {
+            mockSupabase.from.mockReturnValue({
+                update: vi.fn().mockReturnValue({
+                    eq: vi.fn().mockResolvedValue({
+                        data: null,
+                        error: { message: 'Delete failed' },
+                    }),
+                }),
+            });
+
+            await expect(service.moveToTrash(1).toPromise()).rejects.toEqual(
+                expect.objectContaining({ message: 'Delete failed' })
+            );
+        });
+    });
+
+    describe('permanentDeleteProject', () => {
+        it('should permanently delete project', async () => {
             mockSupabase.from.mockReturnValue({
                 delete: vi.fn().mockReturnValue({
                     eq: vi.fn().mockResolvedValue({ data: null, error: null }),
                 }),
             });
 
-            await service.removeProject(1).toPromise();
+            await service.permanentDeleteProject(1).toPromise();
+            expect(mockSupabase.from).toHaveBeenCalledWith('projects');
         });
 
-        it('should throw error when deletion fails', async () => {
+        it('should throw error when permanent delete fails', async () => {
             mockSupabase.from.mockReturnValue({
                 delete: vi.fn().mockReturnValue({
                     eq: vi.fn().mockResolvedValue({
@@ -191,7 +220,7 @@ describe('ProjectSupabaseService', () => {
                 }),
             });
 
-            await expect(service.removeProject(1).toPromise()).rejects.toEqual(
+            await expect(service.permanentDeleteProject(1).toPromise()).rejects.toEqual(
                 expect.objectContaining({ message: 'Delete failed' })
             );
         });

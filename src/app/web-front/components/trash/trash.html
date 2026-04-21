@@ -106,15 +106,12 @@
     }
 
     <confirm-modal
-        [isOpen]="this.showDeleteModal()"
-        [title]="'Eliminar ' + (this.activeTab() === 'projects' ? 'project' : 'prototype')"
-        [message]="
-            'Eliminar permanentment el ' +
-            (this.activeTab() === 'projects' ? 'project' : 'prototype')+'?'
-        "
-        [confirmText]="'Eliminar'"
-        [cancelText]="'Cancel·lar'"
-        [variant]="'warning'"
+        [isOpen]="showDeleteModal()"
+        [title]="'Confirm delete'"
+        [message]="'Are you sure you want to permanently delete \'' + itemToDelete()?.name + '\'?'"
+        [confirmText]="'Delete'"
+        [cancelText]="'Cancel'"
+        [variant]="'danger'"
         (confirm)="confirmDelete()"
         (cancel)="closeDeleteModal()"
     ></confirm-modal>

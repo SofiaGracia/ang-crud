@@ -36,7 +36,6 @@ export class PrototypeCard {
     deleteProto(event: MouseEvent, id: number, projectId: number) {
         event.stopPropagation();
         this.prototypesFacade.removeProto(id, projectId);
-        console.log('Prototype removed');
     }
 
     openPreview() {

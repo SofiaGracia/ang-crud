@@ -32,7 +32,6 @@ export class ProjectsFacade {
     addProject(project: Project) {
         this.projectSupabaseService.addProject(project).subscribe({
             next: (data) => {
-                console.log('Project created', data);
                 this.refresh$.next();
             },
             error: (err) => {

@@ -21,6 +21,5 @@ export class ProjectCard {
     deleteProject(event: MouseEvent, id: number) {
         event.stopPropagation();
         this.projectsFacade.removeProject(id);
-        console.log('Project removed')
     }
 }

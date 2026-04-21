@@ -12,7 +12,7 @@ describe('ProjectsFacade', () => {
             getProjects: vi.fn().mockReturnValue(of([])),
             getProjectById: vi.fn().mockReturnValue(of(null)),
             addProject: vi.fn().mockReturnValue(of({ id: 1, name: 'Test' })),
-            removeProject: vi.fn().mockReturnValue(of(undefined)),
+            moveToTrash: vi.fn().mockReturnValue(of(undefined)),
             updateProject: vi.fn().mockReturnValue(of(undefined)),
         };
 
@@ -51,9 +51,9 @@ describe('ProjectsFacade', () => {
     });
 
     describe('removeProject', () => {
-        it('should call removeProject on service', () => {
+        it('should call moveToTrash on service when removeProject is called', () => {
             facade.removeProject(1);
-            expect(mockService.removeProject).toHaveBeenCalledWith(1);
+            expect(mockService.moveToTrash).toHaveBeenCalledWith(1);
         });
     });
 

@@ -11,12 +11,26 @@ describe('PrototypesSupabaseService', () => {
         mockSupabase = {
             from: vi.fn().mockReturnValue({
                 select: vi.fn().mockReturnValue({
+                    is: vi.fn().mockReturnValue({
+                        order: vi.fn().mockResolvedValue({ data: [], error: null }),
+                    }),
                     insert: vi.fn().mockReturnValue({
-                        update: vi.fn().mockReturnValue({
-                            delete: vi.fn().mockReturnValue({
-                                eq: vi.fn().mockResolvedValue({ data: [], error: null }),
-                            }),
+                        select: vi.fn().mockReturnValue({
+                            single: vi.fn().mockResolvedValue({ data: null, error: null }),
                         }),
+                        update: vi.fn().mockReturnValue({
+                            eq: vi.fn().mockResolvedValue({ data: null, error: null }),
+                        }),
+                        delete: vi.fn().mockReturnValue({
+                            eq: vi.fn().mockResolvedValue({ data: null, error: null }),
+                        }),
+                    }),
+                    eq: vi.fn().mockReturnValue({
+                        is: vi.fn().mockResolvedValue({ data: [], error: null }),
+                    }),
+                    maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
+                    not: vi.fn().mockReturnValue({
+                        order: vi.fn().mockResolvedValue({ data: [], error: null }),
                     }),
                 }),
             }),
@@ -41,7 +55,9 @@ describe('PrototypesSupabaseService', () => {
 
             mockSupabase.from.mockReturnValue({
                 select: vi.fn().mockReturnValue({
-                    eq: vi.fn().mockResolvedValue({ data: mockPrototypes, error: null }),
+                    eq: vi.fn().mockReturnValue({
+                        is: vi.fn().mockResolvedValue({ data: mockPrototypes, error: null }),
+                    }),
                 }),
             });
 
@@ -53,7 +69,9 @@ describe('PrototypesSupabaseService', () => {
         it('should return empty array when no prototypes', async () => {
             mockSupabase.from.mockReturnValue({
                 select: vi.fn().mockReturnValue({
-                    eq: vi.fn().mockResolvedValue({ data: [], error: null }),
+                    eq: vi.fn().mockReturnValue({
+                        is: vi.fn().mockResolvedValue({ data: [], error: null }),
+                    }),
                 }),
             });
 
@@ -64,7 +82,9 @@ describe('PrototypesSupabaseService', () => {
         it('should return empty array when data is null', async () => {
             mockSupabase.from.mockReturnValue({
                 select: vi.fn().mockReturnValue({
-                    eq: vi.fn().mockResolvedValue({ data: null, error: null }),
+                    eq: vi.fn().mockReturnValue({
+                        is: vi.fn().mockResolvedValue({ data: null, error: null }),
+                    }),
                 }),
             });
 
@@ -77,7 +97,9 @@ describe('PrototypesSupabaseService', () => {
 
             mockSupabase.from.mockReturnValue({
                 select: vi.fn().mockReturnValue({
-                    eq: vi.fn().mockResolvedValue({ data: mockPrototypes, error: null }),
+                    eq: vi.fn().mockReturnValue({
+                        is: vi.fn().mockResolvedValue({ data: mockPrototypes, error: null }),
+                    }),
                 }),
             });
 
@@ -88,9 +110,11 @@ describe('PrototypesSupabaseService', () => {
         it('should throw error when Supabase returns error', async () => {
             mockSupabase.from.mockReturnValue({
                 select: vi.fn().mockReturnValue({
-                    eq: vi.fn().mockResolvedValue({
-                        data: null,
-                        error: { message: 'Query failed' },
+                    eq: vi.fn().mockReturnValue({
+                        is: vi.fn().mockResolvedValue({
+                            data: null,
+                            error: { message: 'Query failed' },
+                        }),
                     }),
                 }),
             });
@@ -103,12 +127,144 @@ describe('PrototypesSupabaseService', () => {
         it('should call Supabase with correct table and filter', async () => {
             mockSupabase.from.mockReturnValue({
                 select: vi.fn().mockReturnValue({
-                    eq: vi.fn().mockResolvedValue({ data: [], error: null }),
+                    eq: vi.fn().mockReturnValue({
+                        is: vi.fn().mockResolvedValue({ data: [], error: null }),
+                    }),
                 }),
             });
 
             await service.getPrototypesByProject(42).toPromise();
             expect(mockSupabase.from).toHaveBeenCalledWith('prototypes');
+        });
+    });
+
+    describe('addPrototype', () => {
+        it('should create prototype and return created data', async () => {
+            const newPrototype = { name: 'New Prototype', project_id: 1, tool: 'Figma', url: 'https://figma.com' };
+            const createdPrototype = { id: 1, ...newPrototype };
+
+            mockSupabase.from.mockReturnValue({
+                insert: vi.fn().mockReturnValue({
+                    select: vi.fn().mockReturnValue({
+                        single: vi.fn().mockResolvedValue({ data: createdPrototype, error: null }),
+                    }),
+                }),
+            });
+
+            const prototype = await service.addPrototype(newPrototype as any).toPromise();
+            expect(prototype!.id).toBe(1);
+            expect(prototype!.name).toBe('New Prototype');
+        });
+
+        it('should throw error when insert fails', async () => {
+            const newPrototype = { name: 'New Prototype', project_id: 1 };
+
+            mockSupabase.from.mockReturnValue({
+                insert: vi.fn().mockReturnValue({
+                    select: vi.fn().mockReturnValue({
+                        single: vi.fn().mockResolvedValue({
+                            data: null,
+                            error: { message: 'Insert failed' },
+                        }),
+                    }),
+                }),
+            });
+
+            await expect(service.addPrototype(newPrototype as any).toPromise()).rejects.toEqual(
+                expect.objectContaining({ message: 'Insert failed' })
+            );
+        });
+    });
+
+    describe('moveToTrash', () => {
+        it('should soft delete prototype by setting deleted_at', async () => {
+            mockSupabase.from.mockReturnValue({
+                update: vi.fn().mockReturnValue({
+                    eq: vi.fn().mockResolvedValue({ data: null, error: null }),
+                }),
+            });
+
+            await service.moveToTrash(1).toPromise();
+            expect(mockSupabase.from).toHaveBeenCalledWith('prototypes');
+        });
+
+        it('should throw error when delete fails', async () => {
+            mockSupabase.from.mockReturnValue({
+                update: vi.fn().mockReturnValue({
+                    eq: vi.fn().mockResolvedValue({
+                        data: null,
+                        error: { message: 'Delete failed' },
+                    }),
+                }),
+            });
+
+            await expect(service.moveToTrash(1).toPromise()).rejects.toEqual(
+                expect.objectContaining({ message: 'Delete failed' })
+            );
+        });
+    });
+
+    describe('permanentDeletePrototype', () => {
+        it('should permanently delete prototype', async () => {
+            mockSupabase.from.mockReturnValue({
+                delete: vi.fn().mockReturnValue({
+                    eq: vi.fn().mockResolvedValue({ data: null, error: null }),
+                }),
+            });
+
+            await service.permanentDeletePrototype(1).toPromise();
+            expect(mockSupabase.from).toHaveBeenCalledWith('prototypes');
+        });
+
+        it('should throw error when permanent delete fails', async () => {
+            mockSupabase.from.mockReturnValue({
+                delete: vi.fn().mockReturnValue({
+                    eq: vi.fn().mockResolvedValue({
+                        data: null,
+                        error: { message: 'Delete failed' },
+                    }),
+                }),
+            });
+
+            await expect(service.permanentDeletePrototype(1).toPromise()).rejects.toEqual(
+                expect.objectContaining({ message: 'Delete failed' })
+            );
+        });
+    });
+
+    describe('getPrototypeById', () => {
+        it('should return prototype by id', async () => {
+            const mockPrototype = { id: 1, name: 'Prototype 1', project_id: 1 };
+
+            mockSupabase.from.mockReturnValue({
+                select: vi.fn().mockReturnValue({
+                    eq: vi.fn().mockReturnValue({
+                        eq: vi.fn().mockReturnValue({
+                            maybeSingle: vi.fn().mockResolvedValue({ data: mockPrototype, error: null }),
+                        }),
+                    }),
+                }),
+            });
+
+            const prototype = await service.getPrototypeById(1, 1).toPromise();
+            expect(prototype?.id).toBe(1);
+        });
+
+        it('should validate contract on returned prototype', async () => {
+            const mockPrototype = { id: 1, name: 'Prototype 1', project_id: 1 };
+
+            mockSupabase.from.mockReturnValue({
+                select: vi.fn().mockReturnValue({
+                    eq: vi.fn().mockReturnValue({
+                        eq: vi.fn().mockReturnValue({
+                            maybeSingle: vi.fn().mockResolvedValue({ data: mockPrototype, error: null }),
+                        }),
+                    }),
+                }),
+            });
+
+            const prototype = await service.getPrototypeById(1, 1).toPromise();
+            if (prototype) expect(validatePrototypeContract(prototype)).toBe(true);
         });
     });
 });

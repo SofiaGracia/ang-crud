@@ -42,7 +42,7 @@ export class ProjectsFacade {
     }
 
     removeProject(projectId: number) {
-        this.projectSupabaseService.removeProject(projectId).subscribe({
+        this.projectSupabaseService.moveToTrash(projectId).subscribe({
             next: () => {
                 this.refresh$.next();
             },

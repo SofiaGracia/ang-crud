@@ -25,7 +25,7 @@ export class PrototypesFacade {
     }
 
     removeProto(protoId: number, projectId: number) {
-        this.prototypesSupabaseService.removeProto(protoId).subscribe({
+        this.prototypesSupabaseService.moveToTrash(protoId).subscribe({
             next: () => {
                 this.refresh$.next(projectId);
             },

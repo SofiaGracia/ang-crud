@@ -3,6 +3,7 @@ import { Projects } from '@projects/components/projects/projects';
 import { Prototypes } from '@prototypes/components/prototypes/prototypes';
 import { Prototype } from '@prototypes/components/prototype/prototype';
 import { RecentPrototypes } from '@web-front/components/recent-prototypes/recent-prototypes';
+import { Trash } from '@web-front/components/trash/trash';
 import { authGuard } from '@auth/guards/auth.guard';
 
 export const routes: Routes = [
@@ -34,6 +35,10 @@ export const routes: Routes = [
             {
                 path: 'recent',
                 component: RecentPrototypes,
+            },
+            {
+                path: 'trash',
+                component: Trash,
             },
             {
                 path: ':projectId',

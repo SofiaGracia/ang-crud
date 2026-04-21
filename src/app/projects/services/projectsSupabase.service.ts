@@ -8,7 +8,10 @@ export class ProjectSupabaseService {
     private supabase = inject(SupabaseClientService).instance;
 
     getProjects(): Observable<ProjectInterface[]> {
-        const promise = this.supabase.from('projects').select('*');
+        const promise = this.supabase
+            .from('projects')
+            .select('*')
+            .is('deleted_at', null);
         return from(promise).pipe(
             map((response) => {
                 return response.data ?? [];
@@ -38,7 +41,50 @@ export class ProjectSupabaseService {
         );
     }
 
-    removeProject(projectId: number): Observable<void> {
+    moveToTrash(projectId: number): Observable<void> {
+        const promise = this.supabase
+            .from('projects')
+            .update({ deleted_at: new Date().toISOString() } as any)
+            .eq('id', projectId);
+        return from(promise).pipe(
+            map((response) => {
+                if (response.error) {
+                    throw response.error;
+                }
+                return;
+            }),
+        );
+    }
+
+    getTrashedProjects(): Observable<ProjectInterface[]> {
+        const promise = this.supabase
+            .from('projects')
+            .select('*')
+            .not('deleted_at', 'is', null)
+            .order('deleted_at', { ascending: false });
+        return from(promise).pipe(
+            map((response) => {
+                return response.data ?? [];
+            }),
+        );
+    }
+
+    restoreProject(projectId: number): Observable<void> {
+        const promise = this.supabase
+            .from('projects')
+            .update({ deleted_at: null } as any)
+            .eq('id', projectId);
+        return from(promise).pipe(
+            map((response) => {
+                if (response.error) {
+                    throw response.error;
+                }
+                return;
+            }),
+        );
+    }
+
+    permanentDeleteProject(projectId: number): Observable<void> {
         const promise = this.supabase.from('projects').delete().eq('id', projectId);
         return from(promise).pipe(
             map((response) => {

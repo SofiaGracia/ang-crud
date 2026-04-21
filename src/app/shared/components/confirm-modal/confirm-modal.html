@@ -1,0 +1,20 @@
+<dialog #modal class="modal" [class.modal-open]="isOpen()">
+    <div class="modal-box">
+        <h3 class="font-bold text-lg">{{ title() }}</h3>
+        <p class="py-4">{{ message() }}</p>
+        <div class="modal-action">
+            <form method="dialog">
+                <button class="btn" (click)="cancel.emit()">{{ cancelText() }}</button>
+            </form>
+            <button
+                class="btn"
+                [class.btn-error]="variant() === 'danger'"
+                [class.btn-warning]="variant() === 'warning'"
+                [class.btn-info]="variant() === 'info'"
+                (click)="confirm.emit()"
+            >
+                {{ confirmText() }}
+            </button>
+        </div>
+    </div>
+</dialog>

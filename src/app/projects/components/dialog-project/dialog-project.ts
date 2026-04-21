@@ -59,8 +59,6 @@ export class DialogProject extends DialogBase<ProjectInterface> {
                 return;
             }
 
-            console.log('Creating project with data:', this.createForm.value);
-
             const newProject: Project = {
                 name: this.createForm.controls['name'].value!,
                 description: this.createForm.controls['description'].value!,

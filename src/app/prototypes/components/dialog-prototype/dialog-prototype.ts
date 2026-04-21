@@ -77,7 +77,6 @@ export class DialogPrototype extends DialogBase<PrototypeInterface> {
                     this.project().id,
                 );
             }
-            console.log('Creating prototype with data:', this.createForm.value);
 
             const newProto = {
                 name: this.createForm.controls['name'].value!,
@@ -86,8 +85,6 @@ export class DialogPrototype extends DialogBase<PrototypeInterface> {
                 url: publicUrl,
                 tool: null,
             };
-
-            console.log('Values of new prototype:', newProto);
 
             // Consider capturing errors
             if (this.mode() === 'create') {

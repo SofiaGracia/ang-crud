@@ -24,6 +24,24 @@ export class PrototypesSupabaseService {
         );
     }
 
+    getFirstPrototypesByProject(projectId: number, limit: number): Observable<PrototypeInterface[]> {
+        const promise = this.supabase
+            .from('prototypes')
+            .select('*')
+            .eq('project_id', projectId)
+            .is('deleted_at', null)
+            .limit(limit);
+
+        return from(promise).pipe(
+            map((response) => {
+                if (response.error) {
+                    throw response.error;
+                }
+                return response.data ?? [];
+            }),
+        );
+    }
+
     // Deuria comprovar-se per mateix nom i mateix projecte
     getProtoByName(name: string): Observable<PrototypeInterface | null> {
         const promise = this.supabase.from('prototypes').select('*').eq('name', name).maybeSingle();

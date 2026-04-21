@@ -11,12 +11,26 @@ describe('ProjectSupabaseService', () => {
         mockSupabase = {
             from: vi.fn().mockReturnValue({
                 select: vi.fn().mockReturnValue({
+                    is: vi.fn().mockReturnValue({
+                        order: vi.fn().mockResolvedValue({ data: [], error: null }),
+                    }),
                     insert: vi.fn().mockReturnValue({
-                        update: vi.fn().mockReturnValue({
-                            delete: vi.fn().mockReturnValue({
-                                eq: vi.fn().mockResolvedValue({ data: [], error: null }),
-                            }),
+                        select: vi.fn().mockReturnValue({
+                            single: vi.fn().mockResolvedValue({ data: null, error: null }),
                         }),
+                        update: vi.fn().mockReturnValue({
+                            eq: vi.fn().mockResolvedValue({ data: null, error: null }),
+                        }),
+                        delete: vi.fn().mockReturnValue({
+                            eq: vi.fn().mockResolvedValue({ data: null, error: null }),
+                        }),
+                    }),
+                    maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
+                    eq: vi.fn().mockReturnValue({
+                        maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
+                    }),
+                    not: vi.fn().mockReturnValue({
+                        order: vi.fn().mockResolvedValue({ data: [], error: null }),
                     }),
                 }),
             }),
@@ -40,7 +54,9 @@ describe('ProjectSupabaseService', () => {
             ];
 
             mockSupabase.from.mockReturnValue({
-                select: vi.fn().mockResolvedValue({ data: mockProjects, error: null }),
+                select: vi.fn().mockReturnValue({
+                    is: vi.fn().mockResolvedValue({ data: mockProjects, error: null }),
+                }),
             });
 
             const projects = await service.getProjects().toPromise();
@@ -50,7 +66,9 @@ describe('ProjectSupabaseService', () => {
 
         it('should return empty array when no data', async () => {
             mockSupabase.from.mockReturnValue({
-                select: vi.fn().mockResolvedValue({ data: null, error: null }),
+                select: vi.fn().mockReturnValue({
+                    is: vi.fn().mockResolvedValue({ data: null, error: null }),
+                }),
             });
 
             const projects = await service.getProjects().toPromise();
@@ -61,7 +79,9 @@ describe('ProjectSupabaseService', () => {
             const mockProjects = [{ id: 1, name: 'Project 1', description: 'Desc 1' }];
 
             mockSupabase.from.mockReturnValue({
-                select: vi.fn().mockResolvedValue({ data: mockProjects, error: null }),
+                select: vi.fn().mockReturnValue({
+                    is: vi.fn().mockResolvedValue({ data: mockProjects, error: null }),
+                }),
             });
 
             const projects = await service.getProjects().toPromise();

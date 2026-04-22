@@ -27,7 +27,7 @@ import { SIDEMENUOPTIONS } from '@web-front/constants/sidebar-options.constant';
         }
 
         .nav-links {
-            flex: 1;
+            flex: 0;
         }
 
         .logout-btn {

@@ -1,5 +1,5 @@
 <dialog-project #dialogPro [mode]="'edit'" [project]="project()"></dialog-project>
-<div class="card bg-base-100 w-96 shadow-sm relative" [routerLink]="['/projects', project().id]">
+<div class="card bg-base-100 w-96 shadow-sm relative p-4" [routerLink]="['/projects', project().id]">
     <figure>
         @if (prototypes().length > 0) {
             <div class="grid grid-cols-2 gap-0.5 w-full h-48 bg-base-300">

@@ -1,6 +1,59 @@
 # AngCrud
 
+An Angular project to learn core Angular concepts and prototype CRUD operations with Supabase as backend, including user authentication.
+
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.0.5.
+
+## Project Overview
+
+This project serves as a practical learning environment for building full-stack applications with:
+
+- **Angular 21** standalone components architecture
+- **Supabase** for backend-as-a-service (database + authentication)
+- **Tailwind CSS** + **DaisyUI** for styling
+- **Vitest** for unit testing
+
+### Features
+
+- CRUD operations (Create, Read, Update, Delete)
+- User authentication (signup, login, logout)
+- Reactive state management using Facade pattern
+
+## Tech Stack
+
+| Technology | Purpose |
+|-----------|---------|
+| Angular 21 | Frontend framework |
+| Supabase | Backend (PostgreSQL + Auth) |
+| Tailwind CSS + DaisyUI | Styling |
+| Vitest | Testing |
+| RxJS | Reactive programming |
+
+## Prerequisites
+
+- [Supabase account](https://supabase.com) with a new project created
+- Node.js 18+ and npm
+- Configure your Supabase API credentials in `src/environments/environment.development.ts`
+
+## Setup
+
+1. Clone the repository
+2. Install dependencies:
+
+```bash
+npm install
+```
+
+3. Configure your Supabase credentials:
+
+Create `src/environments/environment.development.ts` with your project URL and anon key:
+
+```typescript
+export const environment = {
+    supabaseUrl: 'your-supabase-url',
+    supabaseKey: 'your-anon-key'
+};
+```
 
 ## Development server
 
@@ -11,6 +64,22 @@ ng serve
 ```
 
 Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+
+## Project Structure
+
+```
+src/app/
+├── auth/              # Authentication feature
+│   ├── components/
+│   ├── services/
+│   └── facades/
+├── projects/         # Projects CRUD feature
+│   ├── components/
+│   ├── services/
+│   └── facades/
+├── shared/           # Shared services
+└── web-front/       # Frontend pages
+```
 
 ## Code scaffolding
 

@@ -1,44 +1,43 @@
 <section class="flex grow gap-2 mb-6">
-    <input
-        type="text"
-        class="input input-bordered mr-2 w-full"
-        [placeholder]="valuePlaceholder()"
-        autofocus
-        #txtSearch
-        (keyup.enter)="searchedValue.emit(txtSearch.value)"
-        (keyup)="searchedValue.emit(txtSearch.value)"
-        (keyup)="inputValue.set(txtSearch.value)"
-        [value]="initialValue()"
-    />
+    <div class="w-full">
+        <input
+            type="text"
+            class="input input-bordered mr-2 w-full"
+            [placeholder]="valuePlaceholder()"
+            autofocus
+            #txtSearch
+            (keyup.enter)="searchedValue.emit(txtSearch.value)"
+            (keyup)="searchedValue.emit(txtSearch.value)"
+            (keyup)="inputValue.set(txtSearch.value)"
+            [value]="initialValue()"
+        />
+
+        <div id="dropdown" class="w-full">
+            <ul class="p-2 text-sm text-body font-medium" aria-labelledby="dropdown-button">
+                @for (item of projects(); track $index) {
+                    <li>
+                        <a
+                            href="#"
+                            class="block p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded-md"
+                            >{{ item.name }}</a
+                        >
+                    </li>
+                }
+
+                @if (errorMessage()) {
+                    <span>{{ errorMessage() }}</span>
+                }
+
+                @if (isEmpty() && !isLoading()) {
+                    <span>No se encontraron resultados</span>
+                }
+
+                @if (isLoading()) {
+                    <span>Buscando paises</span>
+                }
+            </ul>
+        </div>
+    </div>
 
     <button class="btn btn-primary" (click)="searchedValue.emit(txtSearch.value)">Buscar</button>
-
-    <div>
-        @for (item of projects(); track $index) {
-            <span>{{ item.name }} </span>
-        }
-
-        @if (errorMessage()) {
-            <span>{{ errorMessage() }}</span>
-            <!-- <tr>
-                <td colspan="8" class="text-center">
-                    {{ errorMessage() }}
-                </td>
-            </tr> -->
-        }
-
-        @if (isEmpty() && !isLoading()) {
-            <!-- <tr>
-                <td colspan="8" class="text-center">No se encontraron resultados</td>
-            </tr> -->
-            <span>No se encontraron resultados</span>
-        }
-
-        @if (isLoading()) {
-            <!-- <tr>
-                <td colspan="8" class="text-center">Buscando pasíses</td>
-            </tr> -->
-            <span>Buscando paises</span>
-        }
-    </div>
 </section>

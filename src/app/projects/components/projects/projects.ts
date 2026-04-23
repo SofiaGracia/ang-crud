@@ -53,4 +53,8 @@ export class Projects {
         },
         defaultValue: null,
     });
+
+    onClearSearchResults(): void {
+        this.searchResultsResource.reload();
+    }
 }

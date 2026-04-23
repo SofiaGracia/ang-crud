@@ -1,43 +1,37 @@
 <section class="flex grow gap-2 mb-6">
-    <div class="w-full">
-        <input
-            type="text"
-            class="input input-bordered mr-2 w-full"
-            [placeholder]="valuePlaceholder()"
-            autofocus
-            #txtSearch
-            (keyup.enter)="searchedValue.emit(txtSearch.value)"
-            (keyup)="searchedValue.emit(txtSearch.value)"
-            (keyup)="inputValue.set(txtSearch.value)"
-            [value]="initialValue()"
-        />
-
-        <div id="dropdown" class="w-full">
-            <ul class="p-2 text-sm text-body font-medium" aria-labelledby="dropdown-button">
-                @for (item of projects(); track $index) {
-                    <li>
-                        <a
-                            href="#"
-                            class="block p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded-md"
-                            >{{ item.name }}</a
-                        >
-                    </li>
-                }
-
-                @if (errorMessage()) {
-                    <span>{{ errorMessage() }}</span>
-                }
-
-                @if (isEmpty() && !isLoading()) {
-                    <span>No se encontraron resultados</span>
-                }
-
-                @if (isLoading()) {
-                    <span>Buscando paises</span>
-                }
-            </ul>
-        </div>
+  <div class="w-full relative">  <!-- ✅ Afegeix "relative" aquí -->
+    <input
+      type="text"
+      class="input input-bordered mr-2 w-full"
+      [placeholder]="valuePlaceholder()"
+      autofocus
+      #txtSearch
+      (keyup.enter)="searchedValue.emit(txtSearch.value)"
+      (keyup)="searchedValue.emit(txtSearch.value); inputValue.set(txtSearch.value)"
+      [value]="initialValue()"
+    />
+    <div id="dropdown" class="w-full absolute bg-gray-800 rounded-md z-10 left-0">
+      <!-- ✅ "left-0" per alinear-lo a l'esquerra del pare -->
+      <ul class="text-sm text-body font-medium" aria-labelledby="dropdown-button">
+        @for (item of projects(); track $index) {
+          <li>
+            <span
+              href="#"
+              class="block p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded-md"
+            >{{ item.name }}</span>
+          </li>
+        }
+        @if (errorMessage()) {
+          <span>{{ errorMessage() }}</span>
+        }
+        @if (isEmpty() && !isLoading()) {
+          <span>No se encontraron resultados</span>
+        }
+        @if (isLoading()) {
+          <span>Buscant...</span>
+        }
+      </ul>
     </div>
-
-    <button class="btn btn-primary" (click)="searchedValue.emit(txtSearch.value)">Buscar</button>
+  </div>
+  <button class="btn btn-primary" (click)="searchedValue.emit(txtSearch.value)">Buscar</button>
 </section>

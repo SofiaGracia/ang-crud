@@ -1,14 +1,36 @@
 <dialog-project #dialogRef [mode]="'create'"></dialog-project>
 
 <div class="p-6">
+    <search-input
+        (searchedValue)="queryP.set($event)"
+        valuePlaceholder="Buscar por proyecto"
+        [debounceTime]="3000"
+        [initialValue]="queryP()"
+        [projects]="projectsResource.value()"
+        [errorMessage]="projectsResource.error()"
+        [isEmpty]="projectsResource.value()?.length == 0"
+        [isLoading]="projectsResource.isLoading()"
+    ></search-input>
+
     <div class="flex justify-between items-center mb-6">
         <div>
             <h1 class="text-3xl font-bold">My Projects</h1>
             <p class="text-base-content/60">Organize your prototypes into projects</p>
         </div>
         <button class="btn btn-primary" (click)="dialogRef.openDialog()">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            <svg
+                xmlns="http://www.w3.org/2000/svg"
+                class="h-5 w-5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+            >
+                <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 4v16m8-8H4"
+                />
             </svg>
             New Project
         </button>
@@ -19,7 +41,9 @@
             <div class="flex flex-col items-center justify-center py-20 text-center">
                 <div class="text-6xl mb-4 opacity-30">📁</div>
                 <h2 class="text-xl font-semibold mb-2">No projects yet</h2>
-                <p class="text-base-content/60 mb-6">Create your first project to start organizing your prototypes</p>
+                <p class="text-base-content/60 mb-6">
+                    Create your first project to start organizing your prototypes
+                </p>
                 <button class="btn btn-primary" (click)="dialogRef.openDialog()">
                     Create First Project
                 </button>

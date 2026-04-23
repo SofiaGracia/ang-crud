@@ -1,0 +1,44 @@
+<section class="flex grow gap-2 mb-6">
+    <input
+        type="text"
+        class="input input-bordered mr-2 w-full"
+        [placeholder]="valuePlaceholder()"
+        autofocus
+        #txtSearch
+        (keyup.enter)="searchedValue.emit(txtSearch.value)"
+        (keyup)="searchedValue.emit(txtSearch.value)"
+        (keyup)="inputValue.set(txtSearch.value)"
+        [value]="initialValue()"
+    />
+
+    <button class="btn btn-primary" (click)="searchedValue.emit(txtSearch.value)">Buscar</button>
+
+    <div>
+        @for (item of projects(); track $index) {
+            <span>{{ item.name }} </span>
+        }
+
+        @if (errorMessage()) {
+            <span>{{ errorMessage() }}</span>
+            <!-- <tr>
+                <td colspan="8" class="text-center">
+                    {{ errorMessage() }}
+                </td>
+            </tr> -->
+        }
+
+        @if (isEmpty() && !isLoading()) {
+            <!-- <tr>
+                <td colspan="8" class="text-center">No se encontraron resultados</td>
+            </tr> -->
+            <span>No se encontraron resultados</span>
+        }
+
+        @if (isLoading()) {
+            <!-- <tr>
+                <td colspan="8" class="text-center">Buscando pasíses</td>
+            </tr> -->
+            <span>Buscando paises</span>
+        }
+    </div>
+</section>

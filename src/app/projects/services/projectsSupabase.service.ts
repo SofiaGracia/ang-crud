@@ -8,10 +8,7 @@ export class ProjectSupabaseService {
     private supabase = inject(SupabaseClientService).instance;
 
     getProjects(): Observable<ProjectInterface[]> {
-        const promise = this.supabase
-            .from('projects')
-            .select('*')
-            .is('deleted_at', null);
+        const promise = this.supabase.from('projects').select('*').is('deleted_at', null);
         return from(promise).pipe(
             map((response) => {
                 return response.data ?? [];
@@ -104,6 +101,19 @@ export class ProjectSupabaseService {
                     throw response.error;
                 }
                 return;
+            }),
+        );
+    }
+
+    searchProjectsByName(query: string): Observable<ProjectInterface[] | null> {
+        const promise = this.supabase
+            .from('projects')
+            .select('*')
+            .ilike('name', `%${query}%`)
+            .is('deleted_at', null);
+        return from(promise).pipe(
+            map((response) => {
+                return response.data ?? [];
             }),
         );
     }

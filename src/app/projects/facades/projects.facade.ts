@@ -1,16 +1,42 @@
 import { inject, Injectable } from '@angular/core';
 import { Project, ProjectInterface } from '@projects/interfaces/project.interface';
 import { ProjectSupabaseService } from '@projects/services/projectsSupabase.service';
-import { BehaviorSubject, switchMap, of, Observable } from 'rxjs';
+import { PaginatedResponse } from '@shared/interfaces/paginated-response.interface';
+import { BehaviorSubject, switchMap, of, Observable, combineLatest, map } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class ProjectsFacade {
 
-    // Subject to refresh the projects list
-    private refresh$ = new BehaviorSubject<void>(undefined);
     private projectSupabaseService = inject(ProjectSupabaseService);
+    private limit = 8;
+
+    private refresh$ = new BehaviorSubject<void>(undefined);
+    private page$ = new BehaviorSubject<number>(1);
 
     projects$ = this.refresh$.pipe(switchMap(() => this.projectSupabaseService.getProjects()));
+
+    paginatedProjects$ = combineLatest([this.refresh$, this.page$]).pipe(
+        switchMap(([, page]) => this.projectSupabaseService.getProjectsPaginated(page, this.limit)),
+    );
+
+    totalPages$ = this.paginatedProjects$.pipe(map((r) => r.totalPages));
+    currentPage$ = this.page$.asObservable();
+
+    totalCount$ = this.paginatedProjects$.pipe(map((r) => r.total));
+
+    goToPage(page: number) {
+        this.page$.next(page);
+    }
+
+    nextPage() {
+        this.page$.next(this.page$.value + 1);
+    }
+
+    prevPage() {
+        if (this.page$.value > 1) {
+            this.page$.next(this.page$.value - 1);
+        }
+    }
 
     // Subject to select a project
     private selectedProjectId$ = new BehaviorSubject<number | null>(null);

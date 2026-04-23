@@ -4,6 +4,7 @@ import { ProjectsFacade } from '@projects/facades/projects.facade';
 import { firstValueFrom, of } from 'rxjs';
 import { Component, Input } from '@angular/core';
 import { provideRouter } from '@angular/router';
+import { AsyncPipe } from '@angular/common';
 
 @Component({
     selector: 'project-card',
@@ -21,6 +22,22 @@ class MockProjectCard {
 })
 class MockDialogProject {}
 
+@Component({
+    selector: 'search-input',
+    standalone: true,
+    template: '<div></div>',
+    imports: [],
+})
+class MockSearchInput {}
+
+@Component({
+    selector: 'pagination',
+    standalone: true,
+    template: '<div></div>',
+    imports: [],
+})
+class MockPagination {}
+
 describe('Projects', () => {
     let component: Projects;
     let fixture: ComponentFixture<Projects>;
@@ -32,7 +49,21 @@ describe('Projects', () => {
                 { id: 1, name: 'Project 1', description: 'Description 1' },
                 { id: 2, name: 'Project 2', description: 'Description 2' },
             ]),
+            paginatedProjects$: of({
+                data: [
+                    { id: 1, name: 'Project 1', description: 'Description 1' },
+                    { id: 2, name: 'Project 2', description: 'Description 2' },
+                ],
+                total: 2,
+                page: 1,
+                limit: 8,
+                totalPages: 1,
+            }),
+            totalPages$: of(1),
+            currentPage$: of(1),
+            totalCount$: of(2),
             loadProjects: vi.fn(),
+            goToPage: vi.fn(),
         };
 
         await TestBed.configureTestingModule({
@@ -40,6 +71,9 @@ describe('Projects', () => {
                 Projects,
                 MockProjectCard,
                 MockDialogProject,
+                MockSearchInput,
+                MockPagination,
+                AsyncPipe,
             ],
             providers: [
                 { provide: ProjectsFacade, useValue: mockFacade },

@@ -3,21 +3,30 @@
     @if (project?.description) {
         <p>{{ project.description }}</p>
     }
-    <!-- Crear prototip -->
     <dialog-prototype #dialogRef [mode]="'create'" [project]="project"></dialog-prototype>
     <button class="btn btn-primary mb-2" (click)="dialogRef.openDialog()">Add prototype</button>
 } @else {
     <h2>Carregant projecte...</h2>
 }
 
-@if (prototypes$ | async; as prototypes) {
-    @if (prototypes.length === 0) {
+@if (paginatedData$ | async; as paginated) {
+    @if (paginated.data.length === 0) {
         <p>No hi ha prototips.</p>
     } @else {
-        @for (proto of prototypes; track proto.id) {
+        @for (proto of paginated.data; track proto.id) {
             <prototype-card [proto]="proto"></prototype-card>
         }
     }
 } @else {
     <h2>Carregant prototips...</h2>
+}
+
+@if (paginatedData$ | async; as paginated) {
+    <pagination
+        [currentPage]="(currentPage$ | async) ?? 1"
+        [totalPages]="paginated.totalPages"
+        [total]="paginated.total"
+        [limit]="paginated.limit"
+        (pageChange)="onPageChange($event)"
+    ></pagination>
 }

@@ -14,7 +14,7 @@
             <div id="dropdown" class="w-full absolute bg-gray-800 rounded-md z-10 left-0">
                 <ul class="text-sm text-body font-medium" aria-labelledby="dropdown-button">
                     @for (item of searchResults(); track $index) {
-                        <li class="m-3 cursor-pointer" (click)="onItemClick(item)">
+                        <li class="m-3 cursor-pointer hover:bg-gray-700 rounded-md" (click)="onItemClick(item)">
                             <span
                                 href="#"
                                 class="p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded-md justify-between items-center"

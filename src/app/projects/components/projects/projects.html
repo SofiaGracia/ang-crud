@@ -3,13 +3,13 @@
 <div class="p-6 relative">
     <search-input
         (searchedValue)="queryP.set($event)"
-        valuePlaceholder="Buscar por proyecto"
+        valuePlaceholder="Buscar"
         [debounceTime]="3000"
         [initialValue]="queryP()"
-        [projects]="projectsResource.value()"
-        [errorMessage]="projectsResource.error()"
-        [isEmpty]="projectsResource.value()?.length == 0"
-        [isLoading]="projectsResource.isLoading()"
+        [searchResults]="searchResultsResource.value()"
+        [errorMessage]="searchResultsResource.error()"
+        [isEmpty]="(searchResultsResource.value()?.length ?? 0) == 0"
+        [isLoading]="searchResultsResource.isLoading()"
     ></search-input>
 
     <div class="flex justify-between items-center mb-6">

@@ -6,7 +6,10 @@ import { DialogProject } from '../dialog-project/dialog-project';
 import { SearchInput } from '@web-front/components/search-input/search-input';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { ProjectInterface } from '@projects/interfaces/project.interface';
-import { of } from 'rxjs';
+import { of, forkJoin } from 'rxjs';
+import { map } from 'rxjs/operators';
+import { SearchResultItem, SearchResults } from '@web-front/interfaces/search-result.interface';
+import { PrototypesFacade } from '@prototypes/facades/prototypes.facades';
 
 @Component({
     selector: 'app-projects',
@@ -15,22 +18,39 @@ import { of } from 'rxjs';
 })
 export class Projects {
     private projectsFacade = inject(ProjectsFacade);
+    private prototypesFacade = inject(PrototypesFacade);
 
     projects$ = this.projectsFacade.projects$;
 
     queryP = linkedSignal(() => '');
 
-    projectsResource = rxResource<ProjectInterface[] | null, { query: string }>({
-        // definim com a params una funció que retorna l'objecte de paràmetres
+    searchResultsResource = rxResource<SearchResults, { query: string }>({
         params: () => ({ query: this.queryP() }),
-        // definim stream, que rep l'objecte params i retorna l’Observable
         stream: ({ params }) => {
             if (!params.query) {
-                return of<ProjectInterface[] | null>(null);
+                return of<SearchResults>(null);
             }
 
-            return this.projectsFacade.searchProjectsByName(params.query);
+            return forkJoin({
+                projects: this.projectsFacade.searchProjectsByName(params.query),
+                prototypes: this.prototypesFacade.searchPrototypesByName(params.query),
+            }).pipe(
+                map(({ projects, prototypes }) => {
+                    if (!projects || !prototypes) {
+                        return null;
+                    }
+                    const projectResults: SearchResultItem[] = projects.map((p) => ({
+                        ...p,
+                        type: 'project' as const,
+                    }));
+                    const prototypeResults: SearchResultItem[] = prototypes.map((p) => ({
+                        ...p,
+                        type: 'prototype' as const,
+                    }));
+                    return [...projectResults, ...prototypeResults];
+                }),
+            );
         },
-        defaultValue: [] as ProjectInterface[],
+        defaultValue: null,
     });
 }

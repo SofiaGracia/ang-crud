@@ -39,6 +39,10 @@ export class PrototypesFacade {
         return this.prototypesSupabaseService.getPrototypeById(projectId, prototypeId);
     }
 
+    searchPrototypesByName(query: string): Observable<PrototypeInterface[] | null> {
+        return this.prototypesSupabaseService.searchPrototypesByName(query);
+    }
+
     // updateProject(projectId: number, dataToUpdate: Project) {
     //     this.projectSupabaseService.updateProject(projectId, dataToUpdate).subscribe({
     //         next: () => {

@@ -154,4 +154,17 @@ export class PrototypesSupabaseService {
             }),
         );
     }
+
+    searchPrototypesByName(query: string): Observable<PrototypeInterface[] | null> {
+        const promise = this.supabase
+            .from('prototypes')
+            .select('*')
+            .ilike('name', `%${query}%`)
+            .is('deleted_at', null);
+        return from(promise).pipe(
+            map((response) => {
+                return response.data ?? [];
+            }),
+        );
+    }
 }

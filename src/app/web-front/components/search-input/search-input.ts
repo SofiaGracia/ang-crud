@@ -1,5 +1,5 @@
 import { Component, effect, input, linkedSignal, output } from '@angular/core';
-import { ProjectInterface } from '@projects/interfaces/project.interface';
+import { SearchResults } from '@web-front/interfaces/search-result.interface';
 
 @Component({
     selector: 'search-input',
@@ -16,7 +16,7 @@ export class SearchInput {
     inputValue = linkedSignal<string>(() => this.initialValue());
 
     //List of objects searched
-    projects = input.required<ProjectInterface[] | null>();
+    searchResults = input.required<SearchResults>();
 
     errorMessage = input<string | unknown | null>();
     isLoading = input<boolean>(false);

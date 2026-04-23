@@ -1,7 +1,7 @@
 import { inject, Injectable } from '@angular/core';
-import { Project } from '@projects/interfaces/project.interface';
+import { Project, ProjectInterface } from '@projects/interfaces/project.interface';
 import { ProjectSupabaseService } from '@projects/services/projectsSupabase.service';
-import { BehaviorSubject, switchMap, of } from 'rxjs';
+import { BehaviorSubject, switchMap, of, Observable } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class ProjectsFacade {
@@ -60,5 +60,11 @@ export class ProjectsFacade {
                 console.error('Error updating project', err);
             },
         });
+    }
+
+    searchProjectsByName(query: string): Observable<ProjectInterface[] | null>{
+
+        return this.projectSupabaseService.searchProjectsByName(query);
+
     }
 }

@@ -1,0 +1,47 @@
+<section class="flex grow gap-2 mb-6">
+    <div class="w-full relative">
+        <input
+            type="text"
+            class="input input-bordered mr-2 w-full"
+            [placeholder]="valuePlaceholder()"
+            autofocus
+            #txtSearch
+            (keyup.enter)="searchedValue.emit(txtSearch.value)"
+            (keyup)="searchedValue.emit(txtSearch.value); inputValue.set(txtSearch.value)"
+            [value]="initialValue()"
+        />
+        @if (searchResults() !== null) {
+            <div id="dropdown" class="w-full absolute bg-gray-800 rounded-md z-10 left-0">
+                <ul class="text-sm text-body font-medium" aria-labelledby="dropdown-button">
+                    @for (item of searchResults(); track $index) {
+                        <li class="m-3 cursor-pointer" (click)="onItemClick(item)">
+                            <span
+                                href="#"
+                                class="p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded-md justify-between items-center"
+                            >
+                                <span>{{ item.name }}</span>
+                            </span>
+                            <span
+                                class="badge"
+                                [class.badge-primary]="item.type === 'project'"
+                                [class.badge-secondary]="item.type === 'prototype'"
+                            >
+                                {{ item.type }}
+                            </span>
+                        </li>
+                    }
+                    @if (errorMessage()) {
+                        <span>{{ errorMessage() }}</span>
+                    }
+                    @if (isEmpty() && !isLoading()) {
+                        <span>No se encontraron resultados</span>
+                    }
+                    @if (isLoading()) {
+                        <span>Buscant...</span>
+                    }
+                </ul>
+            </div>
+        }
+    </div>
+    <button class="btn btn-primary" (click)="searchedValue.emit(txtSearch.value)">Buscar</button>
+</section>

@@ -7,7 +7,6 @@ import { SearchInput } from '@web-front/components/search-input/search-input';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { ProjectInterface } from '@projects/interfaces/project.interface';
 import { of } from 'rxjs';
-import { ProjectSupabaseService } from '@projects/services/projectsSupabase.service';
 
 @Component({
     selector: 'app-projects',
@@ -18,8 +17,6 @@ export class Projects {
     private projectsFacade = inject(ProjectsFacade);
 
     projects$ = this.projectsFacade.projects$;
-
-    projectsService = inject(ProjectSupabaseService);
 
     queryP = linkedSignal(() => '');
 
@@ -32,7 +29,7 @@ export class Projects {
                 return of<ProjectInterface[] | null>(null);
             }
 
-            return this.projectsService.searchProjectsByName(params.query);
+            return this.projectsFacade.searchProjectsByName(params.query);
         },
         defaultValue: [] as ProjectInterface[],
     });

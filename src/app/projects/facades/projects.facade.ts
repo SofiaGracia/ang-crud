@@ -62,18 +62,9 @@ export class ProjectsFacade {
         });
     }
 
-    // searchByProject(query: string): Observable<ProjectInterface[]>{
+    searchProjectsByName(query: string): Observable<ProjectInterface[] | null>{
 
-    //     this.projectSupabaseService.searchProjectsByName(query).subscribe({
-    //         next: (something) => {
-    //             this.refresh$.next();
-    //             console.log(something);
-    //             return something;
-    //         },
-    //         error: (err) => {
-    //             console.error('Error updating project', err);
-    //         },
-    //     });
+        return this.projectSupabaseService.searchProjectsByName(query);
 
-    // }
+    }
 }

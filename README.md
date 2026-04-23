@@ -149,6 +149,10 @@ For more information on using the Angular CLI, including detailed command refere
   - **Description:** The interface can be more intuitive and accessible.
   - **Implementation:** Add loading skeletons while data loads. More descriptive error messages. Tooltips or contextual help. Visual validations on forms.
 
+- [ ] **Filter Projects by User**
+  - **Description:** Currently all projects are shown to all users. Projects should only be visible to the user who created them.
+  - **Implementation:** Add `user_id` filter to Supabase queries in `ProjectsSupabaseService`. Use the authenticated user's ID from the session to filter results.
+
 - [ ] **Complete Lazy Loading**
   - **Description:** Only login/register have lazy loading. All routes could benefit from it.
   - **Implementation:** Apply `loadComponent()` to all routes that don't load at startup (Projects, Prototypes, Landing, etc.).

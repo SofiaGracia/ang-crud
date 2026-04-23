@@ -1,0 +1,51 @@
+@if (totalPages > 1) {
+    <div class="join flex justify-center items-center mt-4 mb-10">
+        <button
+            class="join-item btn btn-sm"
+            [disabled]="!hasPrev"
+            (click)="prev()"
+        >
+            &laquo; Prev
+        </button>
+
+        @if (visiblePages[0] > 1) {
+            <button class="join-item btn btn-sm" (click)="goToPage(1)">1</button>
+        }
+
+        @if (showEllipsisStart) {
+            <span class="join-item btn btn-disabled btn-sm">...</span>
+        }
+
+        @for (page of visiblePages; track page) {
+            <button
+                class="join-item btn btn-sm"
+                [class.btn-active]="page === currentPage"
+                (click)="goToPage(page)"
+            >
+                {{ page }}
+            </button>
+        }
+
+        @if (showEllipsisEnd) {
+            <span class="join-item btn btn-disabled btn-sm">...</span>
+        }
+
+        @if (visiblePages[visiblePages.length - 1] < totalPages) {
+            <button class="join-item btn btn-sm" (click)="goToPage(totalPages)">
+                {{ totalPages }}
+            </button>
+        }
+
+        <button
+            class="join-item btn btn-sm"
+            [disabled]="!hasNext"
+            (click)="next()"
+        >
+            Next &raquo;
+        </button>
+    </div>
+}
+
+<div class="text-center text-sm text-base-content/60 mb-4">
+    {{ getShowingInfo() }}
+</div>

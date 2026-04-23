@@ -126,3 +126,41 @@ Angular CLI does not come with an end-to-end testing framework by default. You c
 ## Additional Resources
 
 For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+
+---
+
+## Improvements
+
+### To Do
+
+- [ ] **Pagination**
+  - **Description:** Currently all records are loaded from Supabase. When there are many, this causes unnecessary traffic and slowdowns.
+  - **Implementation:** Add `offset` and `limit` parameters to Supabase queries. Create UI controls (Previous/Next buttons or page numbers). Show info like "1-10 of 50 projects".
+
+- [ ] **Test Coverage**
+  - **Description:** Currently only 6 of ~30 components have tests.
+  - **Implementation:** Prioritize tests for services and facades (business logic). Tests for critical components: Projects, Prototypes, Dialogs.
+
+- [ ] **Cache for Projects**
+  - **Description:** Every time projects are visited, they are reloaded from Supabase. Implementing cache reduces API costs and improves performance.
+  - **Implementation:** Store the project list in memory (RxJS BehaviorSubject). Invalidate cache only on Create/Update/Delete. Add visual indicator when loading from cache vs API.
+
+- [ ] **Improve UI**
+  - **Description:** The interface can be more intuitive and accessible.
+  - **Implementation:** Add loading skeletons while data loads. More descriptive error messages. Tooltips or contextual help. Visual validations on forms.
+
+- [ ] **Filter Projects by User**
+  - **Description:** Currently all projects are shown to all users. Projects should only be visible to the user who created them.
+  - **Implementation:** Add `user_id` filter to Supabase queries in `ProjectsSupabaseService`. Use the authenticated user's ID from the session to filter results.
+
+- [ ] **Complete Lazy Loading**
+  - **Description:** Only login/register have lazy loading. All routes could benefit from it.
+  - **Implementation:** Apply `loadComponent()` to all routes that don't load at startup (Projects, Prototypes, Landing, etc.).
+
+### Completed
+
+- [x] **Full CRUD** - Create, Read, Update, Delete for projects and prototypes
+- [x] **Supabase Authentication** - Signup, login, logout
+- [x] **Facade Pattern** - Separation of state and business logic
+- [x] **Testing Setup** - Vitest configured
+- [x] **Modern Angular 21** - Standalone components and new control flow syntax

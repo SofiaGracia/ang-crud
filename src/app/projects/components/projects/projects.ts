@@ -6,14 +6,14 @@ import { DialogProject } from '../dialog-project/dialog-project';
 import { SearchInput } from '@web-front/components/search-input/search-input';
 import { rxResource } from '@angular/core/rxjs-interop';
 import { ProjectInterface } from '@projects/interfaces/project.interface';
-import { of, forkJoin } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { of, forkJoin, combineLatest, map } from 'rxjs';
 import { SearchResultItem, SearchResults } from '@web-front/interfaces/search-result.interface';
 import { PrototypesFacade } from '@prototypes/facades/prototypes.facades';
+import { Pagination } from '@shared/components/pagination/pagination';
 
 @Component({
     selector: 'app-projects',
-    imports: [ProjectCard, DialogProject, AsyncPipe, SearchInput],
+    imports: [ProjectCard, DialogProject, AsyncPipe, SearchInput, Pagination],
     templateUrl: './projects.html',
 })
 export class Projects {
@@ -21,6 +21,11 @@ export class Projects {
     private prototypesFacade = inject(PrototypesFacade);
 
     projects$ = this.projectsFacade.projects$;
+
+    paginatedData$ = this.projectsFacade.paginatedProjects$;
+    totalPages$ = this.projectsFacade.totalPages$;
+    currentPage$ = this.projectsFacade.currentPage$;
+    totalCount$ = this.projectsFacade.totalCount$;
 
     queryP = linkedSignal(() => '');
 
@@ -56,5 +61,9 @@ export class Projects {
 
     onClearSearchResults(): void {
         this.searchResultsResource.reload();
+    }
+
+    onPageChange(page: number) {
+        this.projectsFacade.goToPage(page);
     }
 }

@@ -1,7 +1,8 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, from, map } from 'rxjs';
+import { Observable, from, map, forkJoin } from 'rxjs';
 import { Project, ProjectInterface } from '@projects/interfaces/project.interface';
 import { SupabaseClientService } from '@shared/services/supabase-client.service';
+import { PaginatedResponse } from '@shared/interfaces/paginated-response.interface';
 
 @Injectable({ providedIn: 'root' })
 export class ProjectSupabaseService {
@@ -12,6 +13,43 @@ export class ProjectSupabaseService {
         return from(promise).pipe(
             map((response) => {
                 return response.data ?? [];
+            }),
+        );
+    }
+
+    getProjectsPaginated(
+        page: number,
+        limit: number = 8,
+    ): Observable<PaginatedResponse<ProjectInterface>> {
+        const fromIndex = (page - 1) * limit;
+        const toIndex = fromIndex + limit - 1;
+
+        const countPromise = this.supabase
+            .from('projects')
+            .select('*', { count: 'exact', head: true })
+            .is('deleted_at', null);
+
+        const dataPromise = this.supabase
+            .from('projects')
+            .select('*')
+            .is('deleted_at', null)
+            .range(fromIndex, toIndex);
+
+        return forkJoin({
+            countResponse: from(countPromise),
+            dataResponse: from(dataPromise),
+        }).pipe(
+            map(({ countResponse, dataResponse }) => {
+                const total = countResponse.count ?? 0;
+                const data = dataResponse.data ?? [];
+                const totalPages = Math.ceil(total / limit);
+                return {
+                    data,
+                    total,
+                    page,
+                    limit,
+                    totalPages,
+                };
             }),
         );
     }

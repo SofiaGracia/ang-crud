@@ -9,12 +9,21 @@
             (keyup.enter)="searchedValue.emit(txtSearch.value)"
             (keyup)="searchedValue.emit(txtSearch.value); inputValue.set(txtSearch.value)"
             [value]="initialValue()"
+            (blur)="dropdownClosed.emit()"
         />
-        @if (searchResults() !== null) {
-            <div id="dropdown" class="w-full absolute bg-gray-800 rounded-md z-10 left-0">
-                <ul class="text-sm text-body font-medium" aria-labelledby="dropdown-button">
+
+        <div
+            id="dropdown"
+            class="w-full absolute bg-gray-800 rounded-md z-10 left-0"
+            (mousedown)="$event.preventDefault()"
+        >
+            <ul class="text-sm text-body font-medium">
+                @if (searchResults() !== null) {
                     @for (item of searchResults(); track $index) {
-                        <li class="m-3 cursor-pointer hover:bg-gray-700 rounded-md" (click)="onItemClick(item)">
+                        <li
+                            class="m-3 cursor-pointer hover:bg-gray-700 rounded-md"
+                            (click)="onItemClick(item)"
+                        >
                             <span
                                 href="#"
                                 class="p-2 hover:bg-neutral-tertiary-medium hover:text-heading rounded-md justify-between items-center"
@@ -31,17 +40,17 @@
                         </li>
                     }
                     @if (errorMessage()) {
-                        <span>{{ errorMessage() }}</span>
+                        <li class="m-3">{{ errorMessage() }}</li>
                     }
                     @if (isEmpty() && !isLoading()) {
-                        <span>No se encontraron resultados</span>
+                        <li class="m-3">No se encontraron resultados</li>
                     }
-                    @if (isLoading()) {
-                        <span>Buscant...</span>
-                    }
-                </ul>
-            </div>
-        }
+                }
+                @if (isLoading()) {
+                    <li class="m-3">Buscando</li>
+                }
+            </ul>
+        </div>
     </div>
     <button class="btn btn-primary" (click)="searchedValue.emit(txtSearch.value)">Buscar</button>
 </section>

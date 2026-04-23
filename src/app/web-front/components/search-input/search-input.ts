@@ -26,6 +26,9 @@ export class SearchInput {
     isLoading = input<boolean>(false);
     isEmpty = input<boolean>(false);
 
+    // component .ts
+    readonly dropdownClosed = output<void>();
+
     debounceEffect = effect((onCleanup) => {
         const value = this.inputValue();
 
@@ -36,7 +39,6 @@ export class SearchInput {
         onCleanup(() => {
             clearTimeout(timeout);
         });
-
     });
 
     onItemClick(item: SearchResultItem): void {

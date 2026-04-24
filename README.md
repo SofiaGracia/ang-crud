@@ -15,7 +15,7 @@ This project serves as a practical learning environment for building full-stack 
 
 ### Features
 
-- CRUD operations (Create, Read, Update, Delete)
+- CRUD operations with pagination (Create, Read, Update, Delete)
 - User authentication (signup, login, logout)
 - Reactive state management using Facade pattern
 
@@ -133,10 +133,6 @@ For more information on using the Angular CLI, including detailed command refere
 
 ### To Do
 
-- [ ] **Pagination**
-  - **Description:** Currently all records are loaded from Supabase. When there are many, this causes unnecessary traffic and slowdowns.
-  - **Implementation:** Add `offset` and `limit` parameters to Supabase queries. Create UI controls (Previous/Next buttons or page numbers). Show info like "1-10 of 50 projects".
-
 - [ ] **Test Coverage**
   - **Description:** Currently only 6 of ~30 components have tests.
   - **Implementation:** Prioritize tests for services and facades (business logic). Tests for critical components: Projects, Prototypes, Dialogs.
@@ -147,7 +143,7 @@ For more information on using the Angular CLI, including detailed command refere
 
 - [ ] **Improve UI**
   - **Description:** The interface can be more intuitive and accessible.
-  - **Implementation:** Add loading skeletons while data loads. More descriptive error messages. Tooltips or contextual help. Visual validations on forms.
+  - **Implementation:** Add loading skeletons while data loads. More descriptive error messages. Tooltips or contextual help. Visual validations on forms. Dark mode toggle for user preference.
 
 - [ ] **Filter Projects by User**
   - **Description:** Currently all projects are shown to all users. Projects should only be visible to the user who created them.
@@ -159,6 +155,7 @@ For more information on using the Angular CLI, including detailed command refere
 
 ### Completed
 
+- [x] **Pagination** - Offset/limit queries with Previous/Next controls
 - [x] **Full CRUD** - Create, Read, Update, Delete for projects and prototypes
 - [x] **Supabase Authentication** - Signup, login, logout
 - [x] **Facade Pattern** - Separation of state and business logic

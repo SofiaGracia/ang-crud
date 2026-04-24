@@ -90,14 +90,19 @@ describe('Projects', () => {
         expect(component).toBeTruthy();
     });
 
-    it('should expose projects$ from facade', async () => {
-        const projects = await firstValueFrom(component.projects$);
-        expect(projects).toHaveLength(2);
+    it('should expose paginatedData$ from facade', async () => {
+        const paginated = await firstValueFrom(component.paginatedData$);
+        expect(paginated.data).toHaveLength(2);
     });
 
-    it('should render project cards', () => {
+    it('should render paginated project cards', () => {
         const compiled = fixture.nativeElement as HTMLElement;
         const cards = compiled.querySelectorAll('project-card');
         expect(cards).toHaveLength(2);
+    });
+
+    it('should call goToPage when onPageChange is called', () => {
+        component.onPageChange(2);
+        expect(mockFacade.goToPage).toHaveBeenCalledWith(2);
     });
 });

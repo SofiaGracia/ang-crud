@@ -20,7 +20,10 @@ export class Projects {
     private projectsFacade = inject(ProjectsFacade);
     private prototypesFacade = inject(PrototypesFacade);
 
-    projects$ = this.projectsFacade.projects$;
+    paginatedData$ = this.projectsFacade.paginatedProjects$;
+    totalPages$ = this.projectsFacade.totalPages$;
+    currentPage$ = this.projectsFacade.currentPage$;
+    totalCount$ = this.projectsFacade.totalCount$;
 
     paginatedData$ = this.projectsFacade.paginatedProjects$;
     totalPages$ = this.projectsFacade.totalPages$;

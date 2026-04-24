@@ -1,7 +1,4 @@
-<div
-    class="card bg-base-100 w-96 shadow-sm cursor-pointer"
-    (click)="openPreview()"
->
+<div class="card p-4 bg-base-100 w-96 shadow-sm cursor-pointer" (click)="openPreview()">
     <figure class="h-48 overflow-hidden">
         @if (htmlContent()) {
             <iframe
@@ -44,12 +41,7 @@
                         Move to Trash
                     </a>
                 </li>
-                <!-- Modify -->
             </ul>
-        </div>
-        <div class="card-actions justify-end">
-            <div class="badge badge-outline">{{ proto().tool }}</div>
-            <div class="badge badge-outline">{{ proto().tool }}</div>
         </div>
     </div>
 </div>

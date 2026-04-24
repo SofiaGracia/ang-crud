@@ -8,8 +8,6 @@
 } @else {
     <h2>Carregant projecte...</h2>
 }
-<div class="p-6 relative">
-    <div class="flex justify-between items-center mb-6">
 
 @if (paginatedData$ | async; as paginated) {
     @if (paginated.data.length === 0) {
@@ -18,17 +16,9 @@
         @for (proto of paginated.data; track proto.id) {
             <prototype-card [proto]="proto"></prototype-card>
         }
-    </div>
-</div>
-
-@if (paginatedData$ | async; as paginated) {
-    <pagination
-        [currentPage]="(currentPage$ | async) ?? 1"
-        [totalPages]="paginated.totalPages"
-        [total]="paginated.total"
-        [limit]="paginated.limit"
-        (pageChange)="onPageChange($event)"
-    ></pagination>
+    }
+} @else {
+    <h2>Carregant prototips...</h2>
 }
 
 @if (paginatedData$ | async; as paginated) {

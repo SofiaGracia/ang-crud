@@ -25,11 +25,6 @@ export class Projects {
     currentPage$ = this.projectsFacade.currentPage$;
     totalCount$ = this.projectsFacade.totalCount$;
 
-    paginatedData$ = this.projectsFacade.paginatedProjects$;
-    totalPages$ = this.projectsFacade.totalPages$;
-    currentPage$ = this.projectsFacade.currentPage$;
-    totalCount$ = this.projectsFacade.totalCount$;
-
     queryP = linkedSignal(() => '');
 
     searchResultsResource = rxResource<SearchResults, { query: string }>({

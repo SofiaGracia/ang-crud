@@ -1,15 +1,33 @@
+
+
 @if (project$ | async; as project) {
-    <h2>{{ project?.name }}</h2>
-    @if (project?.description) {
-        <p>{{ project.description }}</p>
-    }
     <dialog-prototype #dialogRef [mode]="'create'" [project]="project"></dialog-prototype>
-    <button class="btn btn-primary mb-2" (click)="dialogRef.openDialog()">Add prototype</button>
-} @else {
-    <h2>Carregant projecte...</h2>
-}
-<div class="p-6 relative">
-    <div class="flex justify-between items-center mb-6">
+    <div class="p-6 relative">
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h1 class="text-3xl font-bold">{{ project?.name }}</h1>
+                @if (project?.description) {
+                    <p class="text-base-content/60">{{ project.description }}</p>
+                }
+            </div>
+            <button class="btn btn-primary" (click)="dialogRef.openDialog()">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 4v16m8-8H4"
+                    />
+                </svg>
+                Add prototype
+            </button>
+        </div>
 
         @if (paginatedData$ | async; as paginated) {
             @if (paginated.data.length === 0) {
@@ -18,7 +36,6 @@
                     <h2 class="text-xl font-semibold mb-2">No prototypes yet</h2>
                     <p class="text-base-content/60 mb-6">Create your first prototype</p>
                 </div>
-                <p>No hi ha prototips.</p>
             } @else {
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                     @for (proto of paginated.data; track proto.id) {
@@ -32,7 +49,11 @@
             </div>
         }
     </div>
-</div>
+} @else {
+    <div class="flex justify-center py-20">
+        <span class="loading loading-spinner loading-lg text-primary"></span>
+    </div>
+}
 
 @if (paginatedData$ | async; as paginated) {
     <pagination

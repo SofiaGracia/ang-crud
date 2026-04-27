@@ -30,9 +30,6 @@ describe('ProjectSupabaseService', () => {
                         }),
                     }),
                     maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
-                    eq: vi.fn().mockReturnValue({
-                        maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
-                    }),
                     not: vi.fn().mockReturnValue({
                         order: vi.fn().mockResolvedValue({ data: [], error: null }),
                     }),

@@ -29,13 +29,6 @@ describe('PrototypesSupabaseService', () => {
                             eq: vi.fn().mockResolvedValue({ data: null, error: null }),
                         }),
                     }),
-                    eq: vi.fn().mockReturnValue({
-                        is: vi.fn().mockResolvedValue({ data: [], error: null }),
-                        maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
-                        eq: vi.fn().mockReturnValue({
-                            maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
-                        }),
-                    }),
                     maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
                     not: vi.fn().mockReturnValue({
                         order: vi.fn().mockResolvedValue({ data: [], error: null }),

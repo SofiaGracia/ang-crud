@@ -11,7 +11,7 @@ describe('PrototypesFacade', () => {
     beforeEach(async () => {
         mockService = {
             getPrototypesByProject: vi.fn().mockReturnValue(of([])),
-            getPrototypesPaginated: vi.fn().mockReturnValue(of({ data: [], total: 0, page: 1, limit: 8, totalPages: 0 }))),
+            getPrototypesPaginated: vi.fn().mockReturnValue(of({ data: [], total: 0, page: 1, limit: 8, totalPages: 0 })),
             addPrototype: vi.fn().mockReturnValue(of({ id: 1, name: 'Test' })),
             moveToTrash: vi.fn().mockReturnValue(of(undefined)),
             getPrototypeById: vi.fn().mockReturnValue(of(null)),

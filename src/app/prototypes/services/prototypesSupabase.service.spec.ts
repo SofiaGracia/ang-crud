@@ -47,6 +47,8 @@ describe('PrototypesSupabaseService', () => {
     });
 
     describe('getPrototypesByProject', () => {
+        const mockUserId = 'mock-user-id';
+
         it('should return array of prototypes for a project', async () => {
             const mockPrototypes = [
                 { id: 1, name: 'Prototype 1', project_id: 1, tool: 'Figma', url: 'https://figma.com' },
@@ -61,7 +63,7 @@ describe('PrototypesSupabaseService', () => {
                 }),
             });
 
-            const prototypes = await service.getPrototypesByProject(1).toPromise();
+            const prototypes = await service.getPrototypesByProject(1, mockUserId).toPromise();
             expect(prototypes).toHaveLength(2);
             expect(prototypes![0].name).toBe('Prototype 1');
         });
@@ -75,7 +77,7 @@ describe('PrototypesSupabaseService', () => {
                 }),
             });
 
-            const prototypes = await service.getPrototypesByProject(1).toPromise();
+            const prototypes = await service.getPrototypesByProject(1, mockUserId).toPromise();
             expect(prototypes).toEqual([]);
         });
 
@@ -88,7 +90,7 @@ describe('PrototypesSupabaseService', () => {
                 }),
             });
 
-            const prototypes = await service.getPrototypesByProject(1).toPromise();
+            const prototypes = await service.getPrototypesByProject(1, mockUserId).toPromise();
             expect(prototypes).toEqual([]);
         });
 
@@ -103,7 +105,7 @@ describe('PrototypesSupabaseService', () => {
                 }),
             });
 
-            const prototypes = await service.getPrototypesByProject(1).toPromise();
+            const prototypes = await service.getPrototypesByProject(1, mockUserId).toPromise();
             prototypes!.forEach((p) => expect(validatePrototypeContract(p)).toBe(true));
         });
 
@@ -119,7 +121,7 @@ describe('PrototypesSupabaseService', () => {
                 }),
             });
 
-            await expect(service.getPrototypesByProject(1).toPromise()).rejects.toEqual(
+            await expect(service.getPrototypesByProject(1, mockUserId).toPromise()).rejects.toEqual(
                 expect.objectContaining({ message: 'Query failed' })
             );
         });
@@ -133,12 +135,14 @@ describe('PrototypesSupabaseService', () => {
                 }),
             });
 
-            await service.getPrototypesByProject(42).toPromise();
+            await service.getPrototypesByProject(42, mockUserId).toPromise();
             expect(mockSupabase.from).toHaveBeenCalledWith('prototypes');
         });
     });
 
     describe('addPrototype', () => {
+        const mockUserId = 'mock-user-id';
+
         it('should create prototype and return created data', async () => {
             const newPrototype = { name: 'New Prototype', project_id: 1, tool: 'Figma', url: 'https://figma.com' };
             const createdPrototype = { id: 1, ...newPrototype };
@@ -151,7 +155,7 @@ describe('PrototypesSupabaseService', () => {
                 }),
             });
 
-            const prototype = await service.addPrototype(newPrototype as any).toPromise();
+            const prototype = await service.addPrototype(newPrototype as any, mockUserId).toPromise();
             expect(prototype!.id).toBe(1);
             expect(prototype!.name).toBe('New Prototype');
         });
@@ -170,7 +174,7 @@ describe('PrototypesSupabaseService', () => {
                 }),
             });
 
-            await expect(service.addPrototype(newPrototype as any).toPromise()).rejects.toEqual(
+            await expect(service.addPrototype(newPrototype as any, mockUserId).toPromise()).rejects.toEqual(
                 expect.objectContaining({ message: 'Insert failed' })
             );
         });
@@ -233,6 +237,8 @@ describe('PrototypesSupabaseService', () => {
     });
 
     describe('getPrototypeById', () => {
+        const mockUserId = 'mock-user-id';
+
         it('should return prototype by id', async () => {
             const mockPrototype = { id: 1, name: 'Prototype 1', project_id: 1 };
 
@@ -246,7 +252,7 @@ describe('PrototypesSupabaseService', () => {
                 }),
             });
 
-            const prototype = await service.getPrototypeById(1, 1).toPromise();
+            const prototype = await service.getPrototypeById(1, 1, mockUserId).toPromise();
             expect(prototype?.id).toBe(1);
         });
 
@@ -263,7 +269,7 @@ describe('PrototypesSupabaseService', () => {
                 }),
             });
 
-            const prototype = await service.getPrototypeById(1, 1).toPromise();
+            const prototype = await service.getPrototypeById(1, 1, mockUserId).toPromise();
             if (prototype) expect(validatePrototypeContract(prototype)).toBe(true);
         });
     });

@@ -47,6 +47,8 @@ describe('ProjectSupabaseService', () => {
     });
 
     describe('getProjects', () => {
+        const mockUserId = 'mock-user-id';
+
         it('should return array of projects', async () => {
             const mockProjects = [
                 { id: 1, name: 'Project 1', description: 'Desc 1' },
@@ -59,7 +61,7 @@ describe('ProjectSupabaseService', () => {
                 }),
             });
 
-            const projects = await service.getProjects().toPromise();
+            const projects = await service.getProjects(mockUserId).toPromise();
             expect(projects).toHaveLength(2);
             expect(projects![0].name).toBe('Project 1');
         });
@@ -71,7 +73,7 @@ describe('ProjectSupabaseService', () => {
                 }),
             });
 
-            const projects = await service.getProjects().toPromise();
+            const projects = await service.getProjects(mockUserId).toPromise();
             expect(projects).toEqual([]);
         });
 
@@ -84,12 +86,14 @@ describe('ProjectSupabaseService', () => {
                 }),
             });
 
-            const projects = await service.getProjects().toPromise();
+            const projects = await service.getProjects(mockUserId).toPromise();
             projects!.forEach((p) => expect(validateProjectContract(p)).toBe(true));
         });
     });
 
     describe('getProjectByName', () => {
+        const mockUserId = 'mock-user-id';
+
         it('should return project by name', async () => {
             const mockProject = { id: 1, name: 'Project 1', description: 'Desc 1' };
 
@@ -101,7 +105,7 @@ describe('ProjectSupabaseService', () => {
                 }),
             });
 
-            const project = await service.getProjectByName('Project 1').toPromise();
+            const project = await service.getProjectByName('Project 1', mockUserId).toPromise();
             expect(project?.name).toBe('Project 1');
         });
 
@@ -114,12 +118,14 @@ describe('ProjectSupabaseService', () => {
                 }),
             });
 
-            const project = await service.getProjectByName('NonExistent').toPromise();
+            const project = await service.getProjectByName('NonExistent', mockUserId).toPromise();
             expect(project).toBeNull();
         });
     });
 
     describe('getProjectById', () => {
+        const mockUserId = 'mock-user-id';
+
         it('should return project by id', async () => {
             const mockProject = { id: 1, name: 'Project 1', description: 'Desc 1' };
 
@@ -131,7 +137,7 @@ describe('ProjectSupabaseService', () => {
                 }),
             });
 
-            const project = await service.getProjectById(1).toPromise();
+            const project = await service.getProjectById(1, mockUserId).toPromise();
             expect(project?.id).toBe(1);
         });
 
@@ -146,12 +152,14 @@ describe('ProjectSupabaseService', () => {
                 }),
             });
 
-            const project = await service.getProjectById(1).toPromise();
+            const project = await service.getProjectById(1, mockUserId).toPromise();
             if (project) expect(validateProjectContract(project)).toBe(true);
         });
     });
 
     describe('addProject', () => {
+        const mockUserId = 'mock-user-id';
+
         it('should create project and return created data', async () => {
             const newProject = { name: 'New Project', description: 'New desc' };
             const createdProject = { id: 1, ...newProject };
@@ -164,7 +172,7 @@ describe('ProjectSupabaseService', () => {
                 }),
             });
 
-            const project = await service.addProject(newProject as any).toPromise();
+            const project = await service.addProject(newProject as any, mockUserId).toPromise();
             expect(project!.id).toBe(1);
             expect(project!.name).toBe('New Project');
             expect(mockSupabase.from).toHaveBeenCalledWith('projects');
@@ -184,7 +192,7 @@ describe('ProjectSupabaseService', () => {
                 }),
             });
 
-            await expect(service.addProject(newProject as any).toPromise()).rejects.toEqual(
+            await expect(service.addProject(newProject as any, mockUserId).toPromise()).rejects.toEqual(
                 expect.objectContaining({ message: 'Insert failed' })
             );
         });

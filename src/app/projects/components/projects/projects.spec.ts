@@ -45,6 +45,7 @@ describe('Projects', () => {
 
     beforeEach(async () => {
         mockFacade = {
+            userId: 'mock-user-id',
             projects$: of([
                 { id: 1, name: 'Project 1', description: 'Description 1' },
                 { id: 2, name: 'Project 2', description: 'Description 2' },
@@ -92,7 +93,7 @@ describe('Projects', () => {
 
     it('should expose paginatedData$ from facade', async () => {
         const paginated = await firstValueFrom(component.paginatedData$);
-        expect(paginated.data).toHaveLength(2);
+        expect(paginated?.data).toHaveLength(2);
     });
 
     it('should render paginated project cards', () => {

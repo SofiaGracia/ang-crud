@@ -7,6 +7,7 @@ import { ProjectsFacade } from '@projects/facades/projects.facade';
 import { DialogProject } from '@projects/components/dialog-project/dialog-project';
 import { PrototypeInterface } from '@prototypes/interfaces/prototype.interface';
 import { PrototypesSupabaseService } from '@prototypes/services/prototypesSupabase.service';
+import { AuthFacade } from '@auth/facades/auth.facade';
 
 @Component({
     selector: 'project-card',
@@ -17,16 +18,22 @@ export class ProjectCard implements OnInit {
     project = input.required<ProjectInterface>();
     private projectsFacade = inject(ProjectsFacade);
     private prototypesService = inject(PrototypesSupabaseService);
+    private authFacade = inject(AuthFacade);
 
     faEllipsis = faEllipsis;
     faPlus = faPlus;
 
     prototypes = signal<PrototypeInterface[]>([]);
 
+    get userId(): string | null {
+        return this.authFacade.currentUserId;
+    }
+
     ngOnInit() {
         const projectId = this.project().id;
-        if (projectId) {
-            this.prototypesService.getFirstPrototypesByProject(projectId, 4).subscribe({
+        const userId = this.userId;
+        if (projectId && userId) {
+            this.prototypesService.getFirstPrototypesByProject(projectId, userId, 4).subscribe({
                 next: (protos) => this.prototypes.set(protos),
                 error: () => this.prototypes.set([]),
             });

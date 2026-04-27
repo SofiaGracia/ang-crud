@@ -2,30 +2,42 @@ import { inject, Injectable } from '@angular/core';
 import { Prototype, PrototypeInterface } from '@prototypes/interfaces/prototype.interface';
 import { PrototypesSupabaseService } from '@prototypes/services/prototypesSupabase.service';
 import { PaginatedResponse } from '@shared/interfaces/paginated-response.interface';
-import { BehaviorSubject, Observable, switchMap, filter, combineLatest, map } from 'rxjs';
+import { AuthFacade } from '@auth/facades/auth.facade';
+import { BehaviorSubject, Observable, switchMap, filter, combineLatest, map, of } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class PrototypesFacade {
     private refresh$ = new BehaviorSubject<number | null>(null);
     private page$ = new BehaviorSubject<number>(1);
     private prototypesSupabaseService = inject(PrototypesSupabaseService);
+    private authFacade = inject(AuthFacade);
     private limit = 8;
+
+    get userId(): string | null {
+        return this.authFacade.currentUserId;
+    }
 
     prototypes$ = this.refresh$.pipe(
         filter((projectId) => projectId !== null),
-        switchMap((projectId) => this.prototypesSupabaseService.getPrototypesByProject(projectId!)),
+        switchMap((projectId) => {
+            const userId = this.userId;
+            return userId ? this.prototypesSupabaseService.getPrototypesByProject(projectId!, userId) : of([]);
+        }),
     );
 
     paginatedPrototypes$ = combineLatest([this.refresh$, this.page$]).pipe(
         filter(([projectId]) => projectId !== null),
-        switchMap(([projectId, page]) =>
-            this.prototypesSupabaseService.getPrototypesPaginated(projectId!, page, this.limit),
-        ),
+        switchMap(([projectId, page]) => {
+            const userId = this.userId;
+            return userId
+                ? this.prototypesSupabaseService.getPrototypesPaginated(projectId!, userId, page, this.limit)
+                : of(null);
+        }),
     );
 
-    totalPages$ = this.paginatedPrototypes$.pipe(map((r) => r.totalPages));
+    totalPages$ = this.paginatedPrototypes$.pipe(map((r) => r?.totalPages ?? 0));
     currentPage$ = this.page$.asObservable();
-    totalCount$ = this.paginatedPrototypes$.pipe(map((r) => r.total));
+    totalCount$ = this.paginatedPrototypes$.pipe(map((r) => r?.total ?? 0));
 
     goToPage(page: number) {
         this.page$.next(page);
@@ -46,7 +58,12 @@ export class PrototypesFacade {
     }
 
     addPrototype(projectId: number, prototype: Prototype) {
-        this.prototypesSupabaseService.addPrototype(prototype).subscribe({
+        const userId = this.userId;
+        if (!userId) {
+            console.error('User not authenticated');
+            return;
+        }
+        this.prototypesSupabaseService.addPrototype(prototype, userId).subscribe({
             next: () => this.refresh$.next(projectId),
             error: (err) => console.error('Error creating prototype', err),
         });
@@ -64,11 +81,15 @@ export class PrototypesFacade {
     }
 
     getPrototypeById(projectId: number, prototypeId: number): Observable<PrototypeInterface | null> {
-        return this.prototypesSupabaseService.getPrototypeById(projectId, prototypeId);
+        const userId = this.userId;
+        if (!userId) return of(null);
+        return this.prototypesSupabaseService.getPrototypeById(projectId, prototypeId, userId);
     }
 
     searchPrototypesByName(query: string): Observable<PrototypeInterface[] | null> {
-        return this.prototypesSupabaseService.searchPrototypesByName(query);
+        const userId = this.userId;
+        if (!userId) return of([]);
+        return this.prototypesSupabaseService.searchPrototypesByName(query, userId);
     }
 
     // updateProject(projectId: number, dataToUpdate: Project) {

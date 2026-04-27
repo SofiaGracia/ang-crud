@@ -8,8 +8,12 @@ import { PaginatedResponse } from '@shared/interfaces/paginated-response.interfa
 export class ProjectSupabaseService {
     private supabase = inject(SupabaseClientService).instance;
 
-    getProjects(): Observable<ProjectInterface[]> {
-        const promise = this.supabase.from('projects').select('*').is('deleted_at', null);
+    getProjects(userId: string): Observable<ProjectInterface[]> {
+        const promise = this.supabase
+            .from('projects')
+            .select('*')
+            .eq('user_id', userId)
+            .is('deleted_at', null);
         return from(promise).pipe(
             map((response) => {
                 return response.data ?? [];
@@ -18,6 +22,7 @@ export class ProjectSupabaseService {
     }
 
     getProjectsPaginated(
+        userId: string,
         page: number,
         limit: number = 8,
     ): Observable<PaginatedResponse<ProjectInterface>> {
@@ -27,11 +32,13 @@ export class ProjectSupabaseService {
         const countPromise = this.supabase
             .from('projects')
             .select('*', { count: 'exact', head: true })
+            .eq('user_id', userId)
             .is('deleted_at', null);
 
         const dataPromise = this.supabase
             .from('projects')
             .select('*')
+            .eq('user_id', userId)
             .is('deleted_at', null)
             .range(fromIndex, toIndex);
 
@@ -54,18 +61,29 @@ export class ProjectSupabaseService {
         );
     }
 
-    getProjectByName(name: string): Observable<ProjectInterface | null> {
-        const promise = this.supabase.from('projects').select('*').eq('name', name).maybeSingle();
+    getProjectByName(name: string, userId: string): Observable<ProjectInterface | null> {
+        const promise = this.supabase
+            .from('projects')
+            .select('*')
+            .eq('name', name)
+            .eq('user_id', userId)
+            .maybeSingle();
         return from(promise).pipe(map((response) => response.data));
     }
 
-    getProjectById(id: number): Observable<ProjectInterface | null> {
-        const promise = this.supabase.from('projects').select('*').eq('id', id).maybeSingle();
+    getProjectById(id: number, userId: string): Observable<ProjectInterface | null> {
+        const promise = this.supabase
+            .from('projects')
+            .select('*')
+            .eq('id', id)
+            .eq('user_id', userId)
+            .maybeSingle();
         return from(promise).pipe(map((response) => response.data));
     }
 
-    addProject(project: Project): Observable<ProjectInterface> {
-        const promise = this.supabase.from('projects').insert(project).select('*').single();
+    addProject(project: Project, userId: string): Observable<ProjectInterface> {
+        const projectWithUser = { ...project, user_id: userId };
+        const promise = this.supabase.from('projects').insert(projectWithUser).select('*').single();
         return from(promise).pipe(
             map((response) => {
                 if (response.error) {
@@ -91,10 +109,11 @@ export class ProjectSupabaseService {
         );
     }
 
-    getTrashedProjects(): Observable<ProjectInterface[]> {
+    getTrashedProjects(userId: string): Observable<ProjectInterface[]> {
         const promise = this.supabase
             .from('projects')
             .select('*')
+            .eq('user_id', userId)
             .not('deleted_at', 'is', null)
             .order('deleted_at', { ascending: false });
         return from(promise).pipe(
@@ -143,10 +162,11 @@ export class ProjectSupabaseService {
         );
     }
 
-    searchProjectsByName(query: string): Observable<ProjectInterface[] | null> {
+    searchProjectsByName(query: string, userId: string): Observable<ProjectInterface[] | null> {
         const promise = this.supabase
             .from('projects')
             .select('*')
+            .eq('user_id', userId)
             .ilike('name', `%${query}%`)
             .is('deleted_at', null);
         return from(promise).pipe(

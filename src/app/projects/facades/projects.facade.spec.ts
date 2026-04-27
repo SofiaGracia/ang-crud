@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { ProjectsFacade } from './projects.facade';
 import { ProjectSupabaseService } from '@projects/services/projectsSupabase.service';
+import { AuthFacade } from '@auth/facades/auth.facade';
 import { firstValueFrom, of } from 'rxjs';
 
 describe('ProjectsFacade', () => {
@@ -10,16 +11,19 @@ describe('ProjectsFacade', () => {
     beforeEach(async () => {
         mockService = {
             getProjects: vi.fn().mockReturnValue(of([])),
+            getProjectsPaginated: vi.fn().mockReturnValue(of({ data: [], total: 0, page: 1, limit: 8, totalPages: 0 })),
             getProjectById: vi.fn().mockReturnValue(of(null)),
             addProject: vi.fn().mockReturnValue(of({ id: 1, name: 'Test' })),
             moveToTrash: vi.fn().mockReturnValue(of(undefined)),
             updateProject: vi.fn().mockReturnValue(of(undefined)),
+            searchProjectsByName: vi.fn().mockReturnValue(of([])),
         };
 
         await TestBed.configureTestingModule({
             providers: [
                 ProjectsFacade,
                 { provide: ProjectSupabaseService, useValue: mockService },
+                { provide: AuthFacade, useValue: { currentUserId: 'test-user-id' } },
             ],
         });
 
@@ -46,7 +50,10 @@ describe('ProjectsFacade', () => {
     describe('addProject', () => {
         it('should call addProject on service', () => {
             facade.addProject({ name: 'New Project', description: 'Desc' } as any);
-            expect(mockService.addProject).toHaveBeenCalled();
+            expect(mockService.addProject).toHaveBeenCalledWith(
+                { name: 'New Project', description: 'Desc' },
+                'test-user-id'
+            );
         });
     });
 

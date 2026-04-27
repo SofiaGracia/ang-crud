@@ -11,6 +11,10 @@ describe('ProjectSupabaseService', () => {
         mockSupabase = {
             from: vi.fn().mockReturnValue({
                 select: vi.fn().mockReturnValue({
+                    eq: vi.fn().mockReturnValue({
+                        is: vi.fn().mockResolvedValue({ data: [], error: null }),
+                        maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
+                    }),
                     is: vi.fn().mockReturnValue({
                         order: vi.fn().mockResolvedValue({ data: [], error: null }),
                     }),

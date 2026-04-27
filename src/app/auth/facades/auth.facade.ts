@@ -45,6 +45,10 @@ export class AuthFacade implements OnDestroy {
         return this.isLoading$.asObservable();
     }
 
+    get currentUserId(): string | null {
+        return this.user$.value?.id ?? null;
+    }
+
     async signInWithGoogle(): Promise<void> {
         const { error } = await this.authService.signInWithGoogle();
         if (error) {

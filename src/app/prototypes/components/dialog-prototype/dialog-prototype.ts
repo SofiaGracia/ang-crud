@@ -7,6 +7,7 @@ import { PrototypeInterface } from '@prototypes/interfaces/prototype.interface';
 import { PrototypesSupabaseService } from '@prototypes/services/prototypesSupabase.service';
 import { DialogShell } from '@shared/components/dialog-shell/dialog-shell';
 import { DialogBase } from '@shared/components/dialog.abstract';
+import { AuthFacade } from '@auth/facades/auth.facade';
 
 @Component({
     selector: 'dialog-prototype',
@@ -22,6 +23,7 @@ export class DialogPrototype extends DialogBase<PrototypeInterface> {
 
     prototypesSupabaseService = inject(PrototypesSupabaseService);
     private prototypesFacade = inject(PrototypesFacade);
+    private authFacade = inject(AuthFacade);
 
     fb = inject(FormBuilder);
 
@@ -29,6 +31,10 @@ export class DialogPrototype extends DialogBase<PrototypeInterface> {
         name: ['', Validators.required],
         description: [''],
     });
+
+    get userId(): string | null {
+        return this.authFacade.currentUserId;
+    }
 
     constructor() {
         super();
@@ -59,10 +65,13 @@ export class DialogPrototype extends DialogBase<PrototypeInterface> {
     }
 
     handleSubmit(name: string) {
-        // First sync validations in abstract class
+        const userId = this.userId;
+        if (!userId) {
+            console.error('User not authenticated');
+            return;
+        }
 
-        // Second async validation ONLY when submit
-        this.prototypesSupabaseService.getProtoByName(name).subscribe(async (proto) => {
+        this.prototypesSupabaseService.getProtoByName(name, userId).subscribe(async (proto) => {
             if (proto && proto.project_id === this.project().id) {
                 const control = this.createForm.get('name')!;
                 control.setErrors({ ...(control.errors || {}), nameExists: true });
@@ -86,17 +95,13 @@ export class DialogPrototype extends DialogBase<PrototypeInterface> {
                 tool: null,
             };
 
-            // Consider capturing errors
             if (this.mode() === 'create') {
                 this.prototypesFacade.addPrototype(this.project().id, newProto);
                 console.log('CREATE PROTOTYPE');
             } else {
-                // const idProject = this.prototype()!.id; // Is never going to be undefined because we are modifying
-                // this.prototypesFacade.updateProto(idProject, newProto);
                 console.log('UPDATE PROTOTYPE');
             }
 
-            // Reset form
             this.selectedHtmlFile = null;
             this.createForm.reset();
             this.closeModal();

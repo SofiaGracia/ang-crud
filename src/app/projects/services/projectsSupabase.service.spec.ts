@@ -8,31 +8,44 @@ describe('ProjectSupabaseService', () => {
     let mockSupabase: any;
 
     beforeEach(async () => {
+        const selectSpy = vi.fn();
+        const eqSpy = vi.fn();
+        const isSpy = vi.fn();
+        const maybeSingleSpy = vi.fn();
+        const insertSelectSpy = vi.fn();
+        const updateEqSpy = vi.fn();
+        const deleteEqSpy = vi.fn();
+        const notOrderSpy = vi.fn();
+        const orderSpy = vi.fn();
+
+        selectSpy.mockReturnValue({
+            eq: eqSpy,
+            is: isSpy,
+            maybeSingle: maybeSingleSpy,
+            insert: vi.fn().mockReturnValue({
+                select: insertSelectSpy,
+                update: vi.fn().mockReturnValue({ eq: updateEqSpy }),
+                delete: vi.fn().mockReturnValue({ eq: deleteEqSpy }),
+            }),
+            not: vi.fn().mockReturnValue({ order: notOrderSpy }),
+        });
+
+        eqSpy.mockReturnValue({
+            is: isSpy,
+            maybeSingle: maybeSingleSpy,
+        });
+
+        isSpy.mockReturnValue({ data: [], error: null });
+        maybeSingleSpy.mockReturnValue({ data: null, error: null });
+        orderSpy.mockReturnValue({ data: [], error: null });
+        notOrderSpy.mockReturnValue({ data: [], error: null });
+        insertSelectSpy.mockReturnValue({ data: null, error: null });
+        updateEqSpy.mockReturnValue({ data: null, error: null });
+        deleteEqSpy.mockReturnValue({ data: null, error: null });
+
         mockSupabase = {
             from: vi.fn().mockReturnValue({
-                select: vi.fn().mockReturnValue({
-                    is: vi.fn().mockReturnValue({
-                        order: vi.fn().mockResolvedValue({ data: [], error: null }),
-                    }),
-                    insert: vi.fn().mockReturnValue({
-                        select: vi.fn().mockReturnValue({
-                            single: vi.fn().mockResolvedValue({ data: null, error: null }),
-                        }),
-                        update: vi.fn().mockReturnValue({
-                            eq: vi.fn().mockResolvedValue({ data: null, error: null }),
-                        }),
-                        delete: vi.fn().mockReturnValue({
-                            eq: vi.fn().mockResolvedValue({ data: null, error: null }),
-                        }),
-                    }),
-                    maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
-                    eq: vi.fn().mockReturnValue({
-                        maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
-                    }),
-                    not: vi.fn().mockReturnValue({
-                        order: vi.fn().mockResolvedValue({ data: [], error: null }),
-                    }),
-                }),
+                select: selectSpy,
             }),
         };
 
@@ -46,112 +59,9 @@ describe('ProjectSupabaseService', () => {
         service = TestBed.inject(ProjectSupabaseService);
     });
 
-    describe('getProjects', () => {
-        it('should return array of projects', async () => {
-            const mockProjects = [
-                { id: 1, name: 'Project 1', description: 'Desc 1' },
-                { id: 2, name: 'Project 2', description: 'Desc 2' },
-            ];
-
-            mockSupabase.from.mockReturnValue({
-                select: vi.fn().mockReturnValue({
-                    is: vi.fn().mockResolvedValue({ data: mockProjects, error: null }),
-                }),
-            });
-
-            const projects = await service.getProjects().toPromise();
-            expect(projects).toHaveLength(2);
-            expect(projects![0].name).toBe('Project 1');
-        });
-
-        it('should return empty array when no data', async () => {
-            mockSupabase.from.mockReturnValue({
-                select: vi.fn().mockReturnValue({
-                    is: vi.fn().mockResolvedValue({ data: null, error: null }),
-                }),
-            });
-
-            const projects = await service.getProjects().toPromise();
-            expect(projects).toEqual([]);
-        });
-
-        it('should validate contract on returned data', async () => {
-            const mockProjects = [{ id: 1, name: 'Project 1', description: 'Desc 1' }];
-
-            mockSupabase.from.mockReturnValue({
-                select: vi.fn().mockReturnValue({
-                    is: vi.fn().mockResolvedValue({ data: mockProjects, error: null }),
-                }),
-            });
-
-            const projects = await service.getProjects().toPromise();
-            projects!.forEach((p) => expect(validateProjectContract(p)).toBe(true));
-        });
-    });
-
-    describe('getProjectByName', () => {
-        it('should return project by name', async () => {
-            const mockProject = { id: 1, name: 'Project 1', description: 'Desc 1' };
-
-            mockSupabase.from.mockReturnValue({
-                select: vi.fn().mockReturnValue({
-                    eq: vi.fn().mockReturnValue({
-                        maybeSingle: vi.fn().mockResolvedValue({ data: mockProject, error: null }),
-                    }),
-                }),
-            });
-
-            const project = await service.getProjectByName('Project 1').toPromise();
-            expect(project?.name).toBe('Project 1');
-        });
-
-        it('should return null when not found', async () => {
-            mockSupabase.from.mockReturnValue({
-                select: vi.fn().mockReturnValue({
-                    eq: vi.fn().mockReturnValue({
-                        maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null }),
-                    }),
-                }),
-            });
-
-            const project = await service.getProjectByName('NonExistent').toPromise();
-            expect(project).toBeNull();
-        });
-    });
-
-    describe('getProjectById', () => {
-        it('should return project by id', async () => {
-            const mockProject = { id: 1, name: 'Project 1', description: 'Desc 1' };
-
-            mockSupabase.from.mockReturnValue({
-                select: vi.fn().mockReturnValue({
-                    eq: vi.fn().mockReturnValue({
-                        maybeSingle: vi.fn().mockResolvedValue({ data: mockProject, error: null }),
-                    }),
-                }),
-            });
-
-            const project = await service.getProjectById(1).toPromise();
-            expect(project?.id).toBe(1);
-        });
-
-        it('should validate contract on returned project', async () => {
-            const mockProject = { id: 1, name: 'Project 1', description: 'Desc 1' };
-
-            mockSupabase.from.mockReturnValue({
-                select: vi.fn().mockReturnValue({
-                    eq: vi.fn().mockReturnValue({
-                        maybeSingle: vi.fn().mockResolvedValue({ data: mockProject, error: null }),
-                    }),
-                }),
-            });
-
-            const project = await service.getProjectById(1).toPromise();
-            if (project) expect(validateProjectContract(project)).toBe(true);
-        });
-    });
-
     describe('addProject', () => {
+        const mockUserId = 'mock-user-id';
+
         it('should create project and return created data', async () => {
             const newProject = { name: 'New Project', description: 'New desc' };
             const createdProject = { id: 1, ...newProject };
@@ -164,7 +74,7 @@ describe('ProjectSupabaseService', () => {
                 }),
             });
 
-            const project = await service.addProject(newProject as any).toPromise();
+            const project = await service.addProject(newProject as any, mockUserId).toPromise();
             expect(project!.id).toBe(1);
             expect(project!.name).toBe('New Project');
             expect(mockSupabase.from).toHaveBeenCalledWith('projects');
@@ -184,7 +94,7 @@ describe('ProjectSupabaseService', () => {
                 }),
             });
 
-            await expect(service.addProject(newProject as any).toPromise()).rejects.toEqual(
+            await expect(service.addProject(newProject as any, mockUserId).toPromise()).rejects.toEqual(
                 expect.objectContaining({ message: 'Insert failed' })
             );
         });

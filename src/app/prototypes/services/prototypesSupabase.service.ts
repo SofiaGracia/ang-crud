@@ -8,11 +8,12 @@ import { PaginatedResponse } from '@shared/interfaces/paginated-response.interfa
 export class PrototypesSupabaseService {
     private supabase = inject(SupabaseClientService).instance;
 
-    getPrototypesByProject(projectId: number): Observable<PrototypeInterface[]> {
+    getPrototypesByProject(projectId: number, userId: string): Observable<PrototypeInterface[]> {
         const promise = this.supabase
             .from('prototypes')
             .select('*')
             .eq('project_id', projectId)
+            .eq('user_id', userId)
             .is('deleted_at', null);
 
         return from(promise).pipe(
@@ -27,6 +28,7 @@ export class PrototypesSupabaseService {
 
     getPrototypesPaginated(
         projectId: number,
+        userId: string,
         page: number,
         limit: number = 8,
     ): Observable<PaginatedResponse<PrototypeInterface>> {
@@ -37,12 +39,14 @@ export class PrototypesSupabaseService {
             .from('prototypes')
             .select('*', { count: 'exact', head: true })
             .eq('project_id', projectId)
+            .eq('user_id', userId)
             .is('deleted_at', null);
 
         const dataPromise = this.supabase
             .from('prototypes')
             .select('*')
             .eq('project_id', projectId)
+            .eq('user_id', userId)
             .is('deleted_at', null)
             .range(fromIndex, toIndex);
 
@@ -65,11 +69,12 @@ export class PrototypesSupabaseService {
         );
     }
 
-    getFirstPrototypesByProject(projectId: number, limit: number): Observable<PrototypeInterface[]> {
+    getFirstPrototypesByProject(projectId: number, userId: string, limit: number): Observable<PrototypeInterface[]> {
         const promise = this.supabase
             .from('prototypes')
             .select('*')
             .eq('project_id', projectId)
+            .eq('user_id', userId)
             .is('deleted_at', null)
             .limit(limit);
 
@@ -84,17 +89,23 @@ export class PrototypesSupabaseService {
     }
 
     // Deuria comprovar-se per mateix nom i mateix projecte
-    getProtoByName(name: string): Observable<PrototypeInterface | null> {
-        const promise = this.supabase.from('prototypes').select('*').eq('name', name).maybeSingle();
+    getProtoByName(name: string, userId: string): Observable<PrototypeInterface | null> {
+        const promise = this.supabase
+            .from('prototypes')
+            .select('*')
+            .eq('name', name)
+            .eq('user_id', userId)
+            .maybeSingle();
         return from(promise).pipe(map((response) => response.data));
     }
 
-    getPrototypeById(projectId: number, prototypeId: number): Observable<PrototypeInterface | null> {
+    getPrototypeById(projectId: number, prototypeId: number, userId: string): Observable<PrototypeInterface | null> {
         const promise = this.supabase
             .from('prototypes')
             .select('*')
             .eq('project_id', projectId)
             .eq('id', prototypeId)
+            .eq('user_id', userId)
             .maybeSingle();
 
         return from(promise).pipe(
@@ -122,10 +133,11 @@ export class PrototypesSupabaseService {
         );
     }
 
-    getTrashedPrototypes(): Observable<PrototypeInterface[]> {
+    getTrashedPrototypes(userId: string): Observable<PrototypeInterface[]> {
         const promise = this.supabase
             .from('prototypes')
             .select('*')
+            .eq('user_id', userId)
             .not('deleted_at', 'is', null)
             .order('deleted_at', { ascending: false });
         return from(promise).pipe(
@@ -184,8 +196,9 @@ export class PrototypesSupabaseService {
         return publicUrlData.publicUrl;
     }
 
-    addPrototype(prototype: Prototype): Observable<PrototypeInterface> {
-        const promise = this.supabase.from('prototypes').insert(prototype).select('*').single();
+    addPrototype(prototype: Prototype, userId: string): Observable<PrototypeInterface> {
+        const prototypeWithUser = { ...prototype, user_id: userId };
+        const promise = this.supabase.from('prototypes').insert(prototypeWithUser).select('*').single();
         return from(promise).pipe(
             map((response) => {
                 if (response.error) {
@@ -196,10 +209,11 @@ export class PrototypesSupabaseService {
         );
     }
 
-    searchPrototypesByName(query: string): Observable<PrototypeInterface[] | null> {
+    searchPrototypesByName(query: string, userId: string): Observable<PrototypeInterface[] | null> {
         const promise = this.supabase
             .from('prototypes')
             .select('*')
+            .eq('user_id', userId)
             .ilike('name', `%${query}%`)
             .is('deleted_at', null);
         return from(promise).pipe(

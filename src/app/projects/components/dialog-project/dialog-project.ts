@@ -6,6 +6,7 @@ import { Project, ProjectInterface } from '@projects/interfaces/project.interfac
 import { ProjectsFacade } from '@projects/facades/projects.facade';
 import { DialogBase } from '@shared/components/dialog.abstract';
 import { DialogShell } from '@shared/components/dialog-shell/dialog-shell';
+import { AuthFacade } from '@auth/facades/auth.facade';
 
 @Component({
     selector: 'dialog-project',
@@ -19,6 +20,7 @@ export class DialogProject extends DialogBase<ProjectInterface> {
 
     private projectsFacade = inject(ProjectsFacade);
     projectSupabaseService = inject(ProjectSupabaseService);
+    private authFacade = inject(AuthFacade);
 
     fb = inject(FormBuilder);
 
@@ -26,6 +28,10 @@ export class DialogProject extends DialogBase<ProjectInterface> {
         name: ['', Validators.required],
         description: [''],
     });
+
+    get userId(): string | null {
+        return this.authFacade.currentUserId;
+    }
 
     constructor() {
         super();
@@ -48,10 +54,13 @@ export class DialogProject extends DialogBase<ProjectInterface> {
     }
 
     handleSubmit(name: string) {
-        // First sync validations in abstract class
+        const userId = this.userId;
+        if (!userId) {
+            console.error('User not authenticated');
+            return;
+        }
 
-        // Second async validation ONLY when submit
-        this.projectSupabaseService.getProjectByName(name).subscribe((project) => {
+        this.projectSupabaseService.getProjectByName(name, userId).subscribe((project) => {
             if (project) {
                 const control = this.createForm.get('name')!;
                 control.setErrors({ ...control.errors, nameExists: true });
@@ -64,15 +73,13 @@ export class DialogProject extends DialogBase<ProjectInterface> {
                 description: this.createForm.controls['description'].value!,
             };
 
-            // Consider capturing errors
             if (this.mode() === 'create') {
                 this.projectsFacade.addProject(newProject);
             } else {
-                const idProject = this.project()!.id; // Is never going to be undefined because we are modifying
+                const idProject = this.project()!.id;
                 this.projectsFacade.updateProject(idProject, newProject);
             }
 
-            // Lògica específica de projects...
             this.createForm.reset();
             this.closeModal();
         });

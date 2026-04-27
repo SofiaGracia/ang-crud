@@ -10,6 +10,7 @@ import { PrototypesSupabaseService } from '@prototypes/services/prototypesSupaba
 import { ProjectSupabaseService } from '@projects/services/projectsSupabase.service';
 import { PrototypeInterface } from '@prototypes/interfaces/prototype.interface';
 import { ProjectInterface } from '@projects/interfaces/project.interface';
+import { AuthFacade } from '@auth/facades/auth.facade';
 
 export interface RecentPrototypeWithDetails {
     prototype: PrototypeInterface;
@@ -26,13 +27,24 @@ export class RecentPrototypes implements OnInit {
     private recentService = inject(RecentPrototypesService);
     private prototypesService = inject(PrototypesSupabaseService);
     private projectsService = inject(ProjectSupabaseService);
+    private authFacade = inject(AuthFacade);
 
     recentPrototypes = signal<RecentPrototypeWithDetails[]>([]);
     loading = signal(true);
 
     faClock = faClock;
 
+    get userId(): string | null {
+        return this.authFacade.currentUserId;
+    }
+
     async ngOnInit() {
+        const userId = this.userId;
+        if (!userId) {
+            this.loading.set(false);
+            return;
+        }
+
         const recent = this.recentService.getRecentPrototypes();
 
         if (recent.length === 0) {
@@ -45,8 +57,8 @@ export class RecentPrototypes implements OnInit {
         for (const item of recent) {
             try {
                 const [prototype, project] = await Promise.all([
-                    this.getPrototype(item.projectId, item.prototypeId),
-                    this.getProject(item.projectId),
+                    this.getPrototype(item.projectId, item.prototypeId, userId),
+                    this.getProject(item.projectId, userId),
                 ]);
 
                 if (prototype && project) {
@@ -68,17 +80,18 @@ export class RecentPrototypes implements OnInit {
     private getPrototype(
         projectId: number,
         prototypeId: number,
+        userId: string,
     ): Promise<PrototypeInterface | null> {
         return new Promise((resolve) => {
             this.prototypesService
-                .getPrototypeById(projectId, prototypeId)
+                .getPrototypeById(projectId, prototypeId, userId)
                 .subscribe((proto) => resolve(proto));
         });
     }
 
-    private getProject(projectId: number): Promise<ProjectInterface | null> {
+    private getProject(projectId: number, userId: string): Promise<ProjectInterface | null> {
         return new Promise((resolve) => {
-            this.projectsService.getProjectById(projectId).subscribe((proj) => resolve(proj));
+            this.projectsService.getProjectById(projectId, userId).subscribe((proj) => resolve(proj));
         });
     }
 }

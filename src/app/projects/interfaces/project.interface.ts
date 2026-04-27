@@ -12,6 +12,7 @@
 export interface Project {
     name: string;
     description: string | null;
+    user_id?: string;
     deleted_at?: string | null;
 }
 
@@ -19,5 +20,6 @@ export interface ProjectInterface {
     id: number;
     name: string;
     description: string | null;
+    user_id?: string;
     deleted_at?: string | null;
 }

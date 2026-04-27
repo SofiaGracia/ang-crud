@@ -7,6 +7,7 @@ import { PrototypesSupabaseService } from '@prototypes/services/prototypesSupaba
 import { ProjectInterface } from '@projects/interfaces/project.interface';
 import { PrototypeInterface } from '@prototypes/interfaces/prototype.interface';
 import { ConfirmModal } from '@shared/components/confirm-modal/confirm-modal';
+import { AuthFacade } from '@auth/facades/auth.facade';
 
 @Component({
     selector: 'app-trash',
@@ -16,6 +17,7 @@ import { ConfirmModal } from '@shared/components/confirm-modal/confirm-modal';
 export class Trash implements OnInit {
     private projectsService = inject(ProjectSupabaseService);
     private prototypesService = inject(PrototypesSupabaseService);
+    private authFacade = inject(AuthFacade);
 
     trashedProjects = signal<ProjectInterface[]>([]);
     trashedPrototypes = signal<PrototypeInterface[]>([]);
@@ -32,6 +34,10 @@ export class Trash implements OnInit {
     faRotateBack = faRotateBack;
     faTrashCan = faTrashCan;
 
+    get userId(): string | null {
+        return this.authFacade.currentUserId;
+    }
+
     ngOnInit() {
         this.loadTrash();
     }
@@ -41,15 +47,18 @@ export class Trash implements OnInit {
     }
 
     private loadTrash() {
+        const userId = this.userId;
+        if (!userId) return;
+
         this.loading.set(true);
-        this.projectsService.getTrashedProjects().subscribe({
+        this.projectsService.getTrashedProjects(userId).subscribe({
             next: (projects) => {
                 this.trashedProjects.set(projects);
                 this.loading.set(false);
             },
             error: (err) => console.error('Error loading trashed projects', err),
         });
-        this.prototypesService.getTrashedPrototypes().subscribe({
+        this.prototypesService.getTrashedPrototypes(userId).subscribe({
             next: (protos) => {
                 this.trashedPrototypes.set(protos);
                 this.loading.set(false);

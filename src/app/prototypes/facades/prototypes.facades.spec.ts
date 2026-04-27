@@ -1,6 +1,7 @@
 import { TestBed } from '@angular/core/testing';
 import { PrototypesFacade } from './prototypes.facades';
 import { PrototypesSupabaseService } from '@prototypes/services/prototypesSupabase.service';
+import { AuthFacade } from '@auth/facades/auth.facade';
 import { firstValueFrom, of } from 'rxjs';
 
 describe('PrototypesFacade', () => {
@@ -10,12 +11,18 @@ describe('PrototypesFacade', () => {
     beforeEach(async () => {
         mockService = {
             getPrototypesByProject: vi.fn().mockReturnValue(of([])),
+            getPrototypesPaginated: vi.fn().mockReturnValue(of({ data: [], total: 0, page: 1, limit: 8, totalPages: 0 })),
+            addPrototype: vi.fn().mockReturnValue(of({ id: 1, name: 'Test' })),
+            moveToTrash: vi.fn().mockReturnValue(of(undefined)),
+            getPrototypeById: vi.fn().mockReturnValue(of(null)),
+            searchPrototypesByName: vi.fn().mockReturnValue(of([])),
         };
 
         await TestBed.configureTestingModule({
             providers: [
                 PrototypesFacade,
                 { provide: PrototypesSupabaseService, useValue: mockService },
+                { provide: AuthFacade, useValue: { currentUserId: 'test-user-id' } },
             ],
         });
 

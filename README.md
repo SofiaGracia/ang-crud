@@ -145,9 +145,9 @@ For more information on using the Angular CLI, including detailed command refere
   - **Description:** The interface can be more intuitive and accessible.
   - **Implementation:** Add loading skeletons while data loads. More descriptive error messages. Tooltips or contextual help. Visual validations on forms. Dark mode toggle for user preference.
 
-- [ ] **Filter Projects by User**
-  - **Description:** Currently all projects are shown to all users. Projects should only be visible to the user who created them.
-  - **Implementation:** Add `user_id` filter to Supabase queries in `ProjectsSupabaseService`. Use the authenticated user's ID from the session to filter results.
+- [x] **Filter Projects by User** - RLS + Frontend
+  - **Description:** Projects and prototypes are now only visible to the user who created them.
+  - **Implementation:** Added `user_id` column to projects/prototypes tables, Supabase RLS policies for row-level security, and user ID filtering in frontend queries.
 
 - [ ] **Complete Lazy Loading**
   - **Description:** Only login/register have lazy loading. All routes could benefit from it.
@@ -155,6 +155,7 @@ For more information on using the Angular CLI, including detailed command refere
 
 ### Completed
 
+- [x] **Filter Projects by User** - RLS + Frontend
 - [x] **Pagination** - Offset/limit queries with Previous/Next controls
 - [x] **Full CRUD** - Create, Read, Update, Delete for projects and prototypes
 - [x] **Supabase Authentication** - Signup, login, logout

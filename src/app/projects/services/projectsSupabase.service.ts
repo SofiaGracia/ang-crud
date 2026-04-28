@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { Observable, from, map, forkJoin } from 'rxjs';
+import { Observable, from, map, forkJoin, of } from 'rxjs';
 import { Project, ProjectInterface } from '@projects/interfaces/project.interface';
 import { SupabaseClientService } from '@shared/services/supabase-client.service';
 import { PaginatedResponse } from '@shared/interfaces/paginated-response.interface';
@@ -50,6 +50,7 @@ export class ProjectSupabaseService {
                 const total = countResponse.count ?? 0;
                 const data = dataResponse.data ?? [];
                 const totalPages = Math.ceil(total / limit);
+
                 return {
                     data,
                     total,

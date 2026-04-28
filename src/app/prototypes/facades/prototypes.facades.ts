@@ -3,7 +3,7 @@ import { Prototype, PrototypeInterface } from '@prototypes/interfaces/prototype.
 import { PrototypesSupabaseService } from '@prototypes/services/prototypesSupabase.service';
 import { PaginatedResponse } from '@shared/interfaces/paginated-response.interface';
 import { AuthFacade } from '@auth/facades/auth.facade';
-import { BehaviorSubject, Observable, switchMap, filter, combineLatest, map, of } from 'rxjs';
+import { BehaviorSubject, Observable, switchMap, filter, combineLatest, map, of, tap } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class PrototypesFacade {
@@ -13,25 +13,37 @@ export class PrototypesFacade {
     private authFacade = inject(AuthFacade);
     private limit = 8;
 
+    private prototypesCache = new Map<string, PaginatedResponse<PrototypeInterface>>();
+
     get userId(): string | null {
         return this.authFacade.currentUserId;
     }
 
-    prototypes$ = this.refresh$.pipe(
-        filter((projectId) => projectId !== null),
-        switchMap((projectId) => {
-            const userId = this.userId;
-            return userId ? this.prototypesSupabaseService.getPrototypesByProject(projectId!, userId) : of([]);
-        }),
-    );
-
     paginatedPrototypes$ = combineLatest([this.refresh$, this.page$]).pipe(
         filter(([projectId]) => projectId !== null),
         switchMap(([projectId, page]) => {
+            const key = `prototypes-${projectId}-${this.limit}-${page}`; //prototypes-0-7
+            if (this.prototypesCache.has(key)) {
+                console.log('PROTOTYPES - DATA RESTORED FROM MAP');
+                return of(this.prototypesCache.get(key)!);
+            }
+
             const userId = this.userId;
-            return userId
-                ? this.prototypesSupabaseService.getPrototypesPaginated(projectId!, userId, page, this.limit)
-                : of(null);
+            if (!userId) {
+                return of(null);
+            }
+
+            return this.prototypesSupabaseService
+                .getPrototypesPaginated(projectId!, userId, page, this.limit)
+                .pipe(
+                    tap((response) => {
+                        console.log('PROTOTYPES - DATA STORED IN MAP: ', key, response);
+
+                        if (response) {
+                            this.prototypesCache.set(key, response);
+                        }
+                    }),
+                );
         }),
     );
 
@@ -57,6 +69,11 @@ export class PrototypesFacade {
         this.refresh$.next(projectId);
     }
 
+    clearCache() {
+        this.prototypesCache.clear();
+        console.log('PROTOTYPES CACHE CLEARED');
+    }
+
     addPrototype(projectId: number, prototype: Prototype) {
         const userId = this.userId;
         if (!userId) {
@@ -64,7 +81,10 @@ export class PrototypesFacade {
             return;
         }
         this.prototypesSupabaseService.addPrototype(prototype, userId).subscribe({
-            next: () => this.refresh$.next(projectId),
+            next: () => {
+                this.clearCache();
+                this.refresh$.next(projectId);
+            },
             error: (err) => console.error('Error creating prototype', err),
         });
     }
@@ -72,6 +92,8 @@ export class PrototypesFacade {
     removeProto(protoId: number, projectId: number) {
         this.prototypesSupabaseService.moveToTrash(protoId).subscribe({
             next: () => {
+                this.clearCache();
+
                 this.refresh$.next(projectId);
             },
             error: (err) => {
@@ -80,7 +102,10 @@ export class PrototypesFacade {
         });
     }
 
-    getPrototypeById(projectId: number, prototypeId: number): Observable<PrototypeInterface | null> {
+    getPrototypeById(
+        projectId: number,
+        prototypeId: number,
+    ): Observable<PrototypeInterface | null> {
         const userId = this.userId;
         if (!userId) return of(null);
         return this.prototypesSupabaseService.getPrototypeById(projectId, prototypeId, userId);

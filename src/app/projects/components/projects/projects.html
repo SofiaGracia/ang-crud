@@ -57,19 +57,16 @@
                 }
             </div>
         }
+        <pagination
+            [currentPage]="(currentPage$ | async) ?? 1"
+            [totalPages]="paginated.totalPages"
+            [total]="paginated.total"
+            [limit]="paginated.limit"
+            (pageChange)="onPageChange($event)"
+        ></pagination>
     } @else {
         <div class="flex justify-center py-20">
             <span class="loading loading-spinner loading-lg text-primary"></span>
         </div>
     }
 </div>
-
-@if (paginatedData$ | async; as paginated) {
-    <pagination
-        [currentPage]="(currentPage$ | async) ?? 1"
-        [totalPages]="paginated.totalPages"
-        [total]="paginated.total"
-        [limit]="paginated.limit"
-        (pageChange)="onPageChange($event)"
-    ></pagination>
-}

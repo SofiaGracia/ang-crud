@@ -1,6 +1,6 @@
 import { Injectable, inject } from '@angular/core';
 import { Prototype, PrototypeInterface } from '@prototypes/interfaces/prototype.interface';
-import { map, Observable, from, forkJoin } from 'rxjs';
+import { map, Observable, from, forkJoin, of } from 'rxjs';
 import { SupabaseClientService } from '@shared/services/supabase-client.service';
 import { PaginatedResponse } from '@shared/interfaces/paginated-response.interface';
 

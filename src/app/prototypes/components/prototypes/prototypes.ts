@@ -22,7 +22,6 @@ export class Prototypes {
     projectsFacade = inject(ProjectsFacade);
 
     project$ = this.projectsFacade.project$;
-    prototypes$ = this.prototypesFacade.prototypes$;
 
     paginatedData$ = this.prototypesFacade.paginatedPrototypes$;
     totalPages$ = this.prototypesFacade.totalPages$;

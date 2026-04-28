@@ -3,17 +3,18 @@ import { Project, ProjectInterface } from '@projects/interfaces/project.interfac
 import { ProjectSupabaseService } from '@projects/services/projectsSupabase.service';
 import { PaginatedResponse } from '@shared/interfaces/paginated-response.interface';
 import { AuthFacade } from '@auth/facades/auth.facade';
-import { BehaviorSubject, switchMap, of, Observable, combineLatest, map } from 'rxjs';
+import { BehaviorSubject, switchMap, of, Observable, combineLatest, map, tap } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class ProjectsFacade {
-
     private projectSupabaseService = inject(ProjectSupabaseService);
     private authFacade = inject(AuthFacade);
     private limit = 8;
 
     private refresh$ = new BehaviorSubject<void>(undefined);
     private page$ = new BehaviorSubject<number>(1);
+
+    private projectsCache = new Map<string, PaginatedResponse<ProjectInterface>>();
 
     get userId(): string | null {
         return this.authFacade.currentUserId;
@@ -28,8 +29,26 @@ export class ProjectsFacade {
 
     paginatedProjects$ = combineLatest([this.refresh$, this.page$]).pipe(
         switchMap(([, page]) => {
+            const key = `projects-${this.limit}-${page}`; // projects-8-1
+            if (this.projectsCache.has(key)) {
+                console.log('PROJECTS - DATA RESTORED FROM MAP: ');
+                return of(this.projectsCache.get(key)!);
+            }
+
             const userId = this.userId;
-            return userId ? this.projectSupabaseService.getProjectsPaginated(userId, page, this.limit) : of(null);
+            if (!userId) {
+                return of(null);
+            }
+
+            return this.projectSupabaseService.getProjectsPaginated(userId, page, this.limit).pipe(
+                tap((response) => {
+                    if (response) {
+                        console.log('PROJECTS - DATA STORED IN MAP: ');
+
+                        this.projectsCache.set(key, response);
+                    }
+                }),
+            );
         }),
     );
 
@@ -73,6 +92,11 @@ export class ProjectsFacade {
         this.refresh$.next();
     }
 
+    clearCache() {
+        this.projectsCache.clear();
+        console.log('PROJECTS CACHE CLEARED');
+    }
+
     addProject(project: Project) {
         const userId = this.userId;
         if (!userId) {
@@ -81,6 +105,7 @@ export class ProjectsFacade {
         }
         this.projectSupabaseService.addProject(project, userId).subscribe({
             next: () => {
+                this.clearCache();
                 this.refresh$.next();
             },
             error: (err) => {
@@ -92,6 +117,7 @@ export class ProjectsFacade {
     removeProject(projectId: number) {
         this.projectSupabaseService.moveToTrash(projectId).subscribe({
             next: () => {
+                this.clearCache();
                 this.refresh$.next();
             },
             error: (err) => {
@@ -103,6 +129,7 @@ export class ProjectsFacade {
     updateProject(projectId: number, dataToUpdate: Project) {
         this.projectSupabaseService.updateProject(projectId, dataToUpdate).subscribe({
             next: () => {
+                this.clearCache();
                 this.refresh$.next();
             },
             error: (err) => {

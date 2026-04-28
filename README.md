@@ -149,12 +149,12 @@ For more information on using the Angular CLI, including detailed command refere
   - **Description:** Projects and prototypes are now only visible to the user who created them.
   - **Implementation:** Added `user_id` column to projects/prototypes tables, Supabase RLS policies for row-level security, and user ID filtering in frontend queries.
 
-- [ ] **Complete Lazy Loading**
+- [x] **Complete Lazy Loading**
   - **Description:** Only login/register have lazy loading. All routes could benefit from it.
   - **Implementation:** Apply `loadComponent()` to all routes that don't load at startup (Projects, Prototypes, Landing, etc.).
 
 ### Completed
-
+- [x] **Complete Lazy Loading** - All routes benefit from lazy loading. Extracted different routes into separated files.
 - [x] **Cache for Projects** - In-memory Map cache with invalidation for Projects and Prototypes
 - [x] **Filter Projects by User** - RLS + Frontend
 - [x] **Pagination** - Offset/limit queries with Previous/Next controls

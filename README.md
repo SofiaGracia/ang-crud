@@ -137,9 +137,9 @@ For more information on using the Angular CLI, including detailed command refere
   - **Description:** Currently only 6 of ~30 components have tests.
   - **Implementation:** Prioritize tests for services and facades (business logic). Tests for critical components: Projects, Prototypes, Dialogs.
 
-- [ ] **Cache for Projects**
-  - **Description:** Every time projects are visited, they are reloaded from Supabase. Implementing cache reduces API costs and improves performance.
-  - **Implementation:** Store the project list in memory (RxJS BehaviorSubject). Invalidate cache only on Create/Update/Delete. Add visual indicator when loading from cache vs API.
+- [x] **Cache for Projects**
+  - **Description:** Projects and prototypes are now cached in memory, reducing API calls and improving navigation performance.
+  - **Implementation:** Store paginated data in `Map` within Facades. Invalidate cache only on Create/Update/Delete operations. Cache hits are logged to console. Applied to both Projects and Prototypes features.
 
 - [ ] **Improve UI**
   - **Description:** The interface can be more intuitive and accessible.
@@ -155,6 +155,7 @@ For more information on using the Angular CLI, including detailed command refere
 
 ### Completed
 
+- [x] **Cache for Projects** - In-memory Map cache with invalidation for Projects and Prototypes
 - [x] **Filter Projects by User** - RLS + Frontend
 - [x] **Pagination** - Offset/limit queries with Previous/Next controls
 - [x] **Full CRUD** - Create, Read, Update, Delete for projects and prototypes

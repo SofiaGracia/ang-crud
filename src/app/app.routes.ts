@@ -1,9 +1,4 @@
 import { Routes } from '@angular/router';
-import { Projects } from '@projects/components/projects/projects';
-import { Prototypes } from '@prototypes/components/prototypes/prototypes';
-import { Prototype } from '@prototypes/components/prototype/prototype';
-import { RecentPrototypes } from '@web-front/components/recent-prototypes/recent-prototypes';
-import { Trash } from '@web-front/components/trash/trash';
 import { authGuard } from '@auth/guards/auth.guard';
 
 export const routes: Routes = [
@@ -27,42 +22,7 @@ export const routes: Routes = [
         path: 'projects',
         loadComponent: () => import('./web-front/layouts/web-front-layout/web-front-layout'),
         canActivate: [authGuard],
-        children: [
-            {
-                path: '',
-                component: Projects,
-            },
-            {
-                path: 'recent',
-                component: RecentPrototypes,
-            },
-            {
-                path: 'trash',
-                component: Trash,
-            },
-            {
-                path: ':projectId',
-                children: [
-                    {
-                        path: '',
-                        redirectTo: 'prototypes',
-                        pathMatch: 'full',
-                    },
-                    {
-                        path: 'prototypes',
-                        component: Prototypes,
-                    },
-                    {
-                        path: 'prototypes/:prototypeId',
-                        component: Prototype,
-                    },
-                ],
-            },
-            {
-                path: '**',
-                redirectTo: '',
-            },
-        ],
+        loadChildren: () => import('@projects/project.routes').then((m) => m.projectRoutes),
     },
     {
         path: '**',

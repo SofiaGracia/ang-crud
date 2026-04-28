@@ -154,7 +154,7 @@ For more information on using the Angular CLI, including detailed command refere
   - **Implementation:** Apply `loadComponent()` to all routes that don't load at startup (Projects, Prototypes, Landing, etc.).
 
 ### Completed
-
+- [x] **Complete Lazy Loading** - All routes benefit from lazy loading. Extracted different routes into separated files.
 - [x] **Cache for Projects** - In-memory Map cache with invalidation for Projects and Prototypes
 - [x] **Filter Projects by User** - RLS + Frontend
 - [x] **Pagination** - Offset/limit queries with Previous/Next controls

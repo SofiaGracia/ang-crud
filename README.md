@@ -4,6 +4,14 @@ An Angular project to learn core Angular concepts and prototype CRUD operations 
 
 This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.0.5.
 
+## About
+
+AngCrud helps you organize your prototypes by project. With this application, you can:
+
+- Create and manage multiple projects to keep your prototypes organized
+- Upload HTML files and store them as prototypes within your projects
+- Preview prototypes instantly in your browser with interactive HTML rendering
+
 ## Project Overview
 
 This project serves as a practical learning environment for building full-stack applications with:

@@ -68,6 +68,7 @@ export class ProjectSupabaseService {
             .select('*')
             .eq('name', name)
             .eq('user_id', userId)
+            .is('deleted_at', null)
             .maybeSingle();
         return from(promise).pipe(map((response) => response.data));
     }

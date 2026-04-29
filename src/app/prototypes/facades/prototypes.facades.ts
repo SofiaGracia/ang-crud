@@ -74,6 +74,14 @@ export class PrototypesFacade {
         console.log('PROTOTYPES CACHE CLEARED');
     }
 
+    getPrototypesByProject(projectId: number): Observable<PrototypeInterface[]> {
+        const userId = this.userId;
+        if (!userId) {
+            return of([]);
+        }
+        return this.prototypesSupabaseService.getPrototypesByProject(projectId, userId);
+    }
+
     addPrototype(projectId: number, prototype: Prototype) {
         const userId = this.userId;
         if (!userId) {

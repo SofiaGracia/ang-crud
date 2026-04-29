@@ -6,8 +6,8 @@ import { faEllipsis, faPlus } from '@fortawesome/free-solid-svg-icons';
 import { ProjectsFacade } from '@projects/facades/projects.facade';
 import { DialogProject } from '@projects/components/dialog-project/dialog-project';
 import { PrototypeInterface } from '@prototypes/interfaces/prototype.interface';
-import { PrototypesSupabaseService } from '@prototypes/services/prototypesSupabase.service';
 import { AuthFacade } from '@auth/facades/auth.facade';
+import { PrototypesFacade } from '@prototypes/facades/prototypes.facades';
 
 @Component({
     selector: 'project-card',
@@ -17,13 +17,14 @@ import { AuthFacade } from '@auth/facades/auth.facade';
 export class ProjectCard implements OnInit {
     project = input.required<ProjectInterface>();
     private projectsFacade = inject(ProjectsFacade);
-    private prototypesService = inject(PrototypesSupabaseService);
+    private prototypesFacade = inject(PrototypesFacade);
     private authFacade = inject(AuthFacade);
 
     faEllipsis = faEllipsis;
     faPlus = faPlus;
 
-    prototypes = signal<PrototypeInterface[]>([]);
+    first4prototypes = signal<PrototypeInterface[]>([]);
+    protoLength = signal<number>(0);
 
     get userId(): string | null {
         return this.authFacade.currentUserId;
@@ -33,9 +34,15 @@ export class ProjectCard implements OnInit {
         const projectId = this.project().id;
         const userId = this.userId;
         if (projectId && userId) {
-            this.prototypesService.getFirstPrototypesByProject(projectId, userId, 4).subscribe({
-                next: (protos) => this.prototypes.set(protos),
-                error: () => this.prototypes.set([]),
+            this.prototypesFacade.getPrototypesByProject(projectId).subscribe({
+                next: (protos) => {
+                    this.protoLength.set(protos.length);
+                    this.first4prototypes.set(protos.slice(0, 4));
+                },
+                error: () => {
+                    this.protoLength.set(0);
+                    this.first4prototypes.set([]);
+                },
             });
         }
     }

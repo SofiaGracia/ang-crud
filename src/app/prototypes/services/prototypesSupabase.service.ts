@@ -69,14 +69,13 @@ export class PrototypesSupabaseService {
         );
     }
 
-    getFirstPrototypesByProject(projectId: number, userId: string, limit: number): Observable<PrototypeInterface[]> {
+    getFirstPrototypesByProject(projectId: number, userId: string): Observable<PrototypeInterface[]> {
         const promise = this.supabase
             .from('prototypes')
             .select('*')
             .eq('project_id', projectId)
             .eq('user_id', userId)
-            .is('deleted_at', null)
-            .limit(limit);
+            .is('deleted_at', null);
 
         return from(promise).pipe(
             map((response) => {

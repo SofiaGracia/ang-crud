@@ -8,6 +8,8 @@ import { ProjectInterface } from '@projects/interfaces/project.interface';
 import { PrototypeInterface } from '@prototypes/interfaces/prototype.interface';
 import { ConfirmModal } from '@shared/components/confirm-modal/confirm-modal';
 import { AuthFacade } from '@auth/facades/auth.facade';
+import { ProjectsFacade } from '@projects/facades/projects.facade';
+import { PrototypesFacade } from '@prototypes/facades/prototypes.facades';
 
 @Component({
     selector: 'app-trash',
@@ -18,6 +20,9 @@ export class Trash implements OnInit {
     private projectsService = inject(ProjectSupabaseService);
     private prototypesService = inject(PrototypesSupabaseService);
     private authFacade = inject(AuthFacade);
+
+    private projectsFacade = inject(ProjectsFacade);
+    private prototypesFacade = inject(PrototypesFacade);
 
     trashedProjects = signal<ProjectInterface[]>([]);
     trashedPrototypes = signal<PrototypeInterface[]>([]);
@@ -70,6 +75,7 @@ export class Trash implements OnInit {
     restoreProject(id: number) {
         this.projectsService.restoreProject(id).subscribe({
             next: () => {
+                this.projectsFacade.clearCache();
                 this.loadTrash();
             },
             error: (err) => console.error('Error restoring project', err),
@@ -79,6 +85,7 @@ export class Trash implements OnInit {
     restorePrototype(id: number) {
         this.prototypesService.restorePrototype(id).subscribe({
             next: () => {
+                this.prototypesFacade.clearCache();
                 this.loadTrash();
             },
             error: (err) => console.error('Error restoring prototype', err),

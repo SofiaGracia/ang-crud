@@ -21,27 +21,33 @@
         }
     </figure>
     <div class="card-body">
-        <h2 class="card-title">
-            {{ proto().name }}
-            <div class="badge badge-secondary">NEW</div>
-        </h2>
-        <p>
-            {{ proto().description }}
-        </p>
-        <div class="dropdown dropdown-end" (click)="$event.stopPropagation()">
-            <label tabindex="0" class="btn btn-ghost btn-circle p-2 m-0">
-                <fa-icon [icon]="faEllipsis"></fa-icon>
-            </label>
-            <ul tabindex="0" class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-32">
-                <li>
-                    <a
-                        (click)="deleteProto($event, proto().id, proto().project_id!)"
-                        class="text-red-600"
-                    >
-                        Move to Trash
-                    </a>
-                </li>
-            </ul>
+        <div class="flex flex-row justify-between items-center">
+            <div class="flex flex-col">
+                <h2 class="card-title">
+                    {{ proto().name }}
+                </h2>
+                <p>
+                    {{ proto().description }}
+                </p>
+            </div>
+            <div class="dropdown dropdown-end" (click)="$event.stopPropagation()">
+                <label tabindex="0" class="btn btn-ghost btn-circle p-2 m-0">
+                    <fa-icon [icon]="faEllipsis"></fa-icon>
+                </label>
+                <ul
+                    tabindex="0"
+                    class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-32"
+                >
+                    <li>
+                        <a
+                            (click)="deleteProto($event, proto().id, proto().project_id!)"
+                            class="text-red-600"
+                        >
+                            Move to Trash
+                        </a>
+                    </li>
+                </ul>
+            </div>
         </div>
     </div>
 </div>

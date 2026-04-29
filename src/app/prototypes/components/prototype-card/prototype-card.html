@@ -27,7 +27,9 @@
                     {{ proto().name }}
                 </h2>
                 <p>
-                    {{ proto().description }}
+                    {{
+                        proto().description !== '' || null ? proto().description : 'No description'
+                    }}
                 </p>
             </div>
             <div class="dropdown dropdown-end" (click)="$event.stopPropagation()">

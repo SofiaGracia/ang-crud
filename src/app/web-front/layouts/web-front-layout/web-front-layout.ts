@@ -20,6 +20,7 @@ import { AuthFacade } from '@auth/facades/auth.facade';
             padding: 2rem;
             height: 100%;
             overflow-y: auto;
+            scrollbar-gutter: stable;
         }
     `,
 })

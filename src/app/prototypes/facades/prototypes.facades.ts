@@ -14,6 +14,7 @@ export class PrototypesFacade {
     private limit = 8;
 
     private prototypesCache = new Map<string, PaginatedResponse<PrototypeInterface>>();
+    private lastResponse: PaginatedResponse<PrototypeInterface> | null = null;
 
     get userId(): string | null {
         return this.authFacade.currentUserId;
@@ -25,7 +26,9 @@ export class PrototypesFacade {
             const key = `prototypes-${projectId}-${this.limit}-${page}`; //prototypes-0-7
             if (this.prototypesCache.has(key)) {
                 console.log('PROTOTYPES - DATA RESTORED FROM MAP');
-                return of(this.prototypesCache.get(key)!);
+                const cached = this.prototypesCache.get(key)!;
+                this.lastResponse = cached;
+                return of(cached);
             }
 
             const userId = this.userId;
@@ -40,6 +43,7 @@ export class PrototypesFacade {
                         console.log('PROTOTYPES - DATA STORED IN MAP: ', key, response);
 
                         if (response) {
+                            this.lastResponse = response;
                             this.prototypesCache.set(key, response);
                         }
                     }),
@@ -98,9 +102,19 @@ export class PrototypesFacade {
     }
 
     removeProto(protoId: number, projectId: number) {
+        const currentPage = this.page$.value;
+        const currentTotal = this.lastResponse?.total ?? 0;
+
         this.prototypesSupabaseService.moveToTrash(protoId).subscribe({
             next: () => {
                 this.clearCache();
+
+                const newTotal = currentTotal - 1;
+                const newTotalPages = Math.ceil(newTotal / this.limit);
+
+                if (currentPage > newTotalPages) {
+                    this.page$.next(Math.max(1, newTotalPages));
+                }
 
                 this.refresh$.next(projectId);
             },

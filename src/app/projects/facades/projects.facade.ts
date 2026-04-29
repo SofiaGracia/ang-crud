@@ -15,6 +15,7 @@ export class ProjectsFacade {
     private page$ = new BehaviorSubject<number>(1);
 
     private projectsCache = new Map<string, PaginatedResponse<ProjectInterface>>();
+    private lastResponse: PaginatedResponse<ProjectInterface> | null = null;
 
     get userId(): string | null {
         return this.authFacade.currentUserId;
@@ -32,7 +33,9 @@ export class ProjectsFacade {
             const key = `projects-${this.limit}-${page}`; // projects-8-1
             if (this.projectsCache.has(key)) {
                 console.log('PROJECTS - DATA RESTORED FROM MAP: ');
-                return of(this.projectsCache.get(key)!);
+                const cached = this.projectsCache.get(key)!;
+                this.lastResponse = cached;
+                return of(cached);
             }
 
             const userId = this.userId;
@@ -44,7 +47,7 @@ export class ProjectsFacade {
                 tap((response) => {
                     if (response) {
                         console.log('PROJECTS - DATA STORED IN MAP: ');
-
+                        this.lastResponse = response;
                         this.projectsCache.set(key, response);
                     }
                 }),
@@ -115,9 +118,20 @@ export class ProjectsFacade {
     }
 
     removeProject(projectId: number) {
+        const currentPage = this.page$.value;
+        const currentTotal = this.lastResponse?.total ?? 0;
+
         this.projectSupabaseService.moveToTrash(projectId).subscribe({
             next: () => {
                 this.clearCache();
+
+                const newTotal = currentTotal - 1;
+                const newTotalPages = Math.ceil(newTotal / this.limit);
+
+                if (currentPage > newTotalPages) {
+                    this.page$.next(Math.max(1, newTotalPages));
+                }
+
                 this.refresh$.next();
             },
             error: (err) => {

@@ -1,72 +1,72 @@
 <dialog-project #dialogRef [mode]="'create'"></dialog-project>
 
 <div class="p-6 relative">
-    <search-input
-        (searchedValue)="queryP.set($event)"
-        (clearResults)="onClearSearchResults()"
-        valuePlaceholder="Buscar"
-        [debounceTime]="3000"
-        [initialValue]="queryP()"
-        [searchResults]="searchResultsResource.value()"
-        [errorMessage]="searchResultsResource.error()"
-        [isEmpty]="(searchResultsResource.value()?.length ?? 0) == 0"
-        [isLoading]="searchResultsResource.isLoading()"
-        (dropdownClosed)="searchResultsResource.set(null)"
-    ></search-input>
-
-    <div class="flex justify-between items-center mb-6">
-        <div>
-            <h1 class="text-3xl font-bold">My Projects</h1>
-            <p class="text-base-content/60">Organize your prototypes into projects</p>
-        </div>
-        <button class="btn btn-primary" (click)="dialogRef.openDialog()">
-            <svg
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-            >
-                <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 4v16m8-8H4"
-                />
-            </svg>
-            New Project
-        </button>
-    </div>
-
-    @if (paginatedData$ | async; as paginated) {
-        @if (paginated.data.length === 0) {
-            <div class="flex flex-col items-center justify-center py-20 text-center">
-                <div class="text-6xl mb-4 opacity-30">📁</div>
-                <h2 class="text-xl font-semibold mb-2">No projects yet</h2>
-                <p class="text-base-content/60 mb-6">
-                    Create your first project to start organizing your prototypes
-                </p>
-                <button class="btn btn-primary" (click)="dialogRef.openDialog()">
-                    Create First Project
-                </button>
+    <div class="flex flex-col justify-between">
+        <search-input
+            (searchedValue)="queryP.set($event)"
+            (clearResults)="onClearSearchResults()"
+            valuePlaceholder="Buscar"
+            [debounceTime]="3000"
+            [initialValue]="queryP()"
+            [searchResults]="searchResultsResource.value()"
+            [errorMessage]="searchResultsResource.error()"
+            [isEmpty]="(searchResultsResource.value()?.length ?? 0) == 0"
+            [isLoading]="searchResultsResource.isLoading()"
+            (dropdownClosed)="searchResultsResource.set(null)"
+        ></search-input>
+        <div class="flex justify-between items-center mb-6">
+            <div>
+                <h1 class="text-3xl font-bold">My Projects</h1>
+                <p class="text-base-content/60">Organize your prototypes into projects</p>
             </div>
+            <button class="btn btn-primary" (click)="dialogRef.openDialog()">
+                <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    class="h-5 w-5"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M12 4v16m8-8H4"
+                    />
+                </svg>
+                New Project
+            </button>
+        </div>
+        @if (paginatedData$ | async; as paginated) {
+            @if (paginated.data.length === 0) {
+                <div class="flex flex-col items-center justify-center py-20 text-center">
+                    <div class="text-6xl mb-4 opacity-30">📁</div>
+                    <h2 class="text-xl font-semibold mb-2">No projects yet</h2>
+                    <p class="text-base-content/60 mb-6">
+                        Create your first project to start organizing your prototypes
+                    </p>
+                    <button class="btn btn-primary" (click)="dialogRef.openDialog()">
+                        Create First Project
+                    </button>
+                </div>
+            } @else {
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    @for (proj of paginated.data; track proj.id) {
+                        <project-card [project]="proj"></project-card>
+                    }
+                </div>
+            }
+            <pagination
+                [currentPage]="(currentPage$ | async) ?? 1"
+                [totalPages]="paginated.totalPages"
+                [total]="paginated.total"
+                [limit]="paginated.limit"
+                (pageChange)="onPageChange($event)"
+            ></pagination>
         } @else {
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                @for (proj of paginated.data; track proj.id) {
-                    <project-card [project]="proj"></project-card>
-                }
+            <div class="flex justify-center py-20">
+                <span class="loading loading-spinner loading-lg text-primary"></span>
             </div>
         }
-        <pagination
-            [currentPage]="(currentPage$ | async) ?? 1"
-            [totalPages]="paginated.totalPages"
-            [total]="paginated.total"
-            [limit]="paginated.limit"
-            (pageChange)="onPageChange($event)"
-        ></pagination>
-    } @else {
-        <div class="flex justify-center py-20">
-            <span class="loading loading-spinner loading-lg text-primary"></span>
-        </div>
-    }
+    </div>
 </div>

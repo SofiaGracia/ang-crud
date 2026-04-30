@@ -13,6 +13,7 @@ import { AuthFacade } from '@auth/facades/auth.facade';
             display: flex;
             height: 100vh;
             overflow: hidden;
+            position: relative;
         }
 
         .content {
@@ -21,6 +22,7 @@ import { AuthFacade } from '@auth/facades/auth.facade';
             height: 100%;
             overflow-y: auto;
             scrollbar-gutter: stable;
+            position: relative
         }
     `,
 })

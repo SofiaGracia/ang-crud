@@ -25,7 +25,56 @@
         </ul>
     </div>
 
-    <div class="logout-btn">
+    @if (user$ | async; as user) {
+        <div class="profile-btn">
+            <div
+                class="dropdown dropdown-top"
+                [class.dropdown-end]="!collapsed"
+                [class.dropdown-right]="collapsed"
+                (click)="$event.stopPropagation()"
+            >
+                <ul class="dropdown-content menu p-2 shadow bg-base-100 hover:bg-grey-500 rounded-box">
+                    <li>
+                        <button
+                            type="button"
+                            class="flex items-center gap-2 cursor-pointer hover:bg-gray-700 rounded px-2 py-2"
+                            (click)="onSignOut()"
+                        >
+                            <fa-icon [icon]="faRightFromBracket" class="text-slate-200"></fa-icon>
+                            <span>Logout</span>
+                        </button>
+                    </li>
+                    <li>
+                        <button
+                            type="button"
+                            class="flex items-center gap-2 cursor-pointer hover:bg-gray-700 rounded px-2 py-2 w-full"
+                            (click)="onChangeTheme()"
+                        >
+                            <fa-icon [icon]="faMoon" class="text-slate-200"></fa-icon>
+                            <span>Toggle Dark/Bright</span>
+                        </button>
+                    </li>
+                </ul>
+
+                <button
+                    type="button"
+                    class="flex items-center gap-2 cursor-pointer hover:bg-gray-700 rounded px-2 py-2 w-full"
+                >
+                    <fa-icon [icon]="faUser" class="text-slate-200"></fa-icon>
+                    <span
+                        class="inline-block overflow-hidden whitespace-nowrap transition-all duration-300"
+                        [class.email-text]="!collapsed"
+                        [style.width.px]="collapsed ? 0 : null"
+                        [style.opacity]="collapsed ? 0 : 1"
+                    >
+                        {{ user.email }}
+                    </span>
+                </button>
+            </div>
+        </div>
+    }
+
+    <!-- <div class="logout-btn">
         <button
             type="button"
             class="flex items-center gap-2 cursor-pointer hover:bg-gray-700 rounded px-2 py-2 w-full"
@@ -40,5 +89,5 @@
                 Logout
             </span>
         </button>
-    </div>
+    </div> -->
 </div>

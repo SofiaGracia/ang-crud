@@ -1,15 +1,16 @@
 <dialog-project #dialogPro [mode]="'edit'" [project]="project()"></dialog-project>
 <div
-    class="card bg-base-100 w-full shadow-sm relative"
+    data-testid="project-card"
+    class="bg-surface shadow-sm hover:shadow-md hover:bg-surface2/50 transition relative w-full cursor-pointer rounded-xl"
     [routerLink]="['/projects', project().id]"
 >
     <figure>
         @if (first4prototypes().length > 0) {
-            <div class="grid grid-cols-2 gap-0.5 w-full h-48 bg-base-300">
+            <div class="grid grid-cols-2 gap-0.5 w-full h-48 bg-surface2">
                 @for (proto of first4prototypes(); track proto.id; let i = $index) {
                     @if (i < 4) {
-                        <div class="bg-base-200 flex items-center justify-center overflow-hidden">
-                            <span class="text-xs text-base-content/50 truncate px-2">
+                        <div class="bg-surface flex items-center justify-center overflow-hidden">
+                            <span class="text-xs text-text/50 truncate px-2">
                                 {{ proto.name }}
                             </span>
                         </div>
@@ -17,57 +18,67 @@
                 }
                 @for (i of [0, 1, 2, 3]; track i) {
                     @if (i >= first4prototypes().length) {
-                        <div class="bg-base-200 flex items-center justify-center">
-                            <fa-icon
-                                [icon]="faPlus"
-                                class="text-base-content/30 text-2xl"
-                            ></fa-icon>
+                        <div class="bg-surface flex items-center justify-center">
+                            <fa-icon [icon]="faPlus" class="text-text/30 text-2xl"></fa-icon>
                         </div>
                     }
                 }
             </div>
         } @else {
             <div
-                class="w-full h-48 bg-gradient-to-br from-purple-500 to-indigo-600 flex items-center justify-center"
+                class="w-full h-48 bg-gradient-to-br from-primary/20 via-surface to-accent/10 flex items-center justify-center"
             >
-                <fa-icon [icon]="faPlus" class="text-white/50 text-4xl"></fa-icon>
+                <fa-icon [icon]="faPlus" class="text-text/50 text-4xl"></fa-icon>
             </div>
         }
     </figure>
-    <div class="card-body">
+    <div class="p-4">
         <div class="flex flex-row justify-between items-center">
             <div class="flex flex-col">
-                <h2 class="card-title">{{ project().name }}</h2>
-                <p>
-                    {{
-                        project().description !== '' || null
-                            ? project().description
-                            : 'No description'
-                    }}
+                <h2 data-testid="project-title" class="text-lg font-semibold text-text">
+                    {{ project().name }}
+                </h2>
+                <p class="text-text/80">
+                    {{ displayDescription() }}
                 </p>
-                <span class="text-xs text-base-content/60 mt-1">
-                    {{ protoLength() }} prototype{{ protoLength() !== 1 ? 's' : '' }}
+                <span class="text-xs text-text/60 mt-1">
+                    {{ prototypeLabel() }}
                 </span>
             </div>
 
-            <!-- Dropdown DaisyUI -->
-            <div class="dropdown dropdown-end" (click)="$event.stopPropagation()">
-                <label tabindex="0" class="btn btn-ghost btn-circle p-2 m-0">
-                    <fa-icon [icon]="faEllipsis"></fa-icon>
-                </label>
-                <ul
-                    tabindex="0"
-                    class="dropdown-content menu p-2 shadow bg-base-100 rounded-box w-32"
+            <!-- Custom dropdown -->
+            <div class="relative" (click)="$event.stopPropagation()">
+                <button
+                    aria-label="Open project menu"
+                    data-testid="project-menu"
+                    type="button"
+                    class="p-2 rounded-full hover:bg-surface2 transition-colors"
+                    (click)="toggleDropdown()"
                 >
-                    <li>
-                        <a (click)="deleteProject($event, project().id)" class="text-red-600">
-                            Move to Trash
-                        </a>
-                    </li>
-                    <li>
-                        <a (click)="dialogPro.openDialog()" class="text-grey-100"> Modify </a>
-                    </li>
-                </ul>
+                    <fa-icon [icon]="faEllipsis"></fa-icon>
+                </button>
+                @if (isDropdownOpen()) {
+                    <ul
+                        class="absolute right-0 top-full mt-2 bg-surface shadow-lg p-2 rounded-lg w-32 z-10"
+                    >
+                        <li>
+                            <button
+                                (click)="deleteProject($event, project().id)"
+                                class="text-danger hover:text-danger/80 w-full text-left px-2 py-1 rounded"
+                            >
+                                Move to Trash
+                            </button>
+                        </li>
+                        <li>
+                            <button
+                                (click)="openEditDialog()"
+                                class="text-text hover:text-text/80 w-full text-left px-2 py-1 rounded"
+                            >
+                                Modify
+                            </button>
+                        </li>
+                    </ul>
+                }
             </div>
         </div>
     </div>

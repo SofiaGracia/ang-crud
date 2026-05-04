@@ -4,7 +4,7 @@
     class="bg-surface shadow-sm hover:shadow-md hover:bg-surface2/50 transition relative w-full cursor-pointer rounded-xl"
     [routerLink]="['/projects', project().id]"
 >
-    <figure>
+    <figure class="overflow-hidden rounded-t-xl">
         @if (first4prototypes().length > 0) {
             <div class="grid grid-cols-2 gap-0.5 w-full h-48 bg-surface2">
                 @for (proto of first4prototypes(); track proto.id; let i = $index) {
@@ -26,7 +26,7 @@
             </div>
         } @else {
             <div
-                class="w-full h-48 bg-gradient-to-br from-primary/20 via-surface to-accent/10 flex items-center justify-center"
+                class="w-full h-48 bg-gradient-to-br from-primary/20 via-surface to-accent/10 flex items-center justify-center rounded-t-xl"
             >
                 <fa-icon [icon]="faPlus" class="text-text/50 text-4xl"></fa-icon>
             </div>

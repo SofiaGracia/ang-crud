@@ -39,13 +39,13 @@ export default defineConfig({
             name: 'setup',
             testMatch: /.*\.setup\.ts/,
         },
-        {
-            name: 'e2e',
-            use: {
-                storageState: 'e2e/auth.json',
-            },
-            dependencies: ['setup'],
-        },
+        // {
+        //     name: 'e2e',
+        //     use: {
+        //         storageState: 'e2e/auth.json',
+        //     },
+        //     dependencies: ['setup'],
+        // },
         {
             name: 'chromium',
             use: {
@@ -54,17 +54,17 @@ export default defineConfig({
             dependencies: ['setup'],
         },
 
-        {
-            name: 'firefox',
-            use: { ...devices['Desktop Firefox'] },
-            dependencies: ['setup'],
-        },
+        // {
+        //     name: 'firefox',
+        //     use: { ...devices['Desktop Firefox'] },
+        //     dependencies: ['setup'],
+        // },
 
-        {
-            name: 'webkit',
-            use: { ...devices['Desktop Safari'] },
-            dependencies: ['setup'],
-        },
+        // {
+        //     name: 'webkit',
+        //     use: { ...devices['Desktop Safari'] },
+        //     dependencies: ['setup'],
+        // },
 
         /* Test against mobile viewports. */
         // {

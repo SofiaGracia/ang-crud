@@ -21,16 +21,25 @@ export class ProjectsFacade {
         return this.authFacade.currentUserId;
     }
 
-    projects$ = this.refresh$.pipe(
-        switchMap(() => {
-            const userId = this.userId;
+    constructor() {
+        this.authFacade.currentUser$.subscribe((user) => {
+            if (!user) {
+                this.clearCache();
+            }
+        });
+    }
+
+    projects$ = combineLatest([this.refresh$, this.authFacade.currentUser$]).pipe(
+        switchMap(([, user]) => {
+            const userId = user?.id ?? null;
             return userId ? this.projectSupabaseService.getProjects(userId) : of([]);
         }),
     );
 
-    paginatedProjects$ = combineLatest([this.refresh$, this.page$]).pipe(
-        switchMap(([, page]) => {
-            const key = `projects-${this.limit}-${page}`; // projects-8-1
+    paginatedProjects$ = combineLatest([this.refresh$, this.page$, this.authFacade.currentUser$]).pipe(
+        switchMap(([, page, user]) => {
+            const userId = user?.id ?? null;
+            const key = `${userId}-projects-${this.limit}-${page}`;
             if (this.projectsCache.has(key)) {
                 console.log('PROJECTS - DATA RESTORED FROM MAP: ');
                 const cached = this.projectsCache.get(key)!;
@@ -38,7 +47,6 @@ export class ProjectsFacade {
                 return of(cached);
             }
 
-            const userId = this.userId;
             if (!userId) {
                 return of(null);
             }
@@ -77,9 +85,9 @@ export class ProjectsFacade {
     // Subject to select a project
     private selectedProjectId$ = new BehaviorSubject<number | null>(null);
 
-    project$ = this.selectedProjectId$.pipe(
-        switchMap((id) => {
-            const userId = this.userId;
+    project$ = combineLatest([this.selectedProjectId$, this.authFacade.currentUser$]).pipe(
+        switchMap(([id, user]) => {
+            const userId = user?.id ?? null;
             if (id == null || !userId) return of(null);
             return this.projectSupabaseService.getProjectById(id, userId);
         }),

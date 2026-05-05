@@ -23,7 +23,7 @@ describe('ProjectsFacade', () => {
             providers: [
                 ProjectsFacade,
                 { provide: ProjectSupabaseService, useValue: mockService },
-                { provide: AuthFacade, useValue: { currentUserId: 'test-user-id' } },
+                { provide: AuthFacade, useValue: { currentUserId: 'test-user-id', currentUser$: of({ id: 'test-user-id' }) } },
             ],
         });
 

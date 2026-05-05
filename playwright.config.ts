@@ -93,4 +93,10 @@ export default defineConfig({
     //   url: 'http://localhost:3000',
     //   reuseExistingServer: !process.env.CI,
     // },
+    webServer: {
+        command: 'npm run start', // o ng serve
+        port: 4200,
+        timeout: 120 * 1000,
+        reuseExistingServer: !process.env.CI,
+    },
 });

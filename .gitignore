@@ -1,7 +1,6 @@
 # See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
 
 #environments
-src/environments
 
 # Compiled output
 /dist
@@ -50,3 +49,12 @@ src/app/auth/Migrations
 # System files
 .DS_Store
 Thumbs.db
+
+# Playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
+/e2e/debug.png

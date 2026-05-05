@@ -1,0 +1,71 @@
+LO IMPORTANT ÉS CREAR UN DESIGN SYSTEM
+
+Refactor ProjectCard component (project-card.ts and project-card.html) to remove DaisyUI styling and prepare it for a custom Tailwind design system.
+
+Requirements:
+
+1. Remove ALL DaisyUI classes (bg-base-*, card, btn, dropdown, etc.)
+2. Replace them with Tailwind utility classes using a custom theme with these tokens:
+   - bg → #0F172A
+   - surface → #111827
+   - surface2 → #1F2937
+   - text → #E2E8F0
+   - primary → #14B8A6
+   - accent → #60A5FA
+
+3. Do NOT introduce random colors (no purple, no indigo, no default Tailwind colors like blue-500 unless mapped to tokens)
+
+4. Keep the layout and structure the same, but:
+   - simplify the HTML
+   - improve readability
+   - avoid duplicated logic
+
+5. Move any conditional logic or formatting out of the template into the component (TypeScript)
+
+6. Prepare the component for E2E testing:
+   - add data-testid attributes to key elements:
+     - project-card
+     - project-menu
+     - project-title
+
+7. Keep Angular control flow syntax (@if, @for)
+
+8. Do NOT add new features, only refactor
+
+Goal:
+A clean, maintainable Angular component that uses Tailwind with design tokens instead of DaisyUI, ready for consistent theming and Playwright testing.
+
+Posar arredonits els cards
+
+PLÀ:
+
+PROMPT
+
+Actua com un enginyer frontend expert en Angular i testing E2E amb Playwright.
+
+Estic preparant una aplicació Angular i necessite afegir data-testid per poder escriure tests E2E estables.
+
+CONTEXT DE L’APP:
+
+Login d’usuari
+Llista de projectes
+Creació de projectes
+Dins de cada projecte: creació de prototips HTML
+Vista de prototip amb dues pestanyes: render sandbox i code view
+
+OBJECTIU:
+Afegir data-testid NOMÉS als elements necessaris per cobrir aquest flux E2E:
+login → create project → create prototype → veure render → veure code view
+
+REQUISITS IMPORTANTS:
+
+NO afegis data-testid a elements visuals o decoratius
+NOMÉS afegis selectors en inputs, botons, tabs i zones de validació del flux
+Mantín noms consistents i semàntics (ex: create-project-button, prototype-html-input)
+No inventes funcionalitats noves
+No refactoritzes codi més enllà d’afegir els atributs
+
+OBJECTIU FINAL:
+El codi ha de quedar preparat per escriure un test E2E de Playwright estable i llegible.
+
+Si tens dubtes sobre on posar un data-testid, prioritza no posar-lo abans que posar-lo malament.

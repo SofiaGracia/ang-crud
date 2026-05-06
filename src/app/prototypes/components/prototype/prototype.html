@@ -12,10 +12,10 @@
 
     @if (loading()) {
         <div class="h-[70vh] rounded-box bg-base-200 flex items-center justify-center">
-            <span class="loading loading-spinner loading-lg"></span>
+            <span class="loading loading-spinner loading-lg" data-testid="prototype-loading"></span>
         </div>
     } @else if (error()) {
-        <div class="alert alert-warning">
+        <div class="alert alert-warning" data-testid="prototype-error-message">
             <span>{{ error() }}</span>
         </div>
     } @else if (srcdoc()) {
@@ -27,6 +27,7 @@
                         class="tab"
                         [class.tab-active]="activeTab() === 'preview'"
                         (click)="activeTab.set('preview')"
+                        data-testid="prototype-tab-preview"
                     >
                         Preview
                     </button>
@@ -35,6 +36,7 @@
                         class="tab"
                         [class.tab-active]="activeTab() === 'code'"
                         (click)="activeTab.set('code')"
+                        data-testid="prototype-tab-code"
                     >
                         Código
                     </button>
@@ -47,10 +49,11 @@
                     class="w-full min-h-[75vh] border-0"
                     sandbox="allow-scripts"
                     scrolling="auto"
+                    data-testid="prototype-render-iframe"
                 ></iframe>
             } @else {
                 <div class="p-4">
-                    <pre class="max-h-[75vh] overflow-x-auto overflow-y-auto whitespace-pre text-sm">{{ downloadedHtml() ?? '' }}</pre>
+                    <pre class="max-h-[75vh] overflow-x-auto overflow-y-auto whitespace-pre text-sm" data-testid="prototype-code-view">{{ downloadedHtml() ?? '' }}</pre>
                 </div>
             }
         </div>

@@ -3,7 +3,7 @@
         <h2 class="card-title text-2xl font-bold text-center mb-6">Welcome Back</h2>
 
         @if (errorMessage()) {
-            <div class="alert alert-error mb-4">
+            <div class="alert alert-error mb-4" data-testid="login-error-message">
                 <span>{{ errorMessage() }}</span>
             </div>
         }
@@ -72,6 +72,7 @@
                         class="grow"
                         placeholder="email@example.com"
                         [(ngModel)]="email"
+                        data-testid="login-email-input"
                     />
                 </label>
             </div>
@@ -87,6 +88,7 @@
                         class="grow"
                         placeholder="••••••••"
                         [(ngModel)]="password"
+                        data-testid="login-password-input"
                     />
                 </label>
             </div>
@@ -96,6 +98,7 @@
                 class="btn btn-primary w-full"
                 (click)="signInWithEmail()"
                 [disabled]="isLoading() || isLoadingOAuth()"
+                data-testid="login-submit-button"
             >
                 @if (isLoading()) {
                     <fa-icon [icon]="faSpinner" class="animate-spin"></fa-icon>

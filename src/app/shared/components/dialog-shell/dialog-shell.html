@@ -4,6 +4,7 @@
             <button
                 class="btn btn-sm btn-circle btn-ghost absolute right-2 top-2"
                 (click)="onClose()"
+                data-testid="dialog-close-button"
             >
                 ✕
             </button>
@@ -26,11 +27,12 @@
                     [placeholder]="placeholder()"
                     class="input"
                     formControlName="name"
+                    data-testid="dialog-name-input"
                 />
                 @if (
                     createForm().controls['name'].touched && createForm().controls['name'].errors
                 ) {
-                    <ul class="error-list">
+                    <ul class="error-list" data-testid="dialog-error-list">
                         @for (error of errorsFn()(); track error) {
                             <li>{{ error }}</li>
                         }
@@ -44,6 +46,7 @@
                 class="textarea"
                 [placeholder]="placeholder() + ' description'"
                 formControlName="description"
+                data-testid="dialog-description-textarea"
             ></textarea>
 
             <div class="mt-5 mb-5">
@@ -53,7 +56,7 @@
             <!-- Slot per contingut extra (drop zone) -->
             <ng-content select="[slot=extra]" />
 
-            <button type="submit" class="btn btn-wide" [disabled]="createForm().errors">
+            <button type="submit-project" class="btn btn-wide" [disabled]="createForm().errors" data-testid="dialog-submit-button">
                 Create
             </button>
         </form>

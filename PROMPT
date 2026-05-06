@@ -69,3 +69,16 @@ OBJECTIU FINAL:
 El codi ha de quedar preparat per escriure un test E2E de Playwright estable i llegible.
 
 Si tens dubtes sobre on posar un data-testid, prioritza no posar-lo abans que posar-lo malament.
+
+****************************
+
+Flow real del meu producte, el happy path core:
+LOGIN
+→ PROJECT LIST
+→ CREATE PROJECT
+→ OPEN PROJECT
+→ CREATE PROTOTYPE
+→ OPEN PROTOTYPE
+→ CHECK RENDER
+→ CHECK CODE
+

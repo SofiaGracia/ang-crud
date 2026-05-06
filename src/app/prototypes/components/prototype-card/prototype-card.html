@@ -1,4 +1,4 @@
-<div class="card bg-base-100 shadow-sm cursor-pointer" (click)="openPreview()">
+<div class="card bg-base-100 shadow-sm cursor-pointer" (click)="openPreview()" data-testid="prototype-card">
     <figure class="h-48 overflow-hidden">
         @if (htmlContent()) {
             <iframe

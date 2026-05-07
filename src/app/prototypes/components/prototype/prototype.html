@@ -40,6 +40,15 @@
                     >
                         Código
                     </button>
+                    <button
+                        type="button"
+                        class="tab"
+                        [class.tab-active]="activeTab() === 'tree'"
+                        (click)="activeTab.set('tree')"
+                        data-testid="prototype-tab-tree"
+                    >
+                        Tree
+                    </button>
                 </div>
             </div>
 
@@ -51,9 +60,13 @@
                     scrolling="auto"
                     data-testid="prototype-render-iframe"
                 ></iframe>
-            } @else {
+            } @else if (activeTab() === 'code') {
                 <div class="p-4">
                     <pre class="max-h-[75vh] overflow-x-auto overflow-y-auto whitespace-pre text-sm" data-testid="prototype-code-view">{{ downloadedHtml() ?? '' }}</pre>
+                </div>
+            } @else {
+                <div class="p-4">
+                    <pre class="max-h-[75vh] overflow-auto text-sm font-mono" data-testid="prototype-tree-view">{{ treeJson() }}</pre>
                 </div>
             }
         </div>

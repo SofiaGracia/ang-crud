@@ -21,36 +21,47 @@
     } @else if (srcdoc()) {
         <div class="rounded-box border border-base-300 overflow-hidden ">
             <div class="border-b border-base-300">
-                <div class="tabs tabs-boxed">
-                    <button
-                        type="button"
-                        class="tab"
-                        [class.tab-active]="activeTab() === 'preview'"
-                        (click)="activeTab.set('preview')"
-                        data-testid="prototype-tab-preview"
-                    >
-                        Preview
-                    </button>
-                    <button
-                        type="button"
-                        class="tab"
-                        [class.tab-active]="activeTab() === 'code'"
-                        (click)="activeTab.set('code')"
-                        data-testid="prototype-tab-code"
-                    >
-                        Código
-                    </button>
-                    <button
-                        type="button"
-                        class="tab"
-                        [class.tab-active]="activeTab() === 'tree'"
-                        (click)="activeTab.set('tree')"
-                        data-testid="prototype-tab-tree"
-                    >
-                        Tree
-                    </button>
+                <div class="flex items-center justify-between px-2">
+                    <div class="tabs tabs-boxed">
+                        <button
+                            type="button"
+                            class="tab"
+                            [class.tab-active]="activeTab() === 'preview'"
+                            (click)="activeTab.set('preview')"
+                            data-testid="prototype-tab-preview"
+                        >
+                            Preview
+                        </button>
+                        <button
+                            type="button"
+                            class="tab"
+                            [class.tab-active]="activeTab() === 'code'"
+                            (click)="activeTab.set('code')"
+                            data-testid="prototype-tab-code"
+                        >
+                            Código
+                        </button>
+                        <button
+                            type="button"
+                            class="tab"
+                            [class.tab-active]="activeTab() === 'tree'"
+                            (click)="activeTab.set('tree')"
+                            data-testid="prototype-tab-tree"
+                        >
+                            Tree
+                        </button>
                 </div>
+                <button
+                    type="button"
+                    class="btn btn-outline btn-sm"
+                    (click)="analyzeUi()"
+                    [disabled]="!parsedTree()"
+                    data-testid="prototype-analyze-btn"
+                >
+                    Analyze UI
+                </button>
             </div>
+        </div>
 
             @if (activeTab() === 'preview') {
                 <iframe
@@ -72,3 +83,6 @@
         </div>
     }
 </div>
+
+<ai-drawer (applySuggestion)="handleApplySuggestion($event)" />
+

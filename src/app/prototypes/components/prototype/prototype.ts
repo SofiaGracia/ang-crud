@@ -7,9 +7,13 @@ import { distinctUntilChanged, filter, map, switchMap, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { PrototypeInterface } from '@prototypes/interfaces/prototype.interface';
 import { parseHtml } from '@prototypes/parser';
+import { AiDrawer } from '@prototypes/ai/components/ai-drawer/ai-drawer';
+import { AiAnalysisFacade } from '@prototypes/ai/facades/ai-analysis.facade';
+import { ApplySuggestionEvent } from '@prototypes/ai/interfaces/ai-analysis.interface';
 
 @Component({
     selector: 'app-prototype',
+    imports: [AiDrawer],
     templateUrl: './prototype.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
@@ -18,6 +22,7 @@ export class Prototype {
     private prototypesFacade = inject(PrototypesFacade);
     private sanitizer = inject(DomSanitizer);
     private recentService = inject(RecentPrototypesService);
+    private aiFacade = inject(AiAnalysisFacade);
 
     prototype = signal<PrototypeInterface | null>(null);
     srcdoc = signal<SafeHtml | null>(null);
@@ -114,6 +119,24 @@ export class Prototype {
                 this.error.set('No se pudo renderizar la preview HTML.');
                 this.loading.set(false);
             });
+    }
+
+    analyzeUi(): void {
+        const tree = this.parsedTree();
+        if (!tree) return;
+        this.aiFacade.openDrawer(tree);
+    }
+
+    handleApplySuggestion(event: ApplySuggestionEvent): void {
+        switch (event.suggestion.type) {
+            case 'accessibility':
+            case 'semantic':
+            case 'styling':
+            case 'structure':
+            default:
+                console.log('Suggestion applied:', event.suggestion.type, event.suggestion.id);
+                break;
+        }
     }
 
     private buildSrcdoc(html: string): string {

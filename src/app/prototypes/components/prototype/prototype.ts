@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { PrototypesFacade } from '@prototypes/facades/prototypes.facades';
@@ -6,6 +6,7 @@ import { RecentPrototypesService } from '@prototypes/services/recent-prototypes.
 import { distinctUntilChanged, filter, map, switchMap, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { PrototypeInterface } from '@prototypes/interfaces/prototype.interface';
+import { parseHtml } from '@prototypes/parser';
 
 @Component({
     selector: 'app-prototype',
@@ -23,7 +24,17 @@ export class Prototype {
     downloadedHtml = signal<string | null>(null);
     loading = signal(true);
     error = signal<string | null>(null);
-    activeTab = signal<'preview' | 'code'>('preview');
+    activeTab = signal<'preview' | 'code' | 'tree'>('preview');
+
+    parsedTree = computed(() => {
+        const html = this.downloadedHtml();
+        return html ? parseHtml(html) : null;
+    });
+
+    treeJson = computed(() => {
+        const tree = this.parsedTree();
+        return tree ? JSON.stringify(tree, null, 2) : '';
+    });
 
     constructor() {
         this.route.paramMap

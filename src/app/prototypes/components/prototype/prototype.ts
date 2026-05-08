@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
-import { ActivatedRoute, RouterLink } from '@angular/router';
+import { ActivatedRoute } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { PrototypesFacade } from '@prototypes/facades/prototypes.facades';
 import { RecentPrototypesService } from '@prototypes/services/recent-prototypes.service';
@@ -7,9 +7,21 @@ import { distinctUntilChanged, filter, map, switchMap, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { PrototypeInterface } from '@prototypes/interfaces/prototype.interface';
 import { parseHtml } from '@prototypes/parser';
+import { HtmlElementNode } from '@prototypes/parser/interfaces/html-node.interface';
+import { serializeTreeToString } from '@prototypes/editor/services/tree-mutation.service';
+import { EditorFacade } from '@prototypes/editor/facades/editor.facade';
 import { AiDrawer } from '@prototypes/ai/components/ai-drawer/ai-drawer';
 import { AiAnalysisFacade } from '@prototypes/ai/facades/ai-analysis.facade';
 import { ApplySuggestionEvent } from '@prototypes/ai/interfaces/ai-analysis.interface';
+
+function wrapInRoot(nodes: HtmlElementNode[]): HtmlElementNode {
+    return {
+        type: 'element',
+        tag: 'div',
+        attributes: {},
+        children: nodes,
+    };
+}
 
 @Component({
     selector: 'app-prototype',
@@ -23,6 +35,7 @@ export class Prototype {
     private sanitizer = inject(DomSanitizer);
     private recentService = inject(RecentPrototypesService);
     private aiFacade = inject(AiAnalysisFacade);
+    editorFacade = inject(EditorFacade);
 
     prototype = signal<PrototypeInterface | null>(null);
     srcdoc = signal<SafeHtml | null>(null);
@@ -31,13 +44,8 @@ export class Prototype {
     error = signal<string | null>(null);
     activeTab = signal<'preview' | 'code' | 'tree'>('preview');
 
-    parsedTree = computed(() => {
-        const html = this.downloadedHtml();
-        return html ? parseHtml(html) : null;
-    });
-
     treeJson = computed(() => {
-        const tree = this.parsedTree();
+        const tree = this.editorFacade.workingTree();
         return tree ? JSON.stringify(tree, null, 2) : '';
     });
 
@@ -64,6 +72,7 @@ export class Prototype {
                     this.error.set(null);
                     this.srcdoc.set(null);
                     this.downloadedHtml.set(null);
+                    this.aiFacade.resetAnalysis();
                     this.activeTab.set('preview');
                 }),
                 switchMap(({ projectId, prototypeId }) =>
@@ -109,8 +118,9 @@ export class Prototype {
                 return res.text();
             })
             .then((html) => {
-                const wrappedSrcdoc = this.buildSrcdoc(html);
                 this.downloadedHtml.set(html);
+                this.initEditorTree(html);
+                const wrappedSrcdoc = this.buildSrcdoc(html);
                 this.srcdoc.set(this.sanitizer.bypassSecurityTrustHtml(wrappedSrcdoc));
                 this.loading.set(false);
             })
@@ -121,31 +131,94 @@ export class Prototype {
             });
     }
 
+    private initEditorTree(html: string): void {
+        const parsed = parseHtml(html);
+        const elementNodes = parsed.filter(
+            (n): n is HtmlElementNode => n.type === 'element',
+        );
+        const root = wrapInRoot(elementNodes);
+
+        this.editorFacade.loadTree(root);
+
+        console.group('🔄 Tree Loaded');
+        console.log('▶ originalTree:', JSON.stringify(this.editorFacade.originalTree(), null, 2));
+        console.log('▶ workingTree:', JSON.stringify(this.editorFacade.workingTree(), null, 2));
+        console.log('▶ Same reference:', JSON.stringify(this.editorFacade.originalTree(), null, 2) === JSON.stringify(this.editorFacade.workingTree(), null, 2));
+        console.groupEnd();
+    }
+
     analyzeUi(): void {
-        const tree = this.parsedTree();
+        const tree = this.editorFacade.workingTree();
         if (!tree) return;
         this.aiFacade.openDrawer(tree);
     }
 
     handleApplySuggestion(event: ApplySuggestionEvent): void {
-        switch (event.suggestion.type) {
-            case 'accessibility':
-            case 'semantic':
-            case 'styling':
-            case 'structure':
-            default:
-                console.log('Suggestion applied:', event.suggestion.type, event.suggestion.id);
-                break;
+        const actions = event.suggestion.actions;
+        if (!actions || actions.length === 0) {
+            console.warn('Suggestion has no actions:', event.suggestion.id);
+            return;
         }
+
+        console.group(`🔧 Applying suggestion: ${event.suggestion.id} (${event.suggestion.type})`);
+
+        for (const action of actions) {
+            console.group(`  Action: ${action.type} @ ${action.targetNodePath}`);
+            console.log('  ▶ Before (workingTree):', JSON.stringify(this.editorFacade.workingTree(), null, 2));
+            console.log('  ▶ Before (originalTree):', JSON.stringify(this.editorFacade.originalTree(), null, 2));
+
+            const mutated = this.editorFacade.dispatch(action);
+
+            console.log('  ▶ Mutated:', mutated);
+            console.log('  ▶ After (workingTree):', JSON.stringify(this.editorFacade.workingTree(), null, 2));
+            if (mutated) {
+                const origStr = JSON.stringify(this.editorFacade.originalTree());
+                const workStr = JSON.stringify(this.editorFacade.workingTree());
+                console.log('  ▶ Differs from original:', origStr !== workStr);
+            }
+            console.groupEnd();
+        }
+
+        console.groupEnd();
+
+        this.updatePreviewFromTree();
+    }
+
+    private updatePreviewFromTree(): void {
+        const tree = this.editorFacade.workingTree();
+        if (!tree) return;
+
+        const innerHtml = tree.children
+            .map((child) => (child.type === 'element' ? serializeTreeToString(child) : child.content))
+            .join('');
+
+        const wrappedSrcdoc = this.buildSrcdoc(innerHtml);
+        this.srcdoc.set(this.sanitizer.bypassSecurityTrustHtml(wrappedSrcdoc));
+
+        console.group('🖼 Preview Updated');
+        console.log('▶ Inner HTML:', innerHtml);
+        console.groupEnd();
+    }
+
+    resetTree(): void {
+        this.editorFacade.reset();
+
+        console.group('🔄 Tree Reset');
+        console.log('▶ originalTree:', JSON.stringify(this.editorFacade.originalTree(), null, 2));
+        console.log('▶ workingTree (after reset):', JSON.stringify(this.editorFacade.workingTree(), null, 2));
+        const origStr = JSON.stringify(this.editorFacade.originalTree());
+        const workStr = JSON.stringify(this.editorFacade.workingTree());
+        console.log('▶ Deep equal:', origStr === workStr);
+        console.groupEnd();
+
+        this.updatePreviewFromTree();
     }
 
     private buildSrcdoc(html: string): string {
         const parser = new DOMParser();
 
-        // Parseamos el documento del prototipo para evitar anidar un `<!doctype html><html><body>...` dentro del preview.
         const parsedDoc = parser.parseFromString(html, 'text/html');
 
-        // Shell del preview (mantiene Tailwind + el handler que evita navegación por `<a>`).
         const shell = `<!doctype html>
 <html lang="en">
   <head>
@@ -153,8 +226,6 @@ export class Prototype {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-      // Evita que el preview navegue cuando el HTML del prototipo contiene enlaces.
-      // Mantenemos el resto de la interacción (hover, toggles, etc.).
       document.addEventListener('click', (event) => {
         const target = event.target;
         if (!(target instanceof Element)) return;
@@ -180,10 +251,7 @@ export class Prototype {
         const srcHead = parsedDoc.head;
         const srcBody = parsedDoc.body;
 
-        // Fallback: si el parseo del prototipo no produce head/body razonables,
-        // lo tratamos como contenido "innerHTML" del contenedor.
         if (!destHead || !destRoot) {
-            // Shell del preview no debería fallar; si falla, devolvemos el HTML sin transformar.
             return shell;
         }
         if (!srcHead || !srcBody) {
@@ -191,20 +259,15 @@ export class Prototype {
             return `<!doctype html>\n${destDoc.documentElement.outerHTML}`;
         }
 
-        // Fusionar <head>: clonamos los hijos del head del prototipo.
-        // Nota: si el prototipo incluye `<base href>`, podría afectar a rutas relativas; es el mismo comportamiento
-        // que tendría en un documento normal, pero aquí lo preservamos porque se pidió tratar el head completo.
         for (const node of Array.from(srcHead.childNodes)) {
             destHead.appendChild(node.cloneNode(true));
         }
 
-        // Insertar solo el contenido del <body> del prototipo en el contenedor del preview.
         while (destRoot.firstChild) destRoot.removeChild(destRoot.firstChild);
         for (const node of Array.from(srcBody.childNodes)) {
             destRoot.appendChild(node.cloneNode(true));
         }
 
-        // Serializamos el documento final para `srcdoc`.
         return `<!doctype html>\n${destDoc.documentElement.outerHTML}`;
     }
 }

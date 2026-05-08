@@ -1,3 +1,5 @@
+import type { TreeAction } from '@prototypes/editor/interfaces/tree-action.interface';
+
 export type SuggestionType = 'accessibility' | 'semantic' | 'styling' | 'structure';
 
 export interface AiAnalysisIssue {
@@ -10,6 +12,7 @@ export interface AiAnalysisSuggestion {
     type: SuggestionType;
     title: string;
     description: string;
+    actions?: TreeAction[];
 }
 
 export interface AiAnalysisResponse {

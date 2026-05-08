@@ -35,9 +35,34 @@ function cloneNode(node: HtmlElementNode): HtmlElementNode {
     };
 }
 
-export function findNodeByPath(tree: HtmlElementNode, path: string): HtmlElementNode | null {
+const VOID_ELEMENTS = new Set([
+    'area', 'base', 'br', 'col', 'embed', 'hr', 'img', 'input',
+    'link', 'meta', 'param', 'source', 'track', 'wbr',
+]);
 
-    console.log('CALLED FIND NODE BY PATH');
+function serializeAttributes(attributes: Record<string, string>): string {
+    const entries = Object.entries(attributes);
+    if (entries.length === 0) return '';
+    return ' ' + entries
+        .map(([key, value]) => (value === 'true' ? key : `${key}="${value.replace(/"/g, '&quot;')}"`))
+        .join(' ');
+}
+
+export function serializeTreeToString(node: HtmlElementNode): string {
+    const attrStr = serializeAttributes(node.attributes);
+
+    if (VOID_ELEMENTS.has(node.tag)) {
+        return `<${node.tag}${attrStr} />`;
+    }
+
+    const children = node.children
+        .map((child) => (child.type === 'element' ? serializeTreeToString(child) : child.content))
+        .join('');
+
+    return `<${node.tag}${attrStr}>${children}</${node.tag}>`;
+}
+
+export function findNodeByPath(tree: HtmlElementNode, path: string): HtmlElementNode | null {
     const indices = parsePathSegments(path);
     if (!indices) return null;
     let current: HtmlElementNode = tree;
@@ -52,8 +77,6 @@ export function findNodeByPath(tree: HtmlElementNode, path: string): HtmlElement
 }
 
 export function replaceTag(tree: HtmlElementNode, action: ReplaceTagAction): ApplyActionResult {
-
-    console.log('CALLED REPLACE TAG');
     const indices = parsePathSegments(action.targetNodePath);
     if (!indices) return { tree, mutated: false };
     if (indices.length === 0) {
@@ -79,8 +102,6 @@ export function replaceTag(tree: HtmlElementNode, action: ReplaceTagAction): App
 }
 
 export function addClass(tree: HtmlElementNode, action: AddClassAction): ApplyActionResult {
-
-    console.log('CALLED ADD CLASS');
     const indices = parsePathSegments(action.targetNodePath);
     if (!indices) return { tree, mutated: false };
     const className = action.payload.className;
@@ -127,8 +148,6 @@ export function addClass(tree: HtmlElementNode, action: AddClassAction): ApplyAc
 }
 
 export function removeNode(tree: HtmlElementNode, action: RemoveNodeAction): ApplyActionResult {
-
-    console.log('CALLED REMOVE NODE');
     const indices = parsePathSegments(action.targetNodePath);
     if (!indices || indices.length === 0) return { tree, mutated: false };
 
@@ -170,6 +189,10 @@ export function removeNode(tree: HtmlElementNode, action: RemoveNodeAction): App
 export class TreeMutationService {
     findNodeByPath(tree: HtmlElementNode, path: string): HtmlElementNode | null {
         return findNodeByPath(tree, path);
+    }
+
+    serializeTree(node: HtmlElementNode): string {
+        return serializeTreeToString(node);
     }
 
     applyAction(tree: HtmlElementNode, action: TreeAction): ApplyActionResult {

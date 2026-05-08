@@ -1,5 +1,5 @@
 import type { HtmlElementNode } from '@prototypes/parser/interfaces/html-node.interface';
-import { findNodeByPath, replaceTag, addClass, removeNode } from './tree-mutation.service';
+import { findNodeByPath, replaceTag, addClass, removeNode, serializeTreeToString } from './tree-mutation.service';
 
 function makeNode(overrides: Partial<HtmlElementNode> = {}): HtmlElementNode {
   return {
@@ -287,5 +287,46 @@ describe('removeNode', () => {
       targetNodePath: '/children/0',
     });
     expect(tree.children).toHaveLength(originalLength);
+  });
+});
+
+describe('serializeTreeToString', () => {
+  it('serializes a simple element', () => {
+    expect(serializeTreeToString(makeNode({ tag: 'div' }))).toBe('<div></div>');
+  });
+
+  it('serializes void element as self-closing', () => {
+    expect(serializeTreeToString(makeNode({ tag: 'br' }))).toBe('<br />');
+    expect(serializeTreeToString(makeNode({ tag: 'img', attributes: { src: 'photo.jpg' } }))).toBe('<img src="photo.jpg" />');
+  });
+
+  it('serializes attributes', () => {
+    const result = serializeTreeToString(makeNode({ tag: 'a', attributes: { href: '/link', class: 'btn' } }));
+    expect(result).toBe('<a href="/link" class="btn"></a>');
+  });
+
+  it('serializes boolean attributes without value', () => {
+    const result = serializeTreeToString(makeNode({ tag: 'button', attributes: { disabled: 'true' } }));
+    expect(result).toBe('<button disabled></button>');
+  });
+
+  it('serializes text content', () => {
+    const tree = makeNode({ tag: 'p', children: [{ type: 'text', content: 'Hello world' }] });
+    expect(serializeTreeToString(tree)).toBe('<p>Hello world</p>');
+  });
+
+  it('serializes nested elements', () => {
+    const tree = makeNode({
+      children: [
+        makeNode({ tag: 'header', children: [makeNode({ tag: 'h1', children: [{ type: 'text', content: 'Title' }] })] }),
+        makeNode({ tag: 'footer' }),
+      ],
+    });
+    expect(serializeTreeToString(tree)).toBe('<div><header><h1>Title</h1></header><footer></footer></div>');
+  });
+
+  it('escapes double quotes in attributes', () => {
+    const tree = makeNode({ attributes: { 'data-value': 'he said "hello"' } });
+    expect(serializeTreeToString(tree)).toBe('<div data-value="he said &quot;hello&quot;"></div>');
   });
 });

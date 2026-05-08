@@ -55,7 +55,7 @@
                     type="button"
                     class="btn btn-outline btn-sm"
                     (click)="analyzeUi()"
-                    [disabled]="!parsedTree()"
+                    [disabled]="!editorFacade.workingTree()"
                     data-testid="prototype-analyze-btn"
                 >
                     Analyze UI

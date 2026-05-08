@@ -1,6 +1,7 @@
 import { inject, Injectable } from '@angular/core';
 import { Observable, throwError, timer } from 'rxjs';
 import { map } from 'rxjs/operators';
+import type { TreeAction } from '@prototypes/editor/interfaces/tree-action.interface';
 import {
     AiAnalysisIssue,
     AiAnalysisResponse,
@@ -44,6 +45,13 @@ export class AiAnalysisService {
                 title: 'Add ARIA Labels to Interactive Elements',
                 description:
                     'Add aria-label attributes to buttons, links, and form controls to improve screen reader navigation and meet WCAG 2.1 AA standards.',
+                actions: [
+                    {
+                        type: 'add-class',
+                        targetNodePath: '/children/0',
+                        payload: { className: 'aria-labeled' },
+                    },
+                ],
             },
             {
                 id: 'sug-2',
@@ -51,6 +59,18 @@ export class AiAnalysisService {
                 title: 'Use Semantic HTML Elements',
                 description:
                     'Replace generic <div> containers with semantic elements like <nav>, <main>, <section>, and <article> for better SEO and accessibility.',
+                actions: [
+                    {
+                        type: 'replace-tag',
+                        targetNodePath: '/children/0',
+                        payload: { newTag: 'nav' },
+                    },
+                    {
+                        type: 'replace-tag',
+                        targetNodePath: '/children/0/children/0',
+                        payload: { newTag: 'button' },
+                    },
+                ],
             },
             {
                 id: 'sug-3',
@@ -58,6 +78,13 @@ export class AiAnalysisService {
                 title: 'Implement Responsive Meta Tags',
                 description:
                     'Add the viewport meta tag and responsive breakpoints to ensure the UI renders correctly across all device sizes.',
+                actions: [
+                    {
+                        type: 'add-class',
+                        targetNodePath: '/',
+                        payload: { className: 'responsive' },
+                    },
+                ],
             },
         ];
 

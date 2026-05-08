@@ -43,6 +43,7 @@ export class Prototype {
     loading = signal(true);
     error = signal<string | null>(null);
     activeTab = signal<'preview' | 'code' | 'tree'>('preview');
+    previewVersion = signal(0);
 
     treeJson = computed(() => {
         const tree = this.editorFacade.workingTree();
@@ -187,6 +188,8 @@ export class Prototype {
     private updatePreviewFromTree(): void {
         const tree = this.editorFacade.workingTree();
         if (!tree) return;
+
+        this.previewVersion.update((v) => v + 1);
 
         const innerHtml = tree.children
             .map((child) => (child.type === 'element' ? serializeTreeToString(child) : child.content))

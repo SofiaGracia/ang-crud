@@ -19,7 +19,7 @@
             <span>{{ error() }}</span>
         </div>
     } @else if (srcdoc()) {
-        <div class="rounded-box border border-base-300 overflow-hidden ">
+        <div class="rounded-box border border-base-300 overflow-hidden">
             <div class="border-b border-base-300">
                 <div class="flex items-center justify-between px-2">
                     <div class="tabs tabs-boxed">
@@ -50,39 +50,48 @@
                         >
                             Tree
                         </button>
+                    </div>
+                    <button
+                        type="button"
+                        class="btn btn-outline btn-sm"
+                        (click)="analyzeUi()"
+                        [disabled]="!editorFacade.workingTree()"
+                        data-testid="prototype-analyze-btn"
+                    >
+                        Analyze UI
+                    </button>
                 </div>
-                <button
-                    type="button"
-                    class="btn btn-outline btn-sm"
-                    (click)="analyzeUi()"
-                    [disabled]="!editorFacade.workingTree()"
-                    data-testid="prototype-analyze-btn"
-                >
-                    Analyze UI
-                </button>
             </div>
-        </div>
 
-            @if (activeTab() === 'preview') {
-                <iframe
-                    [srcdoc]="srcdoc()!"
-                    class="w-full min-h-[75vh] border-0"
-                    sandbox="allow-scripts"
-                    scrolling="auto"
-                    data-testid="prototype-render-iframe"
-                ></iframe>
-            } @else if (activeTab() === 'code') {
-                <div class="p-4">
-                    <pre class="max-h-[75vh] overflow-x-auto overflow-y-auto whitespace-pre text-sm" data-testid="prototype-code-view">{{ downloadedHtml() ?? '' }}</pre>
-                </div>
-            } @else {
-                <div class="p-4">
-                    <pre class="max-h-[75vh] overflow-auto text-sm font-mono" data-testid="prototype-tree-view">{{ treeJson() }}</pre>
-                </div>
+            @for (ver of [previewVersion()]; track ver) {
+                @if (activeTab() === 'preview') {
+                    <iframe
+                        [srcdoc]="srcdoc()!"
+                        class="w-full min-h-[75vh] border-0"
+                        sandbox="allow-scripts"
+                        scrolling="auto"
+                        data-testid="prototype-render-iframe"
+                    ></iframe>
+                } @else if (activeTab() === 'code') {
+                    <div class="p-4">
+                        <pre
+                            class="max-h-[75vh] overflow-x-auto overflow-y-auto whitespace-pre text-sm"
+                            data-testid="prototype-code-view"
+                            >{{ downloadedHtml() ?? '' }}</pre
+                        >
+                    </div>
+                } @else {
+                    <div class="p-4">
+                        <pre
+                            class="max-h-[75vh] overflow-auto text-sm font-mono"
+                            data-testid="prototype-tree-view"
+                            >{{ treeJson() }}</pre
+                        >
+                    </div>
+                }
             }
         </div>
     }
 </div>
 
 <ai-drawer (applySuggestion)="handleApplySuggestion($event)" />
-

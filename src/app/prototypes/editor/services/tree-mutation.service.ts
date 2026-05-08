@@ -36,6 +36,8 @@ function cloneNode(node: HtmlElementNode): HtmlElementNode {
 }
 
 export function findNodeByPath(tree: HtmlElementNode, path: string): HtmlElementNode | null {
+
+    console.log('CALLED FIND NODE BY PATH');
     const indices = parsePathSegments(path);
     if (!indices) return null;
     let current: HtmlElementNode = tree;

@@ -7,14 +7,14 @@ import { distinctUntilChanged, filter, forkJoin, from, map, of, switchMap, tap }
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import type { PrototypeInterface } from '@prototypes/interfaces/prototype.interface';
 import { parseHtml } from '@prototypes/parser';
-import type { HtmlElementNode } from '@prototypes/parser/interfaces/html-node.interface';
+import type { HtmlElementNode, HtmlNode } from '@prototypes/parser/interfaces/html-node.interface';
 import { serializeTreeToString } from '@prototypes/editor/services/tree-mutation.service';
 import { EditorFacade } from '@prototypes/editor/facades/editor.facade';
 import { AiDrawer } from '@prototypes/ai/components/ai-drawer/ai-drawer';
 import { AiAnalysisFacade } from '@prototypes/ai/facades/ai-analysis.facade';
 import type { ApplySuggestionEvent } from '@prototypes/ai/interfaces/ai-analysis.interface';
 
-function wrapInRoot(nodes: HtmlElementNode[]): HtmlElementNode {
+function wrapInRoot(nodes: HtmlNode[]): HtmlElementNode {
     return {
         type: 'element',
         tag: 'div',
@@ -128,10 +128,12 @@ export class Prototype {
                     this.downloadedHtml.set(html);
 
                     const parsed = parseHtml(html);
-                    const elements = parsed.filter(
-                        (n): n is HtmlElementNode => n.type === 'element',
+                    const nodes = parsed.filter(
+                        (n) => n.type === 'element' || (n.type === 'text' && n.content.trim().length > 0),
                     );
-                    const root = wrapInRoot(elements);
+                    const root = nodes.length === 1 && nodes[0].type === 'element'
+                        ? nodes[0] as HtmlElementNode
+                        : wrapInRoot(nodes);
                     this.editorFacade.setOriginalTree(root);
 
                     if (!hasSavedTree) {

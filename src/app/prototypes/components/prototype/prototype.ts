@@ -3,7 +3,7 @@ import { ActivatedRoute } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { PrototypesFacade } from '@prototypes/facades/prototypes.facades';
 import { RecentPrototypesService } from '@prototypes/services/recent-prototypes.service';
-import { distinctUntilChanged, filter, map, switchMap, tap } from 'rxjs';
+import { distinctUntilChanged, filter, map, of, switchMap, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { PrototypeInterface } from '@prototypes/interfaces/prototype.interface';
 import { parseHtml } from '@prototypes/parser';
@@ -77,24 +77,36 @@ export class Prototype {
                     this.activeTab.set('preview');
                 }),
                 switchMap(({ projectId, prototypeId }) =>
-                    this.prototypesFacade.getPrototypeById(projectId, prototypeId),
+                    this.prototypesFacade.getPrototypeById(projectId, prototypeId).pipe(
+                        switchMap((prototype) => {
+                            if (!prototype) return of(null);
+                            const pid = Number(this.route.snapshot.paramMap.get('projectId'));
+                            if (pid && prototype.id) {
+                                this.recentService.addRecentPrototype(prototype.id, pid);
+                            }
+                            this.prototype.set(prototype);
+                            return this.editorFacade.loadFromDb(prototype.id).pipe(
+                                map((loadedFromDb) => ({ prototype, loadedFromDb })),
+                            );
+                        }),
+                    ),
                 ),
                 takeUntilDestroyed(),
             )
             .subscribe({
-                next: (prototype) => {
-                    this.prototype.set(prototype);
-                    if (!prototype) {
+                next: (result) => {
+                    if (!result) {
                         this.error.set('No se encontro el prototipo.');
                         this.loading.set(false);
                         return;
                     }
-                    const projectId = Number(this.route.snapshot.paramMap.get('projectId'));
-                    const prototypeId = prototype.id;
-                    if (projectId && prototypeId) {
-                        this.recentService.addRecentPrototype(prototypeId, projectId);
+                    const { prototype, loadedFromDb } = result;
+                    if (loadedFromDb) {
+                        this.updatePreviewFromTree();
+                        this.loading.set(false);
+                    } else {
+                        this.loadPreview(prototype.url ?? null);
                     }
-                    this.loadPreview(prototype.url ?? null);
                 },
                 error: (err) => {
                     console.error('Error loading prototype', err);

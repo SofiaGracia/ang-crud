@@ -32,6 +32,41 @@ export type Database = {
         }
         Relationships: []
       }
+      prototype_trees: {
+        Row: {
+          id: number
+          prototype_id: number
+          user_id: string
+          tree: Json
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: number
+          prototype_id: number
+          user_id: string
+          tree?: Json
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: number
+          prototype_id?: number
+          user_id?: string
+          tree?: Json
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "prototype_trees_prototype_id_fkey"
+            columns: ["prototype_id"]
+            isOneToOne: true
+            referencedRelation: "prototypes"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       prototypes: {
         Row: {
           description: string | null

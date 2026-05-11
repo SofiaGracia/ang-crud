@@ -82,3 +82,76 @@ LOGIN
 → CHECK RENDER
 → CHECK CODE
 
+Estic redissenyant l’arquitectura del meu projecte Angular + Supabase i necessite ajuda per definir una nova entitat relacionada amb l’editor del sistema. És per a guardar el workingTree en el que es treballa a fitxers com editor.facade.ts després de realitzar les accions del fitxer tree-mutation.service.ts
+
+Context actual:
+
+* Un `Project` té molts `Prototypes`
+* Un `Prototype` pertany a un únic `Project`
+* `Prototype` conté principalment metadata:
+
+  * nom
+  * descripció
+  * tool
+  * url
+  * etc.
+
+Ara mateix el sistema ja té:
+
+* un “workingTree” en memòria
+* suggerències IA que modifiquen aquest estat
+* accions que s’apliquen correctament sobre aquest estat
+
+Problema actual:
+
+L’estat editable viu del prototip no persisteix a la base de dades.
+
+Vull separar:
+
+* metadata persistent del prototype
+  de:
+* estat editable/reactiu de l’editor
+
+Però NO vull:
+
+* sobreenginyeria
+* event sourcing
+* snapshots
+* rollback
+* arquitectura enterprise
+
+Objectiu real:
+
+* tindre un únic estat editable per prototip
+* persistència simple
+* autosave
+* base flexible per evolucionar després
+
+Necessite que proposes:
+
+1. Quin model de dades tindria sentit per a representar aquest “workingTree”
+
+   * nova taula?
+   * relació amb prototype?
+   * ownership?
+   * constraints?
+
+2. Com modelaries l’entitat tant a:
+
+   * Supabase/Postgres
+   * Angular interfaces
+
+3. Quina informació persistiries realment
+   i quina NO persistiries
+
+4. Com evitar acoblament excessiu entre:
+
+   * Prototype
+   * estat editor
+   * UI state
+
+5. Quin seria un pla incremental realista per implementar aquest canvi sense bloquejar el desenvolupament del projecte
+
+Tinc angular CLI instal·lat però la database del projecte està en la versió cloud de supabase. Fes-me totes les preguntes necessaries per poder elaborar el plà.
+
+Vull una proposta pragmàtica, simple i orientada a publicar el projecte ràpid.

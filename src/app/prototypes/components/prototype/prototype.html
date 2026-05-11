@@ -69,15 +69,19 @@
                             Tree
                         </button>
                     </div>
-                    <button
-                        type="button"
-                        class="btn btn-outline btn-sm"
-                        (click)="analyzeUi()"
-                        [disabled]="!editorFacade.workingTree()"
-                        data-testid="prototype-analyze-btn"
-                    >
-                        Analyze UI
-                    </button>
+                    @if (viewMode() === 'current') {
+                        <button
+                            type="button"
+                            class="btn btn-outline btn-sm"
+                            (click)="analyzeUi()"
+                            [disabled]="!editorFacade.workingTree()"
+                            data-testid="prototype-analyze-btn"
+                        >
+                            Analyze UI
+                        </button>
+                    } @else {
+                        <span class="text-sm text-base-content/50">Switch to current to analyze</span>
+                    }
                 </div>
             </div>
 

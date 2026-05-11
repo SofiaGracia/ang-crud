@@ -3,16 +3,16 @@ import { ActivatedRoute } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { PrototypesFacade } from '@prototypes/facades/prototypes.facades';
 import { RecentPrototypesService } from '@prototypes/services/recent-prototypes.service';
-import { distinctUntilChanged, filter, map, of, switchMap, tap } from 'rxjs';
+import { distinctUntilChanged, filter, forkJoin, from, map, of, switchMap, tap } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
-import { PrototypeInterface } from '@prototypes/interfaces/prototype.interface';
+import type { PrototypeInterface } from '@prototypes/interfaces/prototype.interface';
 import { parseHtml } from '@prototypes/parser';
-import { HtmlElementNode } from '@prototypes/parser/interfaces/html-node.interface';
+import type { HtmlElementNode } from '@prototypes/parser/interfaces/html-node.interface';
 import { serializeTreeToString } from '@prototypes/editor/services/tree-mutation.service';
 import { EditorFacade } from '@prototypes/editor/facades/editor.facade';
 import { AiDrawer } from '@prototypes/ai/components/ai-drawer/ai-drawer';
 import { AiAnalysisFacade } from '@prototypes/ai/facades/ai-analysis.facade';
-import { ApplySuggestionEvent } from '@prototypes/ai/interfaces/ai-analysis.interface';
+import type { ApplySuggestionEvent } from '@prototypes/ai/interfaces/ai-analysis.interface';
 
 function wrapInRoot(nodes: HtmlElementNode[]): HtmlElementNode {
     return {
@@ -38,16 +38,28 @@ export class Prototype {
     editorFacade = inject(EditorFacade);
 
     prototype = signal<PrototypeInterface | null>(null);
-    srcdoc = signal<SafeHtml | null>(null);
+    originalSrcdoc = signal<SafeHtml | null>(null);
+    currentSrcdoc = signal<SafeHtml | null>(null);
     downloadedHtml = signal<string | null>(null);
     loading = signal(true);
     error = signal<string | null>(null);
+    viewMode = signal<'original' | 'current'>('current');
     activeTab = signal<'preview' | 'code' | 'tree'>('preview');
     previewVersion = signal(0);
 
     treeJson = computed(() => {
         const tree = this.editorFacade.workingTree();
         return tree ? JSON.stringify(tree, null, 2) : '';
+    });
+
+    originalTreeJson = computed(() => {
+        const tree = this.editorFacade.originalTree();
+        return tree ? JSON.stringify(tree, null, 2) : '';
+    });
+
+    currentHtml = computed(() => {
+        const tree = this.editorFacade.workingTree();
+        return tree ? serializeTreeToString(tree) : '';
     });
 
     constructor() {
@@ -71,23 +83,38 @@ export class Prototype {
                 tap(() => {
                     this.loading.set(true);
                     this.error.set(null);
-                    this.srcdoc.set(null);
+                    this.originalSrcdoc.set(null);
+                    this.currentSrcdoc.set(null);
                     this.downloadedHtml.set(null);
                     this.aiFacade.resetAnalysis();
+                    this.viewMode.set('current');
                     this.activeTab.set('preview');
                 }),
                 switchMap(({ projectId, prototypeId }) =>
                     this.prototypesFacade.getPrototypeById(projectId, prototypeId).pipe(
                         switchMap((prototype) => {
                             if (!prototype) return of(null);
+                            this.prototype.set(prototype);
                             const pid = Number(this.route.snapshot.paramMap.get('projectId'));
                             if (pid && prototype.id) {
                                 this.recentService.addRecentPrototype(prototype.id, pid);
                             }
-                            this.prototype.set(prototype);
-                            return this.editorFacade.loadFromDb(prototype.id).pipe(
-                                map((loadedFromDb) => ({ prototype, loadedFromDb })),
-                            );
+                            if (!prototype.url) {
+                                this.error.set('Este prototipo no tiene URL de preview.');
+                                this.loading.set(false);
+                                return of(null);
+                            }
+                            return forkJoin({
+                                html: from(
+                                    fetch(prototype.url).then((r) => {
+                                        if (!r.ok) {
+                                            throw new Error(`Failed to fetch preview: ${r.status}`);
+                                        }
+                                        return r.text();
+                                    }),
+                                ),
+                                hasSavedTree: this.editorFacade.loadFromDb(prototype.id),
+                            });
                         }),
                     ),
                 ),
@@ -95,18 +122,25 @@ export class Prototype {
             )
             .subscribe({
                 next: (result) => {
-                    if (!result) {
-                        this.error.set('No se encontro el prototipo.');
-                        this.loading.set(false);
-                        return;
+                    if (!result) return;
+
+                    const { html, hasSavedTree } = result;
+                    this.downloadedHtml.set(html);
+
+                    const parsed = parseHtml(html);
+                    const elements = parsed.filter(
+                        (n): n is HtmlElementNode => n.type === 'element',
+                    );
+                    const root = wrapInRoot(elements);
+                    this.editorFacade.setOriginalTree(root);
+
+                    if (!hasSavedTree) {
+                        this.editorFacade.syncWorkingToOriginal();
                     }
-                    const { prototype, loadedFromDb } = result;
-                    if (loadedFromDb) {
-                        this.updatePreviewFromTree();
-                        this.loading.set(false);
-                    } else {
-                        this.loadPreview(prototype.url ?? null);
-                    }
+
+                    this.buildOriginalPreview();
+                    this.updatePreviewFromTree();
+                    this.loading.set(false);
                 },
                 error: (err) => {
                     console.error('Error loading prototype', err);
@@ -116,48 +150,16 @@ export class Prototype {
             });
     }
 
-    private loadPreview(url: string | null) {
-        if (!url) {
-            this.error.set('Este prototipo no tiene URL de preview.');
-            this.loading.set(false);
-            return;
-        }
-
-        fetch(url)
-            .then((res) => {
-                if (!res.ok) {
-                    throw new Error(`Failed to fetch preview: ${res.status}`);
-                }
-                return res.text();
-            })
-            .then((html) => {
-                this.downloadedHtml.set(html);
-                this.initEditorTree(html);
-                const wrappedSrcdoc = this.buildSrcdoc(html);
-                this.srcdoc.set(this.sanitizer.bypassSecurityTrustHtml(wrappedSrcdoc));
-                this.loading.set(false);
-            })
-            .catch((err) => {
-                console.error('Error loading preview html', err);
-                this.error.set('No se pudo renderizar la preview HTML.');
-                this.loading.set(false);
-            });
+    private buildOriginalPreview(): void {
+        const html = this.downloadedHtml();
+        if (!html) return;
+        const wrapped = this.buildSrcdoc(html);
+        this.originalSrcdoc.set(this.sanitizer.bypassSecurityTrustHtml(wrapped));
     }
 
-    private initEditorTree(html: string): void {
-        const parsed = parseHtml(html);
-        const elementNodes = parsed.filter(
-            (n): n is HtmlElementNode => n.type === 'element',
-        );
-        const root = wrapInRoot(elementNodes);
-
-        this.editorFacade.loadTree(root);
-
-        console.group('🔄 Tree Loaded');
-        console.log('▶ originalTree:', JSON.stringify(this.editorFacade.originalTree(), null, 2));
-        console.log('▶ workingTree:', JSON.stringify(this.editorFacade.workingTree(), null, 2));
-        console.log('▶ Same reference:', JSON.stringify(this.editorFacade.originalTree(), null, 2) === JSON.stringify(this.editorFacade.workingTree(), null, 2));
-        console.groupEnd();
+    switchMode(mode: 'original' | 'current'): void {
+        this.viewMode.set(mode);
+        this.previewVersion.update((v) => v + 1);
     }
 
     analyzeUi(): void {
@@ -173,26 +175,9 @@ export class Prototype {
             return;
         }
 
-        console.group(`🔧 Applying suggestion: ${event.suggestion.id} (${event.suggestion.type})`);
-
         for (const action of actions) {
-            console.group(`  Action: ${action.type} @ ${action.targetNodePath}`);
-            console.log('  ▶ Before (workingTree):', JSON.stringify(this.editorFacade.workingTree(), null, 2));
-            console.log('  ▶ Before (originalTree):', JSON.stringify(this.editorFacade.originalTree(), null, 2));
-
-            const mutated = this.editorFacade.dispatch(action);
-
-            console.log('  ▶ Mutated:', mutated);
-            console.log('  ▶ After (workingTree):', JSON.stringify(this.editorFacade.workingTree(), null, 2));
-            if (mutated) {
-                const origStr = JSON.stringify(this.editorFacade.originalTree());
-                const workStr = JSON.stringify(this.editorFacade.workingTree());
-                console.log('  ▶ Differs from original:', origStr !== workStr);
-            }
-            console.groupEnd();
+            this.editorFacade.dispatch(action);
         }
-
-        console.groupEnd();
 
         this.updatePreviewFromTree();
     }
@@ -204,28 +189,17 @@ export class Prototype {
         this.previewVersion.update((v) => v + 1);
 
         const innerHtml = tree.children
-            .map((child) => (child.type === 'element' ? serializeTreeToString(child) : child.content))
+            .map((child) =>
+                child.type === 'element' ? serializeTreeToString(child) : child.content,
+            )
             .join('');
 
         const wrappedSrcdoc = this.buildSrcdoc(innerHtml);
-        this.srcdoc.set(this.sanitizer.bypassSecurityTrustHtml(wrappedSrcdoc));
-
-        console.group('🖼 Preview Updated');
-        console.log('▶ Inner HTML:', innerHtml);
-        console.groupEnd();
+        this.currentSrcdoc.set(this.sanitizer.bypassSecurityTrustHtml(wrappedSrcdoc));
     }
 
     resetTree(): void {
         this.editorFacade.reset();
-
-        console.group('🔄 Tree Reset');
-        console.log('▶ originalTree:', JSON.stringify(this.editorFacade.originalTree(), null, 2));
-        console.log('▶ workingTree (after reset):', JSON.stringify(this.editorFacade.workingTree(), null, 2));
-        const origStr = JSON.stringify(this.editorFacade.originalTree());
-        const workStr = JSON.stringify(this.editorFacade.workingTree());
-        console.log('▶ Deep equal:', origStr === workStr);
-        console.groupEnd();
-
         this.updatePreviewFromTree();
     }
 

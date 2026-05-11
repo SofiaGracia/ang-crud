@@ -18,10 +18,28 @@
         <div class="alert alert-warning" data-testid="prototype-error-message">
             <span>{{ error() }}</span>
         </div>
-    } @else if (srcdoc()) {
+    } @else {
         <div class="rounded-box border border-base-300 overflow-hidden">
             <div class="border-b border-base-300">
                 <div class="flex items-center justify-between px-2">
+                    <div class="join">
+                        <button
+                            type="button"
+                            class="join-item btn btn-sm"
+                            [class.btn-active]="viewMode() === 'original'"
+                            (click)="switchMode('original')"
+                        >
+                            Original
+                        </button>
+                        <button
+                            type="button"
+                            class="join-item btn btn-sm"
+                            [class.btn-active]="viewMode() === 'current'"
+                            (click)="switchMode('current')"
+                        >
+                            Current
+                        </button>
+                    </div>
                     <div class="tabs tabs-boxed">
                         <button
                             type="button"
@@ -65,28 +83,50 @@
 
             @for (ver of [previewVersion()]; track ver) {
                 @if (activeTab() === 'preview') {
-                    <iframe
-                        [srcdoc]="srcdoc()!"
-                        class="w-full min-h-[75vh] border-0"
-                        sandbox="allow-scripts"
-                        scrolling="auto"
-                        data-testid="prototype-render-iframe"
-                    ></iframe>
+                    @if (viewMode() === 'original' && originalSrcdoc()) {
+                        <iframe
+                            [srcdoc]="originalSrcdoc()!"
+                            class="w-full min-h-[75vh] border-0"
+                            sandbox="allow-scripts"
+                            scrolling="auto"
+                            data-testid="prototype-render-iframe"
+                        ></iframe>
+                    } @else if (viewMode() === 'current' && currentSrcdoc()) {
+                        <iframe
+                            [srcdoc]="currentSrcdoc()!"
+                            class="w-full min-h-[75vh] border-0"
+                            sandbox="allow-scripts"
+                            scrolling="auto"
+                            data-testid="prototype-render-iframe"
+                        ></iframe>
+                    }
                 } @else if (activeTab() === 'code') {
                     <div class="p-4">
-                        <pre
-                            class="max-h-[75vh] overflow-x-auto overflow-y-auto whitespace-pre text-sm"
-                            data-testid="prototype-code-view"
-                            >{{ downloadedHtml() ?? '' }}</pre
-                        >
+                        @if (viewMode() === 'original') {
+                            <pre
+                                class="max-h-[75vh] overflow-x-auto overflow-y-auto whitespace-pre text-sm"
+                                data-testid="prototype-code-view"
+                            >{{ downloadedHtml() ?? '' }}</pre>
+                        } @else {
+                            <pre
+                                class="max-h-[75vh] overflow-x-auto overflow-y-auto whitespace-pre text-sm"
+                                data-testid="prototype-code-view"
+                            >{{ currentHtml() }}</pre>
+                        }
                     </div>
                 } @else {
                     <div class="p-4">
-                        <pre
-                            class="max-h-[75vh] overflow-auto text-sm font-mono"
-                            data-testid="prototype-tree-view"
-                            >{{ treeJson() }}</pre
-                        >
+                        @if (viewMode() === 'original') {
+                            <pre
+                                class="max-h-[75vh] overflow-auto text-sm font-mono"
+                                data-testid="prototype-tree-view"
+                            >{{ originalTreeJson() }}</pre>
+                        } @else {
+                            <pre
+                                class="max-h-[75vh] overflow-auto text-sm font-mono"
+                                data-testid="prototype-tree-view"
+                            >{{ treeJson() }}</pre>
+                        }
                     </div>
                 }
             }

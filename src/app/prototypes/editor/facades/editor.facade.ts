@@ -61,17 +61,30 @@ export class EditorFacade {
         this.lastSavedHash = treeHash(tree);
     }
 
+    setOriginalTree(tree: HtmlElementNode): void {
+        this.originalTree.set(structuredClone(tree));
+    }
+
     loadFromDb(prototypeId: number): Observable<boolean> {
         this.prototypeId = prototypeId;
         return this.supabaseService.getTree(prototypeId).pipe(
             map((saved) => {
                 if (saved) {
-                    this.loadTree(saved.tree as HtmlElementNode);
+                    this.workingTree.set(structuredClone(saved.tree as HtmlElementNode));
+                    this.lastSavedHash = treeHash(saved.tree as HtmlElementNode);
                     return true;
                 }
                 return false;
             }),
         );
+    }
+
+    syncWorkingToOriginal(): void {
+        const orig = this.originalTree();
+        if (orig) {
+            this.workingTree.set(structuredClone(orig));
+            this.lastSavedHash = treeHash(orig);
+        }
     }
 
     dispatch(action: TreeAction): boolean {
@@ -90,7 +103,8 @@ export class EditorFacade {
         const original = this.originalTree();
         if (original) {
             this.workingTree.set(structuredClone(original));
-            this.triggerAutoSave(original);
+            this.lastSavedHash = treeHash(original);
+            this.deleteSavedTree().subscribe();
         }
     }
 

@@ -1,5 +1,12 @@
 import type { HtmlElementNode } from '@prototypes/parser/interfaces/html-node.interface';
-import { findNodeByPath, replaceTag, addClass, removeNode, serializeTreeToString } from './tree-mutation.service';
+import {
+    findNodeByPath,
+    replaceTag,
+    addClass,
+    removeNode,
+    serializeTreeToString,
+    serializeTreeForAI,
+} from './tree-mutation.service';
 
 function makeNode(overrides: Partial<HtmlElementNode> = {}): HtmlElementNode {
   return {
@@ -328,5 +335,81 @@ describe('serializeTreeToString', () => {
   it('escapes double quotes in attributes', () => {
     const tree = makeNode({ attributes: { 'data-value': 'he said "hello"' } });
     expect(serializeTreeToString(tree)).toBe('<div data-value="he said &quot;hello&quot;"></div>');
+  });
+});
+
+describe('serializeTreeForAI', () => {
+  it('assigns ai-0 to root and returns empty idToPath for single node', () => {
+    const tree = makeNode({ tag: 'div' });
+    const result = serializeTreeForAI(tree);
+    expect(result.annotatedTree).toBe('ai-0 <div>');
+    expect(result.idToPath).toEqual({ 'ai-0': '/' });
+  });
+
+  it('includes attributes in the tag display', () => {
+    const tree = makeNode({ tag: 'div', attributes: { class: 'container', id: 'main' } });
+    const result = serializeTreeForAI(tree);
+    expect(result.annotatedTree).toBe('ai-0 <div class="container" id="main">');
+  });
+
+  it('renders text content inline when element has only text children', () => {
+    const tree = makeNode({
+      tag: 'p',
+      children: [{ type: 'text', content: 'Hello world' }],
+    });
+    const result = serializeTreeForAI(tree);
+    expect(result.annotatedTree).toBe('ai-0 <p>Hello world');
+  });
+
+  it('renders nested elements with proper indentation and sequential IDs', () => {
+    const tree = makeNode({
+      tag: 'div',
+      children: [makeNode({ tag: 'header', children: [makeNode({ tag: 'h1' })] }), makeNode({ tag: 'footer' })],
+    });
+    const result = serializeTreeForAI(tree);
+    expect(result.annotatedTree).toBe('ai-0 <div>\n  ai-1 <header>\n    ai-2 <h1>\n  ai-3 <footer>');
+  });
+
+  it('builds correct idToPath map for nested elements', () => {
+    const tree = makeNode({
+      tag: 'div',
+      children: [
+        makeNode({ tag: 'header', children: [makeNode({ tag: 'h1' })] }),
+        makeNode({ tag: 'footer' }),
+      ],
+    });
+    const result = serializeTreeForAI(tree);
+    expect(result.idToPath).toEqual({
+      'ai-0': '/',
+      'ai-1': '/children/0',
+      'ai-2': '/children/0/children/0',
+      'ai-3': '/children/1',
+    });
+  });
+
+  it('renders text nodes on separate lines when mixed with elements', () => {
+    const tree = makeNode({
+      tag: 'p',
+      children: [
+        { type: 'text', content: 'Hello ' },
+        makeNode({ tag: 'strong', children: [{ type: 'text', content: 'world' }] }),
+        { type: 'text', content: '!' },
+      ],
+    });
+    const result = serializeTreeForAI(tree);
+    expect(result.annotatedTree).toBe('ai-0 <p>\n  Hello \n  ai-1 <strong>world\n  !');
+  });
+
+  it('handles boolean attributes correctly', () => {
+    const tree = makeNode({ tag: 'button', attributes: { disabled: 'true' } });
+    const result = serializeTreeForAI(tree);
+    expect(result.annotatedTree).toBe('ai-0 <button disabled>');
+  });
+
+  it('preserves original tree (no mutation)', () => {
+    const tree = makeNode({ tag: 'div', children: [makeNode({ tag: 'span' })] });
+    serializeTreeForAI(tree);
+    expect(tree.tag).toBe('div');
+    expect((tree.children[0] as HtmlElementNode).tag).toBe('span');
   });
 });

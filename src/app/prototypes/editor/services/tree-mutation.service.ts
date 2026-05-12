@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import type { HtmlElementNode, HtmlNode } from '@prototypes/parser/interfaces/html-node.interface';
+import type { HtmlElementNode, HtmlNode, HtmlTextNode } from '@prototypes/parser/interfaces/html-node.interface';
 import type {
     TreeAction,
     ReplaceTagAction,
@@ -183,6 +183,54 @@ export function removeNode(tree: HtmlElementNode, action: RemoveNodeAction): App
     }
 
     return { tree: newTree, mutated: true };
+}
+
+export interface SerializedTreeForAI {
+    annotatedTree: string;
+    idToPath: Record<string, string>;
+}
+
+export function serializeTreeForAI(tree: HtmlElementNode): SerializedTreeForAI {
+    let counter = 0;
+    const idToPath: Record<string, string> = {};
+
+    function walk(node: HtmlElementNode, path: string, depth: number): string[] {
+        const id = `ai-${counter++}`;
+        idToPath[id] = path;
+
+        const indent = '  '.repeat(depth);
+        const attrs = node.attributes;
+        const attrStr =
+            Object.keys(attrs).length > 0
+                ? ' ' +
+                  Object.entries(attrs)
+                      .map(([k, v]) => (v === 'true' ? k : `${k}="${v}"`))
+                      .join(' ')
+                : '';
+
+        const textChildren = node.children.filter((c): c is HtmlTextNode => c.type === 'text');
+        const hasOnlyText = textChildren.length === node.children.length && node.children.length > 0;
+        const textContent = hasOnlyText ? textChildren.map((c) => c.content).join('') : '';
+
+        const lines: string[] = [
+            `${indent}${id} <${node.tag}${attrStr}>${textContent || ''}`,
+        ];
+
+        for (let i = 0; i < node.children.length; i++) {
+            const child = node.children[i];
+            if (child.type === 'element') {
+                lines.push(...walk(child, `${path === '/' ? '' : path}/children/${i}`, depth + 1));
+            } else if (!hasOnlyText) {
+                const textIndent = '  '.repeat(depth + 1);
+                lines.push(`${textIndent}${child.content}`);
+            }
+        }
+
+        return lines;
+    }
+
+    const lines = walk(tree, '/', 0);
+    return { annotatedTree: lines.join('\n'), idToPath };
 }
 
 @Injectable({ providedIn: 'root' })

@@ -1,98 +1,36 @@
 import { inject, Injectable } from '@angular/core';
-import { Observable, throwError, timer } from 'rxjs';
-import { map } from 'rxjs/operators';
-import type { TreeAction } from '@prototypes/editor/interfaces/tree-action.interface';
-import {
-    AiAnalysisIssue,
-    AiAnalysisResponse,
-    AiAnalysisSuggestion,
-} from '../interfaces/ai-analysis.interface';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError, timeout } from 'rxjs/operators';
+import type { HtmlElementNode } from '@prototypes/parser/interfaces/html-node.interface';
+import { serializeTreeForAI } from '@prototypes/editor/services/tree-mutation.service';
+import { AiAnalysisResponse } from '../interfaces/ai-analysis.interface';
+import { environment } from '../../../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class AiAnalysisService {
-    analyze(tree: unknown): Observable<AiAnalysisResponse> {
-        if (!tree) {
-            return throwError(() => new Error('No UI structure to analyze'));
-        }
+    private http = inject(HttpClient);
 
-        const delay = 800 + Math.random() * 400;
+    analyze(tree: HtmlElementNode): Observable<AiAnalysisResponse> {
+        const { annotatedTree, idToPath } = serializeTreeForAI(tree);
 
-        return timer(delay).pipe(map(() => this.buildMockResponse()));
-    }
-
-    private buildMockResponse(): AiAnalysisResponse {
-        const issues: AiAnalysisIssue[] = [
-            {
-                severity: 'high',
-                message:
-                    'Missing ARIA labels on interactive elements such as buttons and links.',
-            },
-            {
-                severity: 'medium',
-                message: 'Insufficient color contrast detected in text-overlay areas.',
-            },
-            {
-                severity: 'low',
-                message:
-                    'No responsive viewport configuration found for mobile devices.',
-            },
-        ];
-
-        const suggestions: AiAnalysisSuggestion[] = [
-            {
-                id: 'sug-1',
-                type: 'accessibility',
-                title: 'Add ARIA Labels to Interactive Elements',
-                description:
-                    'Add aria-label attributes to buttons, links, and form controls to improve screen reader navigation and meet WCAG 2.1 AA standards.',
-                actions: [
-                    {
-                        type: 'add-class',
-                        targetNodePath: '/children/0',
-                        payload: { className: 'aria-labeled' },
-                    },
-                ],
-            },
-            {
-                id: 'sug-2',
-                type: 'semantic',
-                title: 'Use Semantic HTML Elements',
-                description:
-                    'Replace generic <div> containers with semantic elements like <nav>, <main>, <section>, and <article> for better SEO and accessibility.',
-                actions: [
-                    {
-                        type: 'replace-tag',
-                        targetNodePath: '/children/0',
-                        payload: { newTag: 'nav' },
-                    },
-                    {
-                        type: 'replace-tag',
-                        targetNodePath: '/children/0/children/0',
-                        payload: { newTag: 'button' },
-                    },
-                ],
-            },
-            {
-                id: 'sug-3',
-                type: 'structure',
-                title: 'Implement Responsive Meta Tags',
-                description:
-                    'Add the viewport meta tag and responsive breakpoints to ensure the UI renders correctly across all device sizes.',
-                actions: [
-                    {
-                        type: 'add-class',
-                        targetNodePath: '/',
-                        payload: { className: 'responsive' },
-                    },
-                ],
-            },
-        ];
-
-        return {
-            summary:
-                'The analysis reviewed the UI component tree across 47 nodes. 3 potential issues were identified, primarily related to accessibility, color contrast, and responsive design. The overall structure follows a clean component-based architecture, with opportunities for semantic HTML improvements.',
-            issues,
-            suggestions,
-        };
+        return this.http
+            .post<AiAnalysisResponse>(`${environment.supabaseEdgeFnUrl}/analyze-ui`, {
+                annotatedTree,
+                idToPath,
+            })
+            .pipe(
+                timeout(30_000),
+                catchError((err: HttpErrorResponse) => {
+                    console.error('AI Analysis HTTP error:', err);
+                    const message =
+                        err.status === 429
+                            ? 'Please wait a moment before requesting another analysis.'
+                            : err.status === 0
+                              ? 'Could not reach the analysis service. Check your connection.'
+                              : err.error?.error || 'Analysis failed. Please try again.';
+                    return throwError(() => new Error(message));
+                }),
+            );
     }
 }

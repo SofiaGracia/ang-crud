@@ -5,4 +5,5 @@ export const environment = {
 
     supabaseKey: 'sb_publishable_bDVHTRbwjOXhWGKQDtcQ-A_PaYmDdzw',
 
+    supabaseEdgeFnUrl: 'https://xjcdphpsoohbuftyozag.supabase.co/functions/v1',
 };

@@ -3,5 +3,7 @@ export const environment = {
 
     supabaseUrl: 'https://xjcdphpsoohbuftyozag.supabase.co',
 
-    supabaseKey: 'sb_publishable_bDVHTRbwjOXhWGKQDtcQ-A_PaYmDdzw'
+    supabaseKey: 'sb_publishable_bDVHTRbwjOXhWGKQDtcQ-A_PaYmDdzw',
+
+    supabaseEdgeFnUrl: 'https://xjcdphpsoohbuftyozag.supabase.co/functions/v1',
 };

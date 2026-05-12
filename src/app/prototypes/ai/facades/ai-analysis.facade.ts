@@ -1,4 +1,5 @@
 import { computed, inject, Injectable, signal } from '@angular/core';
+import type { HtmlElementNode } from '@prototypes/parser/interfaces/html-node.interface';
 import { AiAnalysisResponse } from '../interfaces/ai-analysis.interface';
 import { AiAnalysisService } from '../services/ai-analysis.service';
 
@@ -8,7 +9,7 @@ interface AiAnalysisState {
     analysis: AiAnalysisResponse | null;
     error: string | null;
     appliedSuggestionIds: Set<string>;
-    lastTree: unknown | null;
+    lastTree: HtmlElementNode | null;
 }
 
 const initialState: AiAnalysisState = {
@@ -31,7 +32,7 @@ export class AiAnalysisFacade {
     readonly error = computed(() => this.state().error);
     readonly appliedSuggestionIds = computed(() => this.state().appliedSuggestionIds);
 
-    openDrawer(tree: unknown): void {
+    openDrawer(tree: HtmlElementNode): void {
         const current = this.state();
 
         this.state.update((s) => ({ ...s, lastTree: tree }));

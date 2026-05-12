@@ -18,57 +18,124 @@
         <div class="alert alert-warning" data-testid="prototype-error-message">
             <span>{{ error() }}</span>
         </div>
-    } @else if (srcdoc()) {
-        <div class="rounded-box border border-base-300 overflow-hidden ">
+    } @else {
+        <div class="rounded-box border border-base-300 overflow-hidden">
             <div class="border-b border-base-300">
-                <div class="tabs tabs-boxed">
-                    <button
-                        type="button"
-                        class="tab"
-                        [class.tab-active]="activeTab() === 'preview'"
-                        (click)="activeTab.set('preview')"
-                        data-testid="prototype-tab-preview"
-                    >
-                        Preview
-                    </button>
-                    <button
-                        type="button"
-                        class="tab"
-                        [class.tab-active]="activeTab() === 'code'"
-                        (click)="activeTab.set('code')"
-                        data-testid="prototype-tab-code"
-                    >
-                        Código
-                    </button>
-                    <button
-                        type="button"
-                        class="tab"
-                        [class.tab-active]="activeTab() === 'tree'"
-                        (click)="activeTab.set('tree')"
-                        data-testid="prototype-tab-tree"
-                    >
-                        Tree
-                    </button>
+                <div class="flex items-center justify-between px-2">
+                    <div class="join">
+                        <button
+                            type="button"
+                            class="join-item btn btn-sm"
+                            [class.btn-active]="viewMode() === 'original'"
+                            (click)="switchMode('original')"
+                        >
+                            Original
+                        </button>
+                        <button
+                            type="button"
+                            class="join-item btn btn-sm"
+                            [class.btn-active]="viewMode() === 'current'"
+                            (click)="switchMode('current')"
+                        >
+                            Current
+                        </button>
+                    </div>
+                    <div class="tabs tabs-boxed">
+                        <button
+                            type="button"
+                            class="tab"
+                            [class.tab-active]="activeTab() === 'preview'"
+                            (click)="activeTab.set('preview')"
+                            data-testid="prototype-tab-preview"
+                        >
+                            Preview
+                        </button>
+                        <button
+                            type="button"
+                            class="tab"
+                            [class.tab-active]="activeTab() === 'code'"
+                            (click)="activeTab.set('code')"
+                            data-testid="prototype-tab-code"
+                        >
+                            Código
+                        </button>
+                        <button
+                            type="button"
+                            class="tab"
+                            [class.tab-active]="activeTab() === 'tree'"
+                            (click)="activeTab.set('tree')"
+                            data-testid="prototype-tab-tree"
+                        >
+                            Tree
+                        </button>
+                    </div>
+                    @if (viewMode() === 'current') {
+                        <button
+                            type="button"
+                            class="btn btn-outline btn-sm"
+                            (click)="analyzeUi()"
+                            [disabled]="!editorFacade.workingTree()"
+                            data-testid="prototype-analyze-btn"
+                        >
+                            Analyze UI
+                        </button>
+                    } @else {
+                        <span class="text-sm text-base-content/50">Switch to current to analyze</span>
+                    }
                 </div>
             </div>
 
-            @if (activeTab() === 'preview') {
-                <iframe
-                    [srcdoc]="srcdoc()!"
-                    class="w-full min-h-[75vh] border-0"
-                    sandbox="allow-scripts"
-                    scrolling="auto"
-                    data-testid="prototype-render-iframe"
-                ></iframe>
-            } @else if (activeTab() === 'code') {
-                <div class="p-4">
-                    <pre class="max-h-[75vh] overflow-x-auto overflow-y-auto whitespace-pre text-sm" data-testid="prototype-code-view">{{ downloadedHtml() ?? '' }}</pre>
-                </div>
-            } @else {
-                <div class="p-4">
-                    <pre class="max-h-[75vh] overflow-auto text-sm font-mono" data-testid="prototype-tree-view">{{ treeJson() }}</pre>
-                </div>
+            @for (ver of [previewVersion()]; track ver) {
+                @if (activeTab() === 'preview') {
+                    @if (viewMode() === 'original' && originalSrcdoc()) {
+                        <iframe
+                            [srcdoc]="originalSrcdoc()!"
+                            class="w-full min-h-[75vh] border-0"
+                            sandbox="allow-scripts"
+                            scrolling="auto"
+                            data-testid="prototype-render-iframe"
+                        ></iframe>
+                    } @else if (viewMode() === 'current' && currentSrcdoc()) {
+                        <iframe
+                            [srcdoc]="currentSrcdoc()!"
+                            class="w-full min-h-[75vh] border-0"
+                            sandbox="allow-scripts"
+                            scrolling="auto"
+                            data-testid="prototype-render-iframe"
+                        ></iframe>
+                    }
+                } @else if (activeTab() === 'code') {
+                    <div class="p-4">
+                        @if (viewMode() === 'original') {
+                            <pre
+                                class="max-h-[75vh] overflow-x-auto overflow-y-auto whitespace-pre text-sm"
+                                data-testid="prototype-code-view"
+                            >{{ downloadedHtml() ?? '' }}</pre>
+                        } @else {
+                            <pre
+                                class="max-h-[75vh] overflow-x-auto overflow-y-auto whitespace-pre text-sm"
+                                data-testid="prototype-code-view"
+                            >{{ currentHtml() }}</pre>
+                        }
+                    </div>
+                } @else {
+                    <div class="p-4">
+                        @if (viewMode() === 'original') {
+                            <pre
+                                class="max-h-[75vh] overflow-auto text-sm font-mono"
+                                data-testid="prototype-tree-view"
+                            >{{ originalTreeJson() }}</pre>
+                        } @else {
+                            <pre
+                                class="max-h-[75vh] overflow-auto text-sm font-mono"
+                                data-testid="prototype-tree-view"
+                            >{{ treeJson() }}</pre>
+                        }
+                    </div>
+                }
             }
         </div>
     }
 </div>
+
+<ai-drawer (applySuggestion)="handleApplySuggestion($event)" />

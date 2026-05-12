@@ -90,7 +90,7 @@ export class DialogProject extends DialogBase<ProjectInterface> {
     }
 
     closeModal() {
-        this.shell().closeDialog();
         this.createForm.reset();
+        this.shell().closeDialog();
     }
 }

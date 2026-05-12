@@ -22,14 +22,16 @@ jobs:
           export const environment = {
             production: true,
             supabaseUrl: '${{ secrets.SUPABASE_URL }}',
-            supabaseKey: '${{ secrets.SUPABASE_KEY }}'
+            supabaseKey: '${{ secrets.SUPABASE_KEY }}',
+            supabaseEdgeFnUrl: '${{ secrets.SUPABASE_URL }}/functions/v1'
           };
           EOF
           cat > src/environments/environment.development.ts << 'EOF'
           export const environment = {
             production: false,
             supabaseUrl: '${{ secrets.SUPABASE_URL }}',
-            supabaseKey: '${{ secrets.SUPABASE_KEY }}'
+            supabaseKey: '${{ secrets.SUPABASE_KEY }}',
+            supabaseEdgeFnUrl: '${{ secrets.SUPABASE_URL }}/functions/v1'
           };
           EOF
 

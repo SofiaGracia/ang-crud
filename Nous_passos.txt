@@ -1,0 +1,133 @@
+El flux és: 
+1. IA llig el tree.
+2. IA genera sugestions segons les accions que tenim creades.
+3. L'usuari tria l'action.
+4. El frontend executa l'action.
+
+Per a açò necessitem versionat.
+
+HTML
+↓
+parsedTree (original)
+↓
+clone
+↓
+workingTree
+↓
+apply mutations
+↓
+preview
+
+
+Vale, tenim molts fronts oberts: Necessitem connexió a un LLM, necessitem definir les actions (replace, remove i addClass em pareixen correctes), necessitem modificar la UX per a incloure estes actions, necessitem versionat (un workingTree) amb snapshot i apply mutation entre d'altres. Necessitem fer un plà estructurat.
+
+
+FASES:
+
+🟦 FASE 1 — Mutation Engine (PRIORITAT MÀXIMA)
+OBJECTIU
+
+Fer que el sistema puga modificar el tree de manera fiable.
+
+👉 Sense això, la IA no serveix per a res.
+
+Tasks
+1. Definir TreeAction
+replace-tag
+add-class
+remove-node
+2. Crear paths robustos
+
+Format:
+
+/children/0/children/1
+3. Crear findNodeByPath()
+4. Crear mutations
+replaceTag()
+addClass()
+removeNode()
+5. Crear applyAction()
+switch(action.type)
+6. Crear workingTree
+
+NO modificar original.
+
+7. Refrescar preview
+
+Quan s’aplica mutation.
+
+🚫 NO IA encara
+
+IMPORTANT.
+
+RESULTAT FASE 1
+
+✔ tree modificable
+✔ sistema deterministic
+✔ preview reactiva
+✔ arquitectura robusta
+
+🟨 FASE 2 — Suggestion System
+OBJECTIU
+
+Connectar suggestions → actions reals.
+
+Tasks
+1. Expandir AiSuggestion
+{
+  title,
+  description,
+  action
+}
+2. Mock suggestions amb actions reals
+
+Exemple:
+
+action: {
+  type: 'replace-tag',
+  targetNodePath: '/children/0',
+  payload: {
+    newTag: 'section'
+  }
+}
+3. Apply button executa mutation
+4. Afegir snapshots/versioning
+versions[]
+RESULTAT FASE 2
+
+✔ suggestions executables
+✔ UI realment interactiva
+✔ historial bàsic
+
+🟥 FASE 3 — LLM Integration
+OBJECTIU
+
+Substituir mock AI per IA real.
+
+IMPORTANT
+
+Ara sí:
+
+OpenAI
+Ollama
+LM Studio
+etc.
+Tasks
+1. Definir prompt estricte
+
+LLM només pot retornar:
+
+TreeAction[]
+2. Crear adapter layer
+OpenAiAdapter
+OllamaAdapter
+3. Parse + validate JSON
+
+MOLT important.
+
+4. Fallback si IA retorna basura
+RESULTAT FASE 3
+
+✔ IA real
+✔ provider agnostic
+✔ actions segures

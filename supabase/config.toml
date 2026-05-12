@@ -1,0 +1,7 @@
+[api]
+enabled = true
+port = 54321
+
+[analytics]
+enabled = true
+port = 54323

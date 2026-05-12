@@ -1,0 +1,117 @@
+@if (isOpen()) {
+    <div
+        class="fixed inset-0 bg-black/50 z-40"
+        (click)="close()"
+    ></div>
+}
+
+<div
+    class="fixed top-0 right-0 h-full w-[420px] max-w-[90vw] bg-base-100 shadow-2xl z-50 flex flex-col transform transition-transform duration-300 ease-out overflow-y-auto"
+    [class.translate-x-0]="isOpen()"
+    [class.translate-x-full]="!isOpen()"
+    [attr.aria-hidden]="!isOpen()"
+>
+    @if (isOpen()) {
+        <div class="sticky top-0 z-10 flex items-center justify-between p-4 border-b border-base-300 bg-base-100">
+            <h2 class="text-lg font-semibold">AI Analysis</h2>
+            <button
+                type="button"
+                class="btn btn-ghost btn-sm btn-square"
+                (click)="close()"
+            >
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+            </button>
+        </div>
+
+        <div class="flex-1 p-4">
+            @if (isLoading()) {
+                <div class="flex flex-col items-center justify-center py-16 gap-4">
+                    <span class="loading loading-spinner loading-lg text-primary"></span>
+                    <p class="text-base-content/70 text-sm">Analyzing UI structure...</p>
+                </div>
+            } @else if (error(); as errMsg) {
+                <div class="flex flex-col items-center gap-4 py-8">
+                    <div class="alert alert-error">
+                        <span>{{ errMsg }}</span>
+                    </div>
+                    <button
+                        type="button"
+                        class="btn btn-outline btn-sm"
+                        (click)="onRetry()"
+                    >
+                        Retry Analysis
+                    </button>
+                </div>
+            } @else if (analysis(); as result) {
+                <section class="mb-6">
+                    <h3 class="text-xs font-semibold uppercase tracking-wider text-base-content/50 mb-3">
+                        Summary
+                    </h3>
+                    <p class="text-sm leading-relaxed text-base-content/80">{{ result.summary }}</p>
+                </section>
+
+                <section class="mb-6">
+                    <h3 class="text-xs font-semibold uppercase tracking-wider text-base-content/50 mb-3">
+                        Issues ({{ result.issues.length }})
+                    </h3>
+                    <div class="flex flex-col gap-2">
+                        @for (issue of result.issues; track $index) {
+                            <div class="flex items-start gap-3 p-3 rounded-lg bg-base-200">
+                                <span
+                                    class="badge badge-sm shrink-0 mt-0.5 {{ severityBadge(issue.severity) }}"
+                                >
+                                    {{ issue.severity }}
+                                </span>
+                                <span class="text-sm">{{ issue.message }}</span>
+                            </div>
+                        }
+                    </div>
+                </section>
+
+                <section class="mb-6">
+                    <h3 class="text-xs font-semibold uppercase tracking-wider text-base-content/50 mb-3">
+                        Suggestions ({{ result.suggestions.length }})
+                    </h3>
+                    <div class="flex flex-col gap-3">
+                        @for (suggestion of result.suggestions; track suggestion.id) {
+                            <div
+                                class="p-3 rounded-lg border"
+                                [class.border-success]="appliedSuggestionIds().has(suggestion.id)"
+                                [class.border-base-300]="!appliedSuggestionIds().has(suggestion.id)"
+                            >
+                                <div class="flex items-start justify-between gap-2">
+                                    <h4 class="text-sm font-medium">{{ suggestion.title }}</h4>
+                                    @if (appliedSuggestionIds().has(suggestion.id)) {
+                                        <span class="badge badge-success badge-sm gap-1 shrink-0">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" viewBox="0 0 20 20" fill="currentColor">
+                                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                                            </svg>
+                                            Applied
+                                        </span>
+                                    }
+                                </div>
+                                <p class="text-xs text-base-content/60 mt-1 leading-relaxed">
+                                    {{ suggestion.description }}
+                                </p>
+                                <div class="mt-3 flex items-center gap-2">
+                                    <span class="badge badge-ghost badge-xs capitalize">{{ suggestion.type }}</span>
+                                    @if (!appliedSuggestionIds().has(suggestion.id)) {
+                                        <button
+                                            type="button"
+                                            class="btn btn-ghost btn-xs text-primary"
+                                            (click)="onApply(suggestion)"
+                                        >
+                                            Apply
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </section>
+            }
+        </div>
+    }
+</div>

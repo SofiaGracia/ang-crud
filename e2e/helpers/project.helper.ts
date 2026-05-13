@@ -22,3 +22,28 @@ export async function createProject(page: Page, projectName: string) {
 
     return { card, name: projectName };
 }
+
+export async function moveProjectToTrash(page: Page, projectName: string) {
+    const card = page
+        .locator('[data-testid="project-card"]')
+        .filter({ hasText: projectName });
+
+    await expect(card).toBeVisible({ timeout: 10000 });
+
+    await card.locator('[data-testid="project-menu"]').click();
+    await card.locator('[data-testid="project-move-to-trash"]').click();
+
+    await expect(card).not.toBeVisible({ timeout: 10000 });
+}
+
+export async function restoreProjectFromTrash(page: Page, projectName: string) {
+    const trashedItem = page
+        .locator('[data-testid="trash-project-item"]')
+        .filter({ hasText: projectName });
+
+    await expect(trashedItem).toBeVisible({ timeout: 10000 });
+
+    await trashedItem.locator('[data-testid="trash-restore-button"]').click();
+
+    await expect(trashedItem).not.toBeVisible({ timeout: 10000 });
+}

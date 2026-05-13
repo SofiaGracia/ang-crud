@@ -1,4 +1,4 @@
-import { Component, inject, input, signal } from '@angular/core';
+import { Component, inject, input, signal, OnInit, OnDestroy } from '@angular/core';
 import { PrototypeInterface } from '@prototypes/interfaces/prototype.interface';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
 import { faEllipsis } from '@fortawesome/free-solid-svg-icons';
@@ -11,11 +11,12 @@ import { Router } from '@angular/router';
     imports: [FaIconComponent],
     templateUrl: './prototype-card.html',
 })
-export class PrototypeCard {
+export class PrototypeCard implements OnInit, OnDestroy {
     proto = input.required<PrototypeInterface>();
     private prototypesFacade = inject(PrototypesFacade);
     private sanitizer = inject(DomSanitizer);
     private router = inject(Router);
+    private abortController = new AbortController();
 
     htmlContent = signal<SafeHtml | null>(null);
 
@@ -24,13 +25,24 @@ export class PrototypeCard {
     ngOnInit() {
         const url = this.proto().url;
         if (url) {
-            fetch(url)
-                .then((res) => res.text())
+            fetch(url, { signal: this.abortController.signal })
+                .then((res) => {
+                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                    return res.text();
+                })
                 .then((html) => {
                     const wrappedSrcdoc = this.buildSrcdoc(html);
                     this.htmlContent.set(this.sanitizer.bypassSecurityTrustHtml(wrappedSrcdoc));
+                })
+                .catch((err) => {
+                    if (err.name === 'AbortError') return;
+                    console.error('Failed to fetch prototype preview', err);
                 });
         }
+    }
+
+    ngOnDestroy() {
+        this.abortController.abort();
     }
 
     deleteProto(event: MouseEvent, id: number, projectId: number) {

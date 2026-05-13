@@ -1,4 +1,5 @@
-import { inject, Injectable } from '@angular/core';
+import { DestroyRef, inject, Injectable } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { Project, ProjectInterface } from '@projects/interfaces/project.interface';
 import { ProjectSupabaseService } from '@projects/services/projectsSupabase.service';
 import { PaginatedResponse } from '@shared/interfaces/paginated-response.interface';
@@ -9,6 +10,7 @@ import { BehaviorSubject, switchMap, of, Observable, combineLatest, map, tap } f
 export class ProjectsFacade {
     private projectSupabaseService = inject(ProjectSupabaseService);
     private authFacade = inject(AuthFacade);
+    private destroyRef = inject(DestroyRef);
     private limit = 8;
 
     private refresh$ = new BehaviorSubject<void>(undefined);
@@ -22,11 +24,13 @@ export class ProjectsFacade {
     }
 
     constructor() {
-        this.authFacade.currentUser$.subscribe((user) => {
-            if (!user) {
-                this.clearCache();
-            }
-        });
+        this.authFacade.currentUser$
+            .pipe(takeUntilDestroyed(this.destroyRef))
+            .subscribe((user) => {
+                if (!user) {
+                    this.clearCache();
+                }
+            });
     }
 
     projects$ = combineLatest([this.refresh$, this.authFacade.currentUser$]).pipe(

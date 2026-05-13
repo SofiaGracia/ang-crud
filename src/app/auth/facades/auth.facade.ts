@@ -10,6 +10,7 @@ export class AuthFacade implements OnDestroy {
     private user$ = new BehaviorSubject<User | null>(null);
     private session$ = new BehaviorSubject<Session | null>(null);
     private isLoading$ = new BehaviorSubject<boolean>(true);
+    private authStateSubscription?: { data: { subscription: { unsubscribe: () => void } } };
 
     constructor() {
         this.initAuthState();
@@ -23,7 +24,7 @@ export class AuthFacade implements OnDestroy {
         }
         this.isLoading$.next(false);
 
-        this.authService.onAuthStateChange((_event, session) => {
+        this.authStateSubscription = this.authService.onAuthStateChange((_event, session) => {
             this.session$.next(session);
             this.user$.next(session?.user ?? null);
         });
@@ -96,6 +97,7 @@ export class AuthFacade implements OnDestroy {
     }
 
     ngOnDestroy(): void {
+        this.authStateSubscription?.data.subscription.unsubscribe();
         this.user$.complete();
         this.session$.complete();
         this.isLoading$.complete();

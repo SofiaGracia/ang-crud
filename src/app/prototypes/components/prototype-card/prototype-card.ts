@@ -16,33 +16,67 @@ export class PrototypeCard implements OnInit, OnDestroy {
     private prototypesFacade = inject(PrototypesFacade);
     private sanitizer = inject(DomSanitizer);
     private router = inject(Router);
-    private abortController = new AbortController();
+    private abortController: AbortController | null = null;
 
     htmlContent = signal<SafeHtml | null>(null);
+    error = signal<string | null>(null);
 
     faEllipsis = faEllipsis;
 
     ngOnInit() {
-        const url = this.proto().url;
-        if (url) {
-            fetch(url, { signal: this.abortController.signal })
-                .then((res) => {
-                    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                    return res.text();
-                })
-                .then((html) => {
-                    const wrappedSrcdoc = this.buildSrcdoc(html);
-                    this.htmlContent.set(this.sanitizer.bypassSecurityTrustHtml(wrappedSrcdoc));
-                })
-                .catch((err) => {
-                    if (err.name === 'AbortError') return;
-                    console.error('Failed to fetch prototype preview', err);
-                });
-        }
+        this.fetchPreview();
     }
 
     ngOnDestroy() {
-        this.abortController.abort();
+        this.abortController?.abort();
+    }
+
+    private fetchPreview() {
+
+        const url = this.proto().url;
+        if (!url) return;
+
+        this.error.set(null);
+        this.htmlContent.set(null);
+
+        this.abortController?.abort();
+        const controller = new AbortController();
+        this.abortController = controller;
+
+        const timeoutId = setTimeout(() => controller.abort('timeout'), 10000);
+
+        fetch(url, { signal: controller.signal })
+            .then((res) => {
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                return res.text();
+            })
+            .then((html) => {
+                const wrappedSrcdoc = this.buildSrcdoc(html);
+                this.htmlContent.set(this.sanitizer.bypassSecurityTrustHtml(wrappedSrcdoc));
+                // this.htmlContent.set(null);
+                // this.error.set('On purpose error');
+
+            })
+            .catch((err) => {
+                if (err.name === 'AbortError') {
+                    if (
+                        controller === this.abortController &&
+                        controller.signal.reason === 'timeout'
+                    ) {
+                        this.error.set('Preview request timed out');
+                    }
+                    return;
+                }
+                console.error('Failed to fetch prototype preview', err);
+                this.error.set('Could not load preview');
+            })
+            .finally(() => {
+                clearTimeout(timeoutId);
+            });
+    }
+
+    retry() {
+        this.fetchPreview();
     }
 
     deleteProto(event: MouseEvent, id: number, projectId: number) {

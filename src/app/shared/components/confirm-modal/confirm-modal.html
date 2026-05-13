@@ -4,10 +4,11 @@
         <p class="py-4">{{ message() }}</p>
         <div class="modal-action">
             <form method="dialog">
-                <button class="btn" (click)="cancel.emit()">{{ cancelText() }}</button>
+                <button class="btn" data-testid="confirm-modal-cancel" (click)="cancel.emit()">{{ cancelText() }}</button>
             </form>
             <button
                 class="btn"
+                data-testid="confirm-modal-confirm"
                 [class.btn-error]="variant() === 'danger'"
                 [class.btn-warning]="variant() === 'warning'"
                 [class.btn-info]="variant() === 'info'"

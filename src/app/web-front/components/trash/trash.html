@@ -28,12 +28,12 @@
     } @else if (activeTab() === 'projects') {
         @if (trashedProjects().length === 0) {
             <div class="text-center py-12 text-base-content/60">
-                <p>No deleted projects</p>
+                <p data-testid="trash-empty-message">No deleted projects</p>
             </div>
         } @else {
             <div class="space-y-3">
                 @for (project of trashedProjects(); track project.id) {
-                    <div class="card bg-base-100 shadow-sm">
+                    <div class="card bg-base-100 shadow-sm" data-testid="trash-project-item">
                         <div class="card-body flex-row items-center justify-between p-4">
                             <div>
                                 <h2 class="font-semibold">{{ project.name }}</h2>
@@ -47,6 +47,7 @@
                                 <button
                                     class="btn btn-sm btn-ghost"
                                     title="Restore"
+                                    data-testid="trash-restore-button"
                                     (click)="restoreProject(project.id)"
                                 >
                                     <fa-icon [icon]="faRotateBack"></fa-icon>
@@ -54,6 +55,7 @@
                                 <button
                                     class="btn btn-sm btn-error btn-outline"
                                     title="Delete permanently"
+                                    data-testid="trash-delete-permanently"
                                     (click)="openDeleteModal(project.id, project.name, 'project')"
                                 >
                                     <fa-icon [icon]="faTrashCan"></fa-icon>

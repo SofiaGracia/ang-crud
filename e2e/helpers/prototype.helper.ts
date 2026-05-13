@@ -1,19 +1,29 @@
 import { expect, Page } from '@playwright/test';
 
-export async function createPrototype(page: Page) {
+export async function createPrototype(
+    page: Page,
+    name?: string,
+    fixturePath?: string,
+) {
+    const prototypeName = name ?? `Prototype ${Date.now()}`;
+    const filePath = fixturePath ?? 'e2e/fixtures/test.html';
 
-    // Open prototype creation form
     await page.click('[data-testid="add-prototype-button"]');
 
-    // Fill the specifications
-    await page.fill('[data-testid="dialog-name-input"]', `Prototype ${Date.now()}`);
-    await page.setInputFiles('[data-testid="prototype-html-file-input"]', 'e2e/fixtures/test.html');
+    await page.fill('[data-testid="dialog-name-input"]', prototypeName);
+    await page.setInputFiles('[data-testid="prototype-html-file-input"]', filePath);
 
     await page.click('[data-testid="dialog-submit-button"]');
 
-    const prototype = page.locator('[data-testid="prototype-card"]').first();
+    await expect(page.locator('[data-testid="prototype-dialog"]')).not.toBeVisible({
+        timeout: 5000,
+    });
 
-    await expect(prototype).toBeVisible({ timeout: 10000 });
+    const card = page
+        .locator('[data-testid="prototype-card"]')
+        .filter({ hasText: prototypeName });
 
-    return prototype;
+    await expect(card).toBeVisible({ timeout: 10000 });
+
+    return { card, name: prototypeName };
 }

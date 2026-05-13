@@ -3,29 +3,20 @@ import { createProject } from '../helpers/project.helper';
 import { createPrototype } from '../helpers/prototype.helper';
 
 test('project → prototype → render flow', async ({ page }) => {
-
     const projectName = `Flow Project ${Date.now()}`;
 
-    // PROJECT
-    const project = await createProject(page, projectName);
-    await project.click();
+    const { card: projectCard } = await createProject(page, projectName);
+    await projectCard.click();
 
-    // PROTOTYPE
-    const prototype = await createPrototype(page);
-    await prototype.click();
+    const { card: prototypeCard } = await createPrototype(page);
+    await prototypeCard.click();
 
-    // RENDER CHECK
     await page.click('[data-testid="prototype-tab-preview"]');
 
-    const frame = page.frameLocator(
-        '[data-testid="prototype-render-iframe"]'
-    );
+    const frame = page.frameLocator('[data-testid="prototype-render-iframe"]');
 
     await expect(frame.locator('body')).toContainText('Hello prototype');
 
-    // CODE TAB
     await page.click('[data-testid="prototype-tab-code"]');
-    await expect(
-        page.locator('[data-testid="prototype-code-view"]')
-    ).toBeVisible();
+    await expect(page.locator('[data-testid="prototype-code-view"]')).toBeVisible();
 });

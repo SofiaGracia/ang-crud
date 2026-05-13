@@ -6,6 +6,7 @@
     [submitFn]="onSubmit.bind(this)"
     [errorsFn]="errorsName.bind(this)"
     [onClose]="closeModal.bind(this)"
+    data-testid="prototype-dialog"
 >
     <h3 slot="title" class="text-lg font-bold">Create prototype</h3>
     <h4 slot="debug">{{ prototype() | json }}</h4>

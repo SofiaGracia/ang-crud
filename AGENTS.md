@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-Angular 21 standalone components application with Supabase backend, Tailwind CSS + DaisyUI for styling, and Vitest for testing.
+Angular 21 standalone components application with Supabase backend, Tailwind CSS + DaisyUI for styling, and Vitest for testing (via Angular's `@angular/build:unit-test` builder - use `ng test`, NOT `npx vitest` directly).
 
 ## Build / Lint / Test Commands
 
@@ -19,18 +19,8 @@ npm run build      # Production build
 
 ### Testing
 ```bash
-npm run test              # Run all tests (Vitest + Angular test runner)
-npm run test -- --run     # Run tests once (no watch mode)
-```
-
-To run a **single test file**, use Vitest directly:
-```bash
-npx vitest run src/app/app.spec.ts
-```
-
-To run a **single test** (test name match):
-```bash
-npx vitest run -t "should create the app"
+npm run test              # Run all tests (w/ watch mode)
+npm run test -- --run     # Run tests once (no watch)
 ```
 
 ### Code Quality
@@ -154,7 +144,7 @@ this.service.getData().subscribe({
 
 ### Testing
 
-- Use **Vitest** (configured in `tsconfig.spec.json`)
+- Use **Vitest** via `ng test` (configured in `tsconfig.spec.json`; Angular's `@angular/build:unit-test` builder runs Vitest internally)
 - Use Angular TestBed for component testing
 - Follow existing test patterns in `app.spec.ts`
 

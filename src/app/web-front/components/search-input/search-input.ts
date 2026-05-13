@@ -14,7 +14,7 @@ export class SearchInput {
     valuePlaceholder = input<string>('Buscar');
     searchedValue = output<string>();
     clearResults = output<void>();
-    debounceTime = input(3000);
+    debounceTime = input(300);
     initialValue = input<string>('');
 
     inputValue = linkedSignal<string>(() => this.initialValue());

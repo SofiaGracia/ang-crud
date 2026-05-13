@@ -1,4 +1,5 @@
-import { Component, inject, input, OnInit, signal, computed, ViewChild, ElementRef, HostListener } from '@angular/core';
+import { Component, DestroyRef, inject, input, OnInit, signal, computed, ViewChild, ElementRef, HostListener } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ProjectInterface } from '@projects/interfaces/project.interface';
 import { RouterLink } from '@angular/router';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
@@ -22,6 +23,7 @@ export class ProjectCard implements OnInit {
     private projectsFacade = inject(ProjectsFacade);
     private prototypesFacade = inject(PrototypesFacade);
     private authFacade = inject(AuthFacade);
+    private destroyRef = inject(DestroyRef);
     private elementRef = inject(ElementRef);
 
     faEllipsis = faEllipsis;
@@ -69,7 +71,9 @@ export class ProjectCard implements OnInit {
         const projectId = this.project().id;
         const userId = this.userId;
         if (projectId && userId) {
-            this.prototypesFacade.getPrototypesByProject(projectId).subscribe({
+            this.prototypesFacade.getPrototypesByProject(projectId).pipe(
+                takeUntilDestroyed(this.destroyRef),
+            ).subscribe({
                 next: (protos) => {
                     this.protoLength.set(protos.length);
                     this.first4prototypes.set(protos.slice(0, 4));

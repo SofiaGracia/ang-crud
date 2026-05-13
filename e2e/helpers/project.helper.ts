@@ -47,3 +47,16 @@ export async function restoreProjectFromTrash(page: Page, projectName: string) {
 
     await expect(trashedItem).not.toBeVisible({ timeout: 10000 });
 }
+
+export async function permanentDeleteProject(page: Page, projectName: string) {
+    const trashedItem = page
+        .locator('[data-testid="trash-project-item"]')
+        .filter({ hasText: projectName });
+
+    await expect(trashedItem).toBeVisible({ timeout: 10000 });
+
+    await trashedItem.locator('[data-testid="trash-delete-permanently"]').click();
+    await page.locator('[data-testid="confirm-modal-confirm"]').click();
+
+    await expect(trashedItem).not.toBeVisible({ timeout: 10000 });
+}

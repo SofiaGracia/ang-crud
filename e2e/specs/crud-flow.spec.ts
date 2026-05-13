@@ -1,5 +1,5 @@
 import { test, expect } from '@playwright/test';
-import { createProject, moveProjectToTrash, restoreProjectFromTrash } from '../helpers/project.helper';
+import { createProject, moveProjectToTrash, restoreProjectFromTrash, permanentDeleteProject } from '../helpers/project.helper';
 
 test.describe('Project CRUD persistence flow', () => {
     test('should create, persist after reload, trash, and restore a project', async ({ page }) => {
@@ -38,5 +38,26 @@ test.describe('Project CRUD persistence flow', () => {
             .filter({ hasText: projectName });
         await expect(restoredCard).toBeVisible({ timeout: 10000 });
         await expect(restoredCard).toContainText(projectName);
+    });
+
+    test('should permanently delete a project from trash', async ({ page }) => {
+        const projectName = `Permanent Delete ${Date.now()}`;
+
+        await createProject(page, projectName);
+        await moveProjectToTrash(page, projectName);
+        await page.goto('/projects/trash');
+
+        const trashedItem = page
+            .locator('[data-testid="trash-project-item"]')
+            .filter({ hasText: projectName });
+        await expect(trashedItem).toBeVisible({ timeout: 10000 });
+
+        await permanentDeleteProject(page, projectName);
+
+        await page.goto('/projects');
+        const projectCard = page
+            .locator('[data-testid="project-card"]')
+            .filter({ hasText: projectName });
+        await expect(projectCard).not.toBeVisible({ timeout: 10000 });
     });
 });

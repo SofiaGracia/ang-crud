@@ -1,7 +1,7 @@
 import { expect, Page } from '@playwright/test';
 
 export async function createProject(page: Page, projectName: string) {
-    await page.goto('http://localhost:4200/projects');
+    await page.goto('/projects');
 
     await page.click('[data-testid="create-project-button"]');
 

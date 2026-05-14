@@ -1,10 +1,9 @@
-import { JsonPipe } from '@angular/common';
 import { Component, ElementRef, input, viewChild } from '@angular/core';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
     selector: 'dialog-shell',
-    imports: [ReactiveFormsModule, JsonPipe],
+    imports: [ReactiveFormsModule],
     templateUrl: './dialog-shell.html',
 })
 export class DialogShell {

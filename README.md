@@ -29,6 +29,22 @@ A frontend prototyping workspace built with **Angular 21** and **Supabase**. Cre
 - **E2E testing** — Playwright tests covering critical user flows
 - **Prototype Analysis (Experimental)** — send HTML structure to a Supabase Edge Function for automated UI feedback
 
+### Create Project
+
+[![Create Project](assets/images/01_create_project_poster.png)](https://raw.githubusercontent.com/USERNAME/REPO/main/assets/videos/create-project.mp4)
+
+### Create Prototype and AI Analysis
+
+[![Create Prototype and AI Analysis](assets/images/02_create_prototype.png)](https://raw.githubusercontent.com/USERNAME/REPO/main/assets/videos/02_create_prototype_ai_analysis.mp4)
+
+### Restore from trash
+
+[![Restore from trash](assets/images/03_restore_from_trash.png)](https://raw.githubusercontent.com/USERNAME/REPO/main/assets/videos/03_restore_from_trash.mp4)
+
+### Recent
+
+[![Restore from trash](assets/images/04_recent.png)](https://raw.githubusercontent.com/USERNAME/REPO/main/assets/videos/04_recent.mp4)
+
 ---
 
 ## Prototype Analysis (Experimental)

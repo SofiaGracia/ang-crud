@@ -40,7 +40,7 @@
                 }
             </div>
 
-            <p>Invite others to collaborate on this {{ entityName() }}</p>
+            <!-- <p>Invite others to collaborate on this {{ entityName() }}</p> -->
 
             <textarea
                 class="textarea"
@@ -49,9 +49,9 @@
                 data-testid="dialog-description-textarea"
             ></textarea>
 
-            <div class="mt-5 mb-5">
+            <!-- <div class="mt-5 mb-5">
                 <span>{{ createForm().controls['name'].errors | json }}</span>
-            </div>
+            </div> -->
 
             <!-- Slot per contingut extra (drop zone) -->
             <ng-content select="[slot=extra]" />

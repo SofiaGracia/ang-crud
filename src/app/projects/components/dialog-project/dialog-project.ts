@@ -1,7 +1,6 @@
 import { Component, effect, inject, input, viewChild } from '@angular/core';
 import { ProjectSupabaseService } from '@projects/services/projectsSupabase.service';
 import { FormBuilder, Validators } from '@angular/forms';
-import { JsonPipe } from '@angular/common';
 import { Project, ProjectInterface } from '@projects/interfaces/project.interface';
 import { ProjectsFacade } from '@projects/facades/projects.facade';
 import { DialogBase } from '@shared/components/dialog.abstract';
@@ -10,7 +9,7 @@ import { AuthFacade } from '@auth/facades/auth.facade';
 
 @Component({
     selector: 'dialog-project',
-    imports: [DialogShell, JsonPipe],
+    imports: [DialogShell],
     templateUrl: './dialog-project.html',
 })
 export class DialogProject extends DialogBase<ProjectInterface> {

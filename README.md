@@ -31,19 +31,19 @@ A frontend prototyping workspace built with **Angular 21** and **Supabase**. Cre
 
 ### Create Project
 
-[![Create Project](assets/images/01_create_project_poster.png)](https://github.com/SofiaGracia/ProtoHub/master/assets/videos/01_create-project.mp4)
+[![Create Project](assets/images/01_create_project_poster.png)](https://github.com/SofiaGracia/ProtoHub/blob/master/assets/videos/01_create-project.mp4)
 
 ### Create Prototype and AI Analysis
 
-[![Create Prototype and AI Analysis](assets/images/02_create_prototype.png)](https://github.com/SofiaGracia/ProtoHub/master/assets/videos/02_create_prototype_ai_analysis.mp4)
+[![Create Prototype and AI Analysis](assets/images/02_create_prototype.png)](https://github.com/SofiaGracia/ProtoHub/blob/master/assets/videos/02_create_prototype_ai_analysis.mp4)
 
 ### Restore from trash
 
-[![Restore from trash](assets/images/03_restore_from_trash.png)](https://github.com/SofiaGracia/ProtoHub/master/assets/videos/03_restore_from_trash.mp4)
+[![Restore from trash](assets/images/03_restore_from_trash.png)](https://github.com/SofiaGracia/ProtoHub/blob/master/assets/videos/03_restore_from_trash.mp4)
 
 ### Recent
 
-[![Restore from trash](assets/images/04_recent.png)](https://github.com/SofiaGracia/ProtoHub/master/assets/videos/04_recent.mp4)
+[![Restore from trash](assets/images/04_recent.png)](https://github.com/SofiaGracia/ProtoHub/blob/master/assets/videos/04_recent.mp4)
 
 ---
 

@@ -1,8 +1,17 @@
 <div class="sidebar" [class.collapsed]="collapsed">
-    <button type="button" (click)="toggle()" class="mb-4">
-        <fa-icon [class.hidden]="collapsed" [icon]="faBars"></fa-icon>
-        <fa-icon [class.hidden]="!collapsed" [icon]="faTimes"></fa-icon>
-    </button>
+    <div class="flex items-center gap-2 mb-6 ml-2">
+        <button type="button" (click)="toggle()">
+            <fa-icon [icon]="faBars"></fa-icon>
+        </button>
+
+        <span
+            class="inline-block overflow-hidden whitespace-nowrap transition-all duration-300 text-xl font-bold"
+            [style.width.px]="collapsed ? 0 : 120"
+            [style.opacity]="collapsed ? 0 : 1"
+        >
+            ProtoHub
+        </span>
+    </div>
 
     <div class="nav-links">
         <ul>

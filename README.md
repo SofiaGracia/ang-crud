@@ -31,7 +31,7 @@ A frontend prototyping workspace built with **Angular 21** and **Supabase**. Cre
 
 ### Create Project
 
-[![Create Project](assets/images/01_create_project_poster.png)](https://raw.githubusercontent.com/USERNAME/REPO/main/assets/videos/create-project.mp4)
+[![Create Project](assets/images/01_create_project_poster.png)](https://github.com/SofiaGracia/ProtoHub/main/assets/videos/create-project.mp4)
 
 ### Create Prototype and AI Analysis
 

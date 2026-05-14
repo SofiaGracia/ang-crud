@@ -3,7 +3,7 @@ import { Component, Output, EventEmitter, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AuthFacade } from '@auth/facades/auth.facade';
 import { FaIconComponent } from '@fortawesome/angular-fontawesome';
-import { faBars, faTimes, faRightFromBracket, faUserAlt, faMoon, faSun } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faRightFromBracket, faUserAlt, faMoon, faSun } from '@fortawesome/free-solid-svg-icons';
 import { SIDEMENUOPTIONS } from '@web-front/constants/sidebar-options.constant';
 
 @Component({
@@ -60,7 +60,6 @@ export class FrontSidebar {
     user$ = this.authFacade.currentUser$;
 
     faBars = faBars;
-    faTimes = faTimes;
     faRightFromBracket = faRightFromBracket;
     faUser = faUserAlt;
     faMoon = faMoon;

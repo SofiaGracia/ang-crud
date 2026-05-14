@@ -106,6 +106,7 @@ export class PrototypesSupabaseService {
             .eq('project_id', projectId)
             .eq('id', prototypeId)
             .eq('user_id', userId)
+            .is('deleted_at', null)
             .maybeSingle();
 
         return from(promise).pipe(
@@ -136,9 +137,9 @@ export class PrototypesSupabaseService {
     getTrashedPrototypes(userId: string): Observable<PrototypeInterface[]> {
         const promise = this.supabase
             .from('prototypes')
-            .select('*')
+            .select('*, projects!inner(deleted_at)')
             .eq('user_id', userId)
-            .not('deleted_at', 'is', null)
+            .or('deleted_at.not.is.null,projects.deleted_at.not.is.null')
             .order('deleted_at', { ascending: false });
         return from(promise).pipe(
             map((response) => {
@@ -209,13 +210,57 @@ export class PrototypesSupabaseService {
         );
     }
 
+    bulkMoveToTrashByProject(projectId: number): Observable<void> {
+        const promise = this.supabase
+            .from('prototypes')
+            .update({ deleted_at: new Date().toISOString() } as any)
+            .eq('project_id', projectId)
+            .is('deleted_at', null);
+        return from(promise).pipe(
+            map((response) => {
+                if (response.error) {
+                    throw response.error;
+                }
+                return;
+            }),
+        );
+    }
+
+    bulkRestoreByProject(projectId: number): Observable<void> {
+        const promise = this.supabase
+            .from('prototypes')
+            .update({ deleted_at: null } as any)
+            .eq('project_id', projectId);
+        return from(promise).pipe(
+            map((response) => {
+                if (response.error) {
+                    throw response.error;
+                }
+                return;
+            }),
+        );
+    }
+
+    bulkPermanentDeleteByProject(projectId: number): Observable<void> {
+        const promise = this.supabase.from('prototypes').delete().eq('project_id', projectId);
+        return from(promise).pipe(
+            map((response) => {
+                if (response.error) {
+                    throw response.error;
+                }
+                return;
+            }),
+        );
+    }
+
     searchPrototypesByName(query: string, userId: string): Observable<PrototypeInterface[] | null> {
         const promise = this.supabase
             .from('prototypes')
-            .select('*')
+            .select('*, projects!inner(deleted_at)')
             .eq('user_id', userId)
             .ilike('name', `%${query}%`)
-            .is('deleted_at', null);
+            .is('deleted_at', null)
+            .is('projects.deleted_at', null);
         return from(promise).pipe(
             map((response) => {
                 return response.data ?? [];

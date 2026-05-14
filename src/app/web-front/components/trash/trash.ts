@@ -73,11 +73,8 @@ export class Trash implements OnInit {
     }
 
     restoreProject(id: number) {
-        this.projectsService.restoreProject(id).subscribe({
-            next: () => {
-                this.projectsFacade.clearCache();
-                this.loadTrash();
-            },
+        this.projectsFacade.restoreProjectFromTrash(id).subscribe({
+            next: () => this.loadTrash(),
             error: (err) => console.error('Error restoring project', err),
         });
     }
@@ -115,10 +112,8 @@ export class Trash implements OnInit {
     }
 
     permanentDeleteProject(id: number) {
-        this.projectsService.permanentDeleteProject(id).subscribe({
-            next: () => {
-                this.loadTrash();
-            },
+        this.projectsFacade.permanentDeleteProjectFromTrash(id).subscribe({
+            next: () => this.loadTrash(),
             error: (err) => console.error('Error deleting project', err),
         });
     }
